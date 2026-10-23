@@ -31,6 +31,16 @@ export async function waitForForm(page: Page): Promise<void> {
   await expect(page.locator('form[data-hydrated]')).toBeAttached()
 }
 
+/** Log in through the form straight to `landing` (an account page, not the map-heavy dashboard). */
+export async function logIn(page: Page, email: string, password: string, landing = '/tili') {
+  await page.goto(`/kirjaudu?next=${encodeURIComponent(landing)}`)
+  await waitForForm(page)
+  await page.getByLabel('Sähköposti').fill(email)
+  await page.getByLabel('Salasana', { exact: true }).fill(password)
+  await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
+  await expect(page).toHaveURL(landing)
+}
+
 /** "Kirjaudu ulos" from the app header's account menu (MV-050); lands on `/kirjauduttu-ulos`. */
 export async function logOut(page: Page): Promise<void> {
   const item = page.getByRole('menuitem', { name: 'Kirjaudu ulos' })

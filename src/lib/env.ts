@@ -15,6 +15,8 @@ export const env = createEnv({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     DATABASE_URL: z.url().startsWith('postgres'),
     PAYLOAD_SECRET: z.string().min(16),
+    /** HS256 key of the app's signed links (`lib/tokens.ts`, `01 §9`); unset = derived from `PAYLOAD_SECRET`. */
+    TOKEN_SECRET: z.string().min(32).optional(),
     WFS_BASE_URL: z.url(),
     WFS_LAYER: z.string().min(1).default('v1:forestusedeclaration'),
     CRON_SECRET: z.string().min(8),

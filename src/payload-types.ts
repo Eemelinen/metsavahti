@@ -182,6 +182,11 @@ export interface User {
    */
   verificationSentAt?: string | null;
   /**
+   * Vaihdetaan tilin osoitteeksi, kun käyttäjä avaa uuteen osoitteeseen lähetetyn linkin.
+   */
+  pendingEmail?: string | null;
+  pendingEmailTokenId?: string | null;
+  /**
    * Poistotyön merkki; rivi poistetaan pysyvästi työn lopussa.
    */
   deletedAt?: string | null;
@@ -751,6 +756,8 @@ export interface UsersSelect<T extends boolean = true> {
       };
   plan?: T;
   verificationSentAt?: T;
+  pendingEmail?: T;
+  pendingEmailTokenId?: T;
   deletedAt?: T;
   updatedAt?: T;
   createdAt?: T;

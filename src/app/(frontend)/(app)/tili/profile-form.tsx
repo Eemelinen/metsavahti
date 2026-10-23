@@ -21,6 +21,7 @@ import {
 } from '@/lib/account/account-schema'
 
 import { updateProfile } from './actions'
+import { EmailChangeField } from './email-change-field'
 
 const copy = fi.account.profile
 
@@ -34,16 +35,18 @@ function FieldError({ id, children }: { id: string; children?: string }) {
 }
 
 /**
- * The `/tili` profile card (App artboard `tili`): the address with "Vaihda" (the change flow
- * arrives with MV-052, until then the button is disabled), name, language and time zone, and
- * "Tallenna". A save refreshes the page so the header's initials follow the new name.
+ * The `/tili` profile card (App artboard `tili`): the address with "Vaihda" (its own change
+ * flow, `EmailChangeField`, MV-052), name, language and time zone, and "Tallenna". A save
+ * refreshes the page so the header's initials follow the new name.
  */
 export function ProfileForm({
   email,
+  pendingEmail,
   defaults,
   timezones,
 }: {
   email: string
+  pendingEmail: string | null
   defaults: ProfileFormValues
   timezones: string[]
 }) {
@@ -87,31 +90,7 @@ export function ProfileForm({
       <FormSuccess>{status && 'saved' in status ? copy.saved : null}</FormSuccess>
       <FormError>{status && 'error' in status ? status.error : null}</FormError>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="email">{copy.email}</Label>
-        <div className="flex flex-wrap gap-2">
-          <Input
-            aria-describedby="email-hint"
-            className="min-w-50 flex-1"
-            id="email"
-            readOnly
-            type="email"
-            value={email}
-          />
-          <Button
-            aria-describedby="email-hint"
-            className="h-12 px-3.5 font-semibold"
-            disabled
-            type="button"
-            variant="outline"
-          >
-            {copy.changeEmail}
-          </Button>
-        </div>
-        <p className="text-sm text-ink-muted" id="email-hint">
-          {copy.emailHint} {copy.changeEmailSoon}
-        </p>
-      </div>
+      <EmailChangeField email={email} pendingEmail={pendingEmail} />
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="name">

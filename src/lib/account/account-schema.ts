@@ -15,7 +15,7 @@ export const LOCALES = ['fi', 'en'] as const
  * Input of the `updateProfile` Server Action (`/tili`, E04 MV-051). Browser-safe: the form
  * validates with it before the round trip and the action again. An empty name clears it
  * (`users.name` is optional); the address is not part of the profile, it changes through its
- * own confirmation flow (MV-052).
+ * own confirmation flow (`changeEmailFormSchema`, MV-052).
  */
 export const profileFormSchema = z.object({
   name: z.string().trim().max(MAX_NAME_LENGTH, profileCopy.nameTooLong),
@@ -26,6 +26,18 @@ export const profileFormSchema = z.object({
 export type ProfileFormValues = z.infer<typeof profileFormSchema>
 export type ProfileField = keyof ProfileFormValues
 export type ProfileFieldErrors = Partial<Record<ProfileField, string>>
+
+/**
+ * Input of the `requestEmailChange` Server Action (`/tili` "Vaihda", E04 MV-052): the new
+ * address, lower-cased like registration's. Whether it differs from the current one is
+ * checked on the server, which knows the account.
+ */
+export const changeEmailFormSchema = z.object({
+  // Trimmed before the format check: a pasted address often brings a trailing space.
+  email: z.string().trim().toLowerCase().pipe(z.email(profileCopy.emailInvalid)),
+})
+
+export type ChangeEmailFormValues = z.infer<typeof changeEmailFormSchema>
 
 /**
  * Input of the `changePassword` Server Action (`/tili/turvallisuus`): the current password

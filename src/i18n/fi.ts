@@ -159,7 +159,9 @@ export const fi = {
       email: 'Sähköposti',
       changeEmail: 'Vaihda',
       emailHint: 'Uusi osoite vahvistetaan sähköpostilla ennen käyttöönottoa.',
-      changeEmailSoon: 'Osoitteen vaihto avautuu pian.',
+      emailChangeSent: 'Lähetimme vahvistuslinkin uuteen osoitteeseen. Linkki on voimassa tunnin.',
+      emailPending: (email: string) =>
+        `Odottaa vahvistusta: ${email}. Nykyinen osoite on käytössä, kunnes uusi vahvistetaan.`,
       name: 'Nimi',
       optional: '(valinnainen)',
       locale: 'Kieli',
@@ -171,6 +173,25 @@ export const fi = {
         nameTooLong: 'Nimi voi olla enintään 100 merkkiä',
         localeInvalid: 'Valitse kieli',
         timezoneInvalid: 'Valitse aikavyöhyke',
+        emailInvalid: 'Anna kelvollinen sähköpostiosoite',
+        emailSame: 'Tämä on jo tilisi osoite.',
+      },
+    },
+    emailChange: {
+      changed: {
+        title: 'Sähköpostiosoite vaihdettu',
+        body: 'Kirjaudu jatkossa osoitteella',
+        cta: 'Siirry tiliin',
+      },
+      invalid: {
+        title: 'Linkki ei ole voimassa',
+        body: 'Vahvistuslinkki on vanhentunut, jo käytetty tai korvattu uudemmalla. Tilisi osoite ei ole vaihtunut. Voit pyytää uuden linkin tilin asetuksista.',
+        cta: 'Tilin asetuksiin',
+      },
+      taken: {
+        title: 'Osoite on jo käytössä',
+        body: 'Osoitteella on jo toinen Metsävahti-tili, joten tilisi osoite ei vaihtunut.',
+        cta: 'Tilin asetuksiin',
       },
     },
     password: {
@@ -220,6 +241,28 @@ export const fi = {
       cta: 'Aseta uusi salasana',
       note: 'Jos et pyytänyt salasanan vaihtoa, salasanasi ei ole vaihtunut eikä sinun tarvitse tehdä mitään. Halutessasi voit kirjata ulos muut laitteet tilin turvallisuusasetuksista.',
       footerWhy: 'Saat tämän viestin, koska salasanan palautusta pyydettiin tilillesi.',
+    },
+    changeEmail: {
+      subject: 'Vahvista uusi sähköpostiosoite',
+      preview: 'Vahvista uusi sähköpostiosoitteesi',
+      badge: 'Turvallisuus',
+      heading: 'Vahvista uusi sähköpostiosoite',
+      lead: (email: string) =>
+        `Tilisi sähköpostiosoitteeksi pyydettiin vaihtoa osoitteeseen ${email}. Vahvista vaihto painikkeesta. Vanha osoite pysyy käytössä, kunnes vahvistus on tehty. Linkki on voimassa tunnin.`,
+      cta: 'Vahvista uusi osoite',
+      note: 'Jos et pyytänyt vaihtoa, jätä viesti huomiotta; osoite ei vaihdu. Lähetimme tiedon myös vanhaan osoitteeseen.',
+      footerWhy: 'Saat tämän viestin, koska tilisi sähköpostiosoitteen vaihtoa pyydettiin.',
+    },
+    emailChangeNotice: {
+      subject: 'Sähköpostiosoitteen vaihtoa pyydettiin',
+      preview: 'Tilisi sähköpostiosoitteen vaihtoa pyydettiin',
+      badge: 'Turvallisuus',
+      heading: 'Sähköpostiosoitteen vaihtoa pyydettiin',
+      lead: (email: string) =>
+        `Tilisi sähköpostiosoitteeksi pyydettiin vaihtoa osoitteeseen ${email}. Osoite vaihtuu vasta, kun vaihto vahvistetaan uuteen osoitteeseen lähetetystä linkistä; siihen asti kirjaudut tällä osoitteella.`,
+      cta: 'Avaa turvallisuusasetukset',
+      note: 'Jos et pyytänyt vaihtoa, vaihda salasanasi ja kirjaa muut laitteet ulos turvallisuusasetuksista.',
+      footerWhy: 'Saat tämän viestin, koska tilisi sähköpostiosoitteen vaihtoa pyydettiin.',
     },
   },
   forms: {

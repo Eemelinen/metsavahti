@@ -202,6 +202,33 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      // Email change (MV-052): the requested new address waits here until the link sent to it
+      // is opened; `email` stays the login address until then. Only the server writes it.
+      name: 'pendingEmail',
+      type: 'email',
+      label: 'Odottava sähköpostiosoite',
+      access: {
+        create: isAdminField,
+        update: isAdminField,
+      },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'Vaihdetaan tilin osoitteeksi, kun käyttäjä avaa uuteen osoitteeseen lähetetyn linkin.',
+      },
+    },
+    {
+      // `jti` of the newest email-change link: only that link applies the change, and only once.
+      name: 'pendingEmailTokenId',
+      type: 'text',
+      hidden: true,
+      access: {
+        create: isAdminField,
+        update: isAdminField,
+      },
+    },
+    {
       name: 'deletedAt',
       type: 'date',
       label: 'Poisto aloitettu',
