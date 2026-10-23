@@ -955,8 +955,8 @@
         "2026-10-23 pnpm test:integration tests/integration/app-layout-sidebar-bottom-tabs.int.test.ts → pass (working tree on e0243f7, Docker available)",
         "2026-10-23 pnpm test:e2e tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts → pass (working tree on e0243f7, Docker available, CI=1: next start on the last build, retries 2)"
       ],
-      "attempts": 0,
-      "notes": "Tests (ticket): unit render at two viewports; E2E nav on Mobile Chrome."
+      "attempts": 1,
+      "notes": "Tests (ticket): unit render at two viewports; E2E nav on Mobile Chrome. Attempt 1 failed 2026-10-23: evaluator: Revise"
     },
     {
       "id": "F-051",
