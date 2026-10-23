@@ -80,6 +80,20 @@ describe('feature_list.json (harness state)', () => {
     }
     expect(() => validateFeatureList(unlabelled)).toThrow(/L1: /)
   })
+
+  it('rejects a "--" before the test file unless the feature already passed', () => {
+    const step = 'L1: pnpm test:unit -- tests/unit/a.test.ts (it works)'
+    expect(() =>
+      validateFeatureList(listWith([feature({ id: 'F-001', verification: [step] })])),
+    ).toThrow(/drop the "--"/)
+    expect(() =>
+      validateFeatureList(
+        listWith([
+          feature({ id: 'F-001', status: 'passing', verification: [step], evidence: ['ran'] }),
+        ]),
+      ),
+    ).not.toThrow()
+  })
 })
 
 describe('depends_on rules', () => {

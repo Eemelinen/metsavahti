@@ -40,7 +40,7 @@ sequenceDiagram
     participant D as Driver (harness-loop.ts)
     participant G as Generator session (claude -p)
     participant S as Scripts (harness-feature / verify / clean-state)
-    participant E as Evaluator session (claude -p --agent evaluator)
+    participant E as Evaluator session (claude -p + evaluator.md as system prompt)
     participant GH as GitHub (gh)
 
     D->>D: preflight: main clean & in sync, harness:check, Docker, db:up, gh, claude + one probe request per configured model
@@ -86,21 +86,21 @@ stateDiagram-v2
 
 ## 3. What each safeguard catches
 
-| Safeguard                                           | Catches                                                                                                                                                                                          | Where                                                       |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| Permission allow rules (`--allowedTools`, settings) | The known-good pnpm/git path runs without prompts or classifier round-trips                                                                                                                      | `harness.config.json`, `.claude/settings.json`              |
-| Auto-mode classifier                                | Anything not on the allowlist is reviewed by a second model; `--permission-prompts none` denies what would have prompted                                                                         | Claude Code                                                 |
-| Deny rules                                          | `.env`, generated files, `db:reset`, `compose down -v`, force push, `reset --hard` — in every mode                                                                                               | `.claude/settings.json`                                     |
-| `guard.sh` (PreToolUse)                             | Bare `vitest`/`playwright`, npm/yarn/npx, destructive git, `rm -rf`; invalid `feature_list.json` before a commit; in loop mode also `db:up/down`, `git push`, `checkout main`, worktree commands | `.claude/hooks/guard.sh`                                    |
-| `harness:check` (validator)                         | Two `in_progress`, `passing` without evidence, unknown or cyclic `depends_on`, `in_progress` with unmet deps                                                                                     | runs from unit tests, lint-staged, the guard and the driver |
-| `harness:verify`                                    | A layer skipped or run out of order; Docker missing for L2/L3; `manual:` steps waived unattended                                                                                                 | the only way a feature becomes `passing`                    |
-| `clean-state-check.sh`                              | Dirty tree, `.only`/`.skip`, lowered thresholds, `console.log`, missing PROGRESS.md update, staged `.env`, broken AGENTS.md marker, broken `init.sh`                                             | clock-out, Stop hook, driver post-check                     |
-| Stop hook (`stop-guard.sh`, loop only)              | A session ending with an unverified or uncommitted feature (max 3 blocks, respects `stop_hook_active`)                                                                                           | `.claude/hooks/stop-guard.sh`                               |
-| Driver post-check                                   | A transcript that claims success while the branch says otherwise (status, clean-state, no commits)                                                                                               | `scripts/harness-loop.ts`                                   |
-| Evaluator (fresh context, read-only)                | Work that passes its own tests but misses the behaviour, scope creep, stale evidence, bad handoff                                                                                                | `.claude/agents/evaluator.md`, `evaluator-rubric.md`        |
-| Caps                                                | Runaway sessions: turns, budget, wall clock, attempts, consecutive failures                                                                                                                      | `harness.config.json`                                       |
-| CI on the PR                                        | Everything again on a clean runner (lint → typecheck → unit → integration → build → e2e)                                                                                                         | `.github/workflows/ci.yml`                                  |
-| Design-system lint                                  | Arbitrary Tailwind values, raw palette colours, unknown classes, inline styles                                                                                                                   | `eslint.config.mjs`, part of L1                             |
+| Safeguard                                           | Catches                                                                                                                                                                                                                                                                                                        | Where                                                       |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Permission allow rules (`--allowedTools`, settings) | The known-good pnpm/git path runs without prompts or classifier round-trips                                                                                                                                                                                                                                    | `harness.config.json`, `.claude/settings.json`              |
+| Auto-mode classifier                                | Anything not on the allowlist is reviewed by a second model; `--permission-prompts none` denies what would have prompted                                                                                                                                                                                       | Claude Code                                                 |
+| Deny rules                                          | `.env`, generated files, `db:reset`, `compose down -v`, force push, `reset --hard` — in every mode                                                                                                                                                                                                             | `.claude/settings.json`                                     |
+| `guard.sh` (PreToolUse)                             | Bare `vitest`/`playwright`, npm/yarn/npx, destructive git, `rm -rf`; invalid `feature_list.json` before a commit; in loop mode also `db:up/down`, `git push`, `checkout main`, worktree commands, and writes outside the worktree (Edit/Write outside it or the temp dir; Bash writes into the home directory) | `.claude/hooks/guard.sh`                                    |
+| `harness:check` (validator)                         | Two `in_progress`, `passing` without evidence, unknown or cyclic `depends_on`, `in_progress` with unmet deps                                                                                                                                                                                                   | runs from unit tests, lint-staged, the guard and the driver |
+| `harness:verify`                                    | A layer skipped or run out of order; Docker missing for L2/L3; `manual:` steps waived unattended                                                                                                                                                                                                               | the only way a feature becomes `passing`                    |
+| `clean-state-check.sh`                              | Dirty tree, `.only`/`.skip`, lowered thresholds, `console.log`, missing PROGRESS.md update, staged `.env`, broken AGENTS.md marker, broken `init.sh`                                                                                                                                                           | clock-out, Stop hook, driver post-check                     |
+| Stop hook (`stop-guard.sh`, loop only)              | A session ending with an unverified or uncommitted feature (max 3 blocks, respects `stop_hook_active`)                                                                                                                                                                                                         | `.claude/hooks/stop-guard.sh`                               |
+| Driver post-check                                   | A transcript that claims success while the branch says otherwise (status, clean-state, no commits)                                                                                                                                                                                                             | `scripts/harness-loop.ts`                                   |
+| Evaluator (fresh context, read-only)                | Work that passes its own tests but misses the behaviour, scope creep, stale evidence, bad handoff                                                                                                                                                                                                              | `.claude/agents/evaluator.md`, `evaluator-rubric.md`        |
+| Caps                                                | Runaway sessions: turns, budget, wall clock, attempts, consecutive failures                                                                                                                                                                                                                                    | `harness.config.json`                                       |
+| CI on the PR                                        | Everything again on a clean runner (lint → typecheck → unit → integration → build → e2e)                                                                                                                                                                                                                       | `.github/workflows/ci.yml`                                  |
+| Design-system lint                                  | Arbitrary Tailwind values, raw palette colours, unknown classes, inline styles                                                                                                                                                                                                                                 | `eslint.config.mjs`, part of L1                             |
 
 ## 4. Operating the loop
 
@@ -111,7 +111,9 @@ browsers installed (`pnpm exec playwright install chromium webkit`). On Windows:
 add `%USERPROFILE%\.local\bin` to `Path`), and run the driver from Git Bash; it runs `pnpm` through
 node there because the `pnpm.cmd` shim cannot be spawned without a shell. Desktop notifications are
 macOS-only. With `merge: "auto"`, `main` needs branch protection with required CI checks, or GitHub
-merges the PR before CI runs.
+merges the PR before CI runs. Run `claude` interactively in the repository once and accept the trust
+dialog; until then Claude Code ignores the `permissions.allow` list in `.claude/settings.json` and
+the sessions rely on `allowedTools` from `harness.config.json` alone.
 
 **Commands**
 
@@ -130,10 +132,21 @@ merges the PR before CI runs.
 Run it in tmux; the driver prints one line per assistant message and tool call and sends a macOS
 notification at every terminal state (PR ready, blocked, queue empty, failure cap).
 
-**Reading a run.** `.harness/traces/F-NNN-<timestamp>.generator.jsonl` is the full stream
-(`--include-hook-events`, so hook blocks are visible); the `result` line at the end carries
-`num_turns`, `total_cost_usd`, `permission_denials`. The evaluator's JSON is next to it. The PR body
-repeats the evidence lines, the verdict table and the cost.
+**Reading a run.** The console and `.harness/traces/F-NNN-<timestamp>.log` show the same readable
+log (`scripts/harness-events.ts` formats the stream):
+
+- every tool call with its target (`bash: <description> · <command>`, `edit: src/…`, `skill: /clock-in F-046`)
+- milestones with their outcome: `▶ … started`, then `✓` done, `⚠` reported failures (output said so
+  despite exit 0), `✗` failed, or `…` continues in the background. Milestones are activate, verify,
+  `pnpm check`, each test layer, the clean-state check and commits.
+- `⛔` lines for hook blocks and denials with their reason, and `✗` for any failed tool call
+- a heartbeat every 5 minutes (elapsed time, turns, output tokens, what is still running)
+- the post-check problems, the evaluator's scores and findings, each CI check as it finishes, and the merge
+
+`.harness/traces/F-NNN-<timestamp>.generator.jsonl` is the full stream (`--include-hook-events`, so hook
+blocks are visible); the `result` line at the end carries `num_turns`, `total_cost_usd`,
+`permission_denials`. The evaluator's JSON is next to it. The PR body repeats the evidence lines, the
+verdict table and the cost.
 
 **Intervening.** Merge or close the PR (a closed PR stops the loop for that feature); unblock a feature
 with `pnpm harness:feature unblock F-NNN` after fixing the cause; edit the ticket or the deviations
@@ -142,8 +155,9 @@ ledger and re-import; lower or raise the caps in `harness.config.json`; add an a
 compare the evaluator's scores with your own and record the rubric change in its tuning log.
 
 **Cost expectations.** A small library feature (unit tests only) runs in 20–60 turns and a few dollars;
-a cross-component feature with L2/L3 can use most of the 200-turn / 15 USD / 60-minute caps. The
-evaluator is capped at 60 turns / 4 USD.
+a cross-component feature with L2/L3 can use a large part of the caps in `harness.config.json`
+(currently 300 turns / 25 USD / 90 minutes per session). F-046, the first run on Windows, took two
+attempts, 140 minutes and about 14 USD in total. The evaluator is capped at 60 turns / 4 USD.
 
 ## 5. Limits and the next stage
 
@@ -163,4 +177,5 @@ evaluator is capped at 60 turns / 4 USD.
   `in_progress` features and a per-worker WIP=1. The swarm schedule in
   [../product/04-delivery-plan.md](../product/04-delivery-plan.md) is the target shape for that stage.
 
-Phase-2 brief and history: [phase-2-automated-loop.md](phase-2-automated-loop.md).
+Phase-2 brief and history: [phase-2-automated-loop.md](phase-2-automated-loop.md). Copying the
+harness into another repository: [porting-guide.md](porting-guide.md).

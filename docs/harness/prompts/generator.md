@@ -11,13 +11,18 @@ Follow the session loop exactly:
    feature's scope; a narrow supporting fix is fine, a second feature is not.
 3. `/verify-feature {{FEATURE_ID}}` — never pass `--allow-manual`; if the feature has a manual step it is not
    yours to finish (block it, see below).
-4. `/clock-out` — commit on this branch with a conventional subject and a body that explains why. Do not push:
-   the driver pushes and opens the pull request.
+4. Clock out by following AGENTS.md → Clock-out and `.claude/skills/clock-out/SKILL.md` step by step yourself.
+   The `/clock-out` skill is user-only (`disable-model-invocation`), so do not call it through the Skill tool;
+   this prompt is the user's explicit request to run its steps. Commit on this branch with a conventional
+   subject and a body that explains why. Do not push: the driver pushes and opens the pull request.
 
 Rules for unattended runs:
 
 - Never run `pnpm db:up`, `pnpm db:down`, `docker compose …`, `git push`, `git checkout main` or `git worktree …`;
   Docker services are already running and the guard hook blocks these anyway.
+- Never change the host outside this worktree (no files in the home directory, no PATH or shell-profile
+  edits, no global installs). If the machine itself is broken (a tool missing from PATH, wrong Node
+  version), describe it in `PROGRESS.md` and block the feature; a human fixes the host.
 - Never ask a question. Pick the simplest interpretation that satisfies the spec, implement it, and record the
   choice in `PROGRESS.md` and, when it deviates from the spec, in `docs/product/00-deviations.md`.
 - If you cannot finish (missing API key, spec conflict you cannot resolve, a layer that fails for reasons outside

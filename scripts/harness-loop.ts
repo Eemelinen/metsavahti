@@ -30,6 +30,7 @@ import { parseArgs } from 'node:util'
 
 import { z } from 'zod'
 
+import { describeEvent, heartbeat, newStreamState } from './harness-events'
 import {
   FEATURE_LIST_PATH,
   isHumanOnly,
@@ -92,8 +93,14 @@ interface Options {
 // Small helpers
 // ---------------------------------------------------------------------------------------
 
-const log = (line: string) =>
-  console.log(`[harness ${new Date().toISOString().slice(11, 19)}] ${line}`)
+/** Human-readable log of the current feature (`.harness/traces/F-NNN-<time>.log`), next to the traces. */
+let logFile: string | undefined
+
+const log = (line: string) => {
+  const stamped = `[harness ${new Date().toISOString().slice(11, 19)}] ${line}`
+  console.log(stamped)
+  if (logFile) appendFileSync(logFile, `${stamped}\n`)
+}
 
 /**
  * On Windows `pnpm` is a `.cmd` shim that spawnSync cannot run without a shell, and a shell
@@ -194,26 +201,20 @@ function runClaude(run: ClaudeRun): Promise<ClaudeResult> {
       setTimeout(() => child.kill('SIGTERM'), 30_000).unref()
     }, run.wallClockMs)
 
+    const state = newStreamState(run.cwd)
+    const beat = run.stream ? setInterval(() => log(heartbeat(state)), 5 * 60_000) : undefined
+
     const handleLine = (line: string) => {
       if (!line.trim()) return
       trace.write(`${line}\n`)
+      let msg: Record<string, unknown>
       try {
-        const msg = JSON.parse(line) as Record<string, unknown>
-        if (msg.type === 'result') result = msg
-        if (msg.type === 'assistant') {
-          const message = msg.message as
-            { content?: { type: string; text?: string; name?: string }[] } | undefined
-          for (const block of message?.content ?? []) {
-            if (block.type === 'text' && block.text)
-              log(`claude: ${block.text.replace(/\s+/g, ' ').slice(0, 160)}`)
-            if (block.type === 'tool_use') log(`tool: ${block.name}`)
-          }
-        }
-        if (msg.type === 'system' && msg.subtype === 'permission_denied')
-          log(`permission denied: ${line.slice(0, 200)}`)
+        msg = JSON.parse(line) as Record<string, unknown>
       } catch {
-        // non-JSON line (e.g. a warning); kept in the trace
+        return // non-JSON line (e.g. a warning); kept in the trace
       }
+      if (msg.type === 'result') result = msg
+      for (const out of describeEvent(msg, state)) log(out)
     }
 
     child.stdout?.on('data', (chunk: Buffer) => {
@@ -228,11 +229,14 @@ function runClaude(run: ClaudeRun): Promise<ClaudeResult> {
       for (const line of lines) handleLine(line)
     })
     child.stderr?.on('data', (chunk: Buffer) => {
-      trace.write(`[stderr] ${chunk.toString()}`)
-      process.stderr.write(chunk)
+      // A JSON result file (evaluator) must stay parseable; stderr goes to the readable log.
+      if (run.stream) trace.write(`[stderr] ${chunk.toString()}`)
+      for (const line of chunk.toString().split('\n'))
+        if (line.trim()) log(`stderr: ${line.trim().slice(0, 300)}`)
     })
     child.on('close', (code) => {
       clearTimeout(timer)
+      if (beat) clearInterval(beat)
       currentChild = undefined
       if (run.stream && buffer) handleLine(buffer)
       if (!run.stream && raw.trim()) {
@@ -331,6 +335,8 @@ interface PostCheck {
   status: Feature['status'] | 'missing'
   feature?: Feature
   problems: string[]
+  /** Commits on the feature branch that are not on main. */
+  ahead: number
 }
 
 function postCheck(dir: string): PostCheck {
@@ -366,7 +372,7 @@ function postCheck(dir: string): PostCheck {
     sh('git', ['rev-list', '--count', 'main..HEAD'], { cwd: dir, quiet: true }).out || 0,
   )
   if (ahead === 0) problems.push('no commits on the branch')
-  return { ok: problems.length === 0, status, feature, problems }
+  return { ok: problems.length === 0, status, feature, problems, ahead }
 }
 
 // ---------------------------------------------------------------------------------------
@@ -390,9 +396,43 @@ function parseVerdict(result: Record<string, unknown> | undefined): Verdict | un
   return {
     verdict: verdict as Verdict['verdict'],
     scores: {},
-    findings: [{ severity: 'major', note: text.slice(0, 2000) }],
+    findings: [{ severity: 'major', note: text.slice(0, 12_000) }],
     required_follow_up: [],
   }
+}
+
+/**
+ * The evaluator subagent's instructions and tools from `.claude/agents/evaluator.md`. The driver
+ * passes them with `--append-system-prompt` / `--tools` instead of `--agent evaluator`, because
+ * `claude -p --agent` ignores `--json-schema` and returns prose (seen on the F-046 run).
+ */
+function evaluatorAgent(): { instructions: string; tools: string } {
+  const text = readFileSync(path.join(ROOT, '.claude/agents/evaluator.md'), 'utf8')
+  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/.exec(text)
+  if (!match) throw new Error('.claude/agents/evaluator.md has no frontmatter')
+  const tools = /^tools:\s*(.+)$/m.exec(match[1] ?? '')?.[1] ?? 'Read, Glob, Grep, Bash'
+  return {
+    instructions: (match[2] ?? '').trim(),
+    tools: tools
+      .split(',')
+      .map((t) => t.trim())
+      .join(','),
+  }
+}
+
+/** Score line plus one line per finding, for the console and the readable log. */
+function verdictLines(v: Verdict): string[] {
+  const scores = Object.entries(v.scores)
+    .map(([k, s]) => `${k} ${s}`)
+    .join(' · ')
+  return [
+    `verdict ${v.verdict}${scores ? ` — ${scores}` : ' (unstructured)'}`,
+    ...v.findings.map(
+      (f) =>
+        `${f.severity}${f.file ? ` ${f.file}${f.line ? `:${f.line}` : ''}` : ''}: ${f.note.replace(/\s+/g, ' ').slice(0, 200)}`,
+    ),
+    ...v.required_follow_up.map((s) => `follow-up: ${s.replace(/\s+/g, ' ').slice(0, 200)}`),
+  ]
 }
 
 function verdictMarkdown(v: Verdict): string {
@@ -465,9 +505,14 @@ async function runFeature(
   opts: Options,
 ): Promise<IterationOutcome> {
   const id = feature.id
-  const dir = ensureWorktree(config, id, opts.dryRun)
   const started = Date.now()
   const stamp = () => new Date().toISOString().replace(/[:.]/g, '-')
+  if (!opts.dryRun) {
+    logFile = path.join(ROOT, config.traceDir, `${id}-${stamp()}.log`)
+    mkdirSync(path.dirname(logFile), { recursive: true })
+    log(`${id} — ${feature.title}; readable log: ${path.relative(ROOT, logFile)}`)
+  }
+  const dir = ensureWorktree(config, id, opts.dryRun)
   const generatorTemplate = readFileSync(
     path.join(ROOT, 'docs/harness/prompts/generator.md'),
     'utf8',
@@ -527,7 +572,7 @@ async function runFeature(
         `would then: post-check (feature status, clean-state --require-terminal, commits ahead of main)`,
       )
       console.log(
-        `  claude -p "<evaluator prompt>" --agent evaluator --permission-mode ${config.generator.permissionMode} --permission-prompts none --max-turns ${config.evaluator.maxTurns} --max-budget-usd ${config.evaluator.maxBudgetUsd} --model ${config.evaluator.model}${config.evaluator.effort ? ` --effort ${config.evaluator.effort}` : ''} --output-format json --json-schema <docs/harness/prompts/evaluator-schema.json>`,
+        `  claude -p "<evaluator prompt>" --append-system-prompt "<.claude/agents/evaluator.md body>" --tools ${evaluatorAgent().tools} --permission-mode ${config.generator.permissionMode} --permission-prompts none --max-turns ${config.evaluator.maxTurns} --max-budget-usd ${config.evaluator.maxBudgetUsd} --model ${config.evaluator.model}${config.evaluator.effort ? ` --effort ${config.evaluator.effort}` : ''} --output-format json --json-schema <docs/harness/prompts/evaluator-schema.json>`,
       )
       log(
         `would then: git push -u origin ${branchFor(id)} && gh pr create --base main --head ${branchFor(id)} …; merge policy ${opts.autoMerge ? 'auto' : config.merge}`,
@@ -583,7 +628,8 @@ async function runFeature(
 
     if (!check.ok) {
       const summary = check.problems.join('; ')
-      log(`post-check failed: ${summary}`)
+      log(`post-check failed (${check.problems.length} problem(s)):`)
+      for (const problem of check.problems) log(`  ✗ ${problem}`)
       context = `The previous session ended in a bad state: ${summary}. The session result was: ${describeResult(gen)}. Continue from the current branch state (read git status, git log and PROGRESS.md first) and finish the loop properly.`
       recordAttempt(dir, id, `post-check failed: ${summary}`)
       record(config, {
@@ -600,13 +646,21 @@ async function runFeature(
       continue
     }
 
-    // Evaluator: fresh context, read-only.
+    log(
+      `post-check ok: ${id} is ${check.status}, clean-state check passed, ${check.ahead} commit(s) ahead of main`,
+    )
+
+    // Evaluator: fresh context, read-only. `--agent` ignores `--json-schema`, so the agent
+    // file's instructions and tool list are passed directly (see evaluatorAgent()).
     log(`=== ${id}: evaluator session (${config.evaluator.model})`)
+    const agent = evaluatorAgent()
     const evalArgs = [
       '-p',
       render(evaluatorTemplate, { FEATURE_ID: id, FEATURE_TITLE: feature.title }),
-      '--agent',
-      'evaluator',
+      '--append-system-prompt',
+      agent.instructions,
+      '--tools',
+      agent.tools,
       '--permission-mode',
       config.generator.permissionMode,
       '--permission-prompts',
@@ -635,12 +689,13 @@ async function runFeature(
     const verdict = parseVerdict(ev.result)
     const evalCost = Number(ev.result?.total_cost_usd ?? 0)
     log(`evaluator finished: ${describeResult(ev)} → ${verdict?.verdict ?? 'no verdict'}`)
+    if (verdict) for (const line of verdictLines(verdict)) log(`  ${line}`)
 
     if (!verdict || verdict.verdict === 'Revise') {
       const findings = verdict
         ? verdictMarkdown(verdict)
         : 'The evaluator produced no verdict; treat the work as unreviewed and re-verify everything.'
-      context = `The evaluator asked for revisions:\n${findings}\nAddress every finding, re-run /verify-feature ${id} and /clock-out again.`
+      context = `The evaluator asked for revisions:\n${findings}\nAddress every finding, re-run /verify-feature ${id}, then clock out again (AGENTS.md → Clock-out).`
       recordAttempt(dir, id, `evaluator: ${verdict?.verdict ?? 'no verdict'}`)
       record(config, {
         ts: new Date().toISOString(),
@@ -822,16 +877,34 @@ function publish(
 
 async function waitForMerge(pr: string, auto: boolean) {
   notify(`PR ready: ${pr}${auto ? ' (auto-merge armed)' : ' — merge it to let the loop continue'}`)
-  for (;;) {
+  log(`waiting for ${auto ? 'CI and auto-merge' : 'a human merge'}: ${pr}`)
+  const reported = new Set<string>()
+  const waitStarted = Date.now()
+  for (let poll = 0; ; poll++) {
+    const checks = sh('gh', ['pr', 'checks', pr, '--json', 'name,bucket'], { quiet: true })
+    let pending = 0
+    if (checks.out.startsWith('[')) {
+      for (const c of JSON.parse(checks.out) as { name: string; bucket: string }[]) {
+        if (c.bucket === 'pending') pending++
+        else if (!reported.has(c.name)) {
+          reported.add(c.name)
+          log(`${c.bucket === 'pass' ? '✓' : '✗'} CI ${c.name}: ${c.bucket}`)
+        }
+      }
+    }
     const r = sh('gh', ['pr', 'view', pr, '--json', 'state,mergedAt'], { quiet: true })
     if (r.code === 0) {
       const info = JSON.parse(r.out) as { state: string }
       if (info.state === 'MERGED') {
-        log(`PR merged: ${pr}`)
+        log(`PR merged after ${Math.round((Date.now() - waitStarted) / 60000)} min: ${pr}`)
         return
       }
       if (info.state === 'CLOSED') throw new Error(`PR ${pr} was closed without merging`)
     }
+    if (poll > 0 && poll % 5 === 0)
+      log(
+        `… still waiting for the merge (${Math.round((Date.now() - waitStarted) / 60000)} min, ${pending} check(s) pending)`,
+      )
     if (aborting) throw new Error('aborted while waiting for merge')
     await sleep(60_000)
   }

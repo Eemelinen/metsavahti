@@ -15,6 +15,7 @@ the table says which one wins and where the disagreement is recorded.
 | How do the tests work?                                                   | [../tests/README.md](../tests/README.md)                                                      | Suites, environments, fixtures.                                                                                       |
 | What does it look like?                                                  | [design/](design/) — Claude Design artboards, `tokens.js`, `design-map.json`, styling rules   | Visual source of truth; `design-map.json` links every ticket to its artboard; the tokens are the Tailwind theme.      |
 | How does the agent harness and the automated loop work?                  | [harness/README.md](harness/README.md), then `harness/` (checklist, rubric, handoff, quality) | Explains the parts, the flow, the safeguards and how to run `pnpm harness:loop`.                                      |
+| How do I copy the harness into another project?                          | [harness/porting-guide.md](harness/porting-guide.md)                                          | File-by-file porting classes, exact edits, skeletons, GitHub setup, acceptance checks and a ready-made agent prompt.  |
 
 Conventions for this folder: files are Markdown, English, Prettier-formatted (`pnpm format`).
 Relative links must resolve from the file's own directory (`pnpm check` does not verify links;

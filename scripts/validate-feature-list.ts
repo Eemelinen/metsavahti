@@ -92,6 +92,19 @@ export const featureListSchema = z
           message: `${feature.id} is blocked but notes do not say why`,
         })
       }
+      // pnpm forwards a literal `--` to the script, and vitest/playwright then ignore the file
+      // filter and run the whole suite. Passing features keep their recorded commands.
+      if (feature.status !== 'passing') {
+        feature.verification.forEach((step, stepIndex) => {
+          if (/pnpm test:[\w-]+ -- /.test(step)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['features', index, 'verification', stepIndex],
+              message: `${feature.id}: drop the "--" in "${step.split(' (')[0]}"; the test runner ignores files after it`,
+            })
+          }
+        })
+      }
     })
 
     list.features.forEach((feature, index) => {

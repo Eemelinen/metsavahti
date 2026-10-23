@@ -30,8 +30,9 @@ any 0 → Block.
 
 ## Machine output (loop driver)
 
-The driver (`pnpm harness:loop`) runs the evaluator as a separate `claude -p --agent evaluator`
-session with `--json-schema docs/harness/prompts/evaluator-schema.json` and acts on the result
+The driver (`pnpm harness:loop`) runs the evaluator as a separate `claude -p` session with the
+instructions and tools of `.claude/agents/evaluator.md` (`--append-system-prompt`, `--tools`; `--agent`
+would ignore the schema) and `--json-schema docs/harness/prompts/evaluator-schema.json`, and acts on the result
 without a human: Accept → push + PR, Revise → one bounded retry with the findings appended to
 the generator prompt, Block → the feature is set `blocked` and the branch is pushed for a human.
 The scores use the keys `correctness`, `verification`, `scope`, `reliability`, `maintainability`,

@@ -72,15 +72,15 @@ describe('import-tickets parser', () => {
     const steps = deriveVerification(reg)
     expect(steps[0]).toBe('L1: pnpm check')
     expect(
-      steps.some((s) => s.startsWith('L1: pnpm test:unit -- tests/unit/auth/registration.test.ts')),
+      steps.some((s) => s.startsWith('L1: pnpm test:unit tests/unit/auth/registration.test.ts')),
     ).toBe(true)
     expect(
       steps.some((s) =>
-        s.startsWith('L2: pnpm test:integration -- tests/integration/registration.int.test.ts'),
+        s.startsWith('L2: pnpm test:integration tests/integration/registration.int.test.ts'),
       ),
     ).toBe(true)
     expect(
-      steps.some((s) => s.startsWith('L3: pnpm test:e2e -- tests/e2e/registration.spec.ts')),
+      steps.some((s) => s.startsWith('L3: pnpm test:e2e tests/e2e/registration.spec.ts')),
     ).toBe(true)
     const marketing = tickets[2] as (typeof tickets)[number]
     expect(deriveVerification(marketing)).toEqual([
