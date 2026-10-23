@@ -35,7 +35,7 @@ time; `notifiedAt` marks delivery and owners can only set `readAt`.
 
 | Layer             | Choice                                                                                                                                                                                                                                                                                                                                               |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime / tooling | Node.js 22, pnpm 10, TypeScript 5.9 (`strict`, `noUncheckedIndexedAccess`)                                                                                                                                                                                                                                                                           |
+| Runtime / tooling | Node.js 24, pnpm 10, TypeScript 5.9 (`strict`, `noUncheckedIndexedAccess`)                                                                                                                                                                                                                                                                           |
 | App               | Next.js 16 (App Router, Turbopack), React 19, Tailwind CSS 4 with the design tokens from [docs/design/](docs/design/) as the theme, shadcn/ui, Figtree                                                                                                                                                                                               |
 | Backend / CMS     | Payload CMS 3 embedded in Next.js — collections `users`, `watch-areas`, `declarations`, `declaration-revisions`, `watch-area-declarations`, `alerts`, `notification-log`, `consent-events`, `data-export-requests`, `job-runs`, `legal-documents` (Lexical rich text), `exports` (upload), `rate-limit-buckets`; Payload Jobs Queue for the pipeline |
 | Database          | PostgreSQL 16 + PostGIS 3.4 via `@payloadcms/db-postgres` (Drizzle); spatial SQL isolated in `src/lib/geo/spatial-queries.ts`                                                                                                                                                                                                                        |
@@ -52,7 +52,7 @@ The full spec, including deviations from the original plan, is in
 
 ## Prerequisites
 
-- Node.js 22 (`.nvmrc`) and pnpm 10 (`corepack enable` picks the pinned version)
+- Node.js 24 (`.nvmrc`) and pnpm 10 (`corepack enable` picks the pinned version)
 - Docker Desktop (PostGIS ×2 + Mailpit run as containers; tests also start
   throwaway containers through Testcontainers)
 
