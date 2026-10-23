@@ -25,7 +25,8 @@ Output, in this order and nothing else:
 - Verdict: Accept (all 2) / Revise (any 1) / Block (any 0).
 - Required follow-up: missing evidence, required fixes, next review trigger.
 
-When the loop driver runs you (`claude -p --agent evaluator --json-schema …`, see `docs/harness/README.md`),
+When the loop driver runs you (`claude -p` with this file's body as `--append-system-prompt`, its `tools` as
+`--tools`, and `--json-schema …`; see `docs/harness/README.md`),
 the same content goes into the structured fields: `verdict`, `scores` (the six categories, 0–2, keys
 `correctness`, `verification`, `scope`, `reliability`, `maintainability`, `handoff`), `findings`
 (severity `critical`/`major`/`minor`, file, line, note) and `required_follow_up`. In that mode the diff
