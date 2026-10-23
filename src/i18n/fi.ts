@@ -32,7 +32,6 @@ export const fi = {
       },
     },
     logout: {
-      button: 'Kirjaudu ulos',
       title: 'Olet kirjautunut ulos',
       body: 'Vahtialueesi jatkavat seurantaa ja saat sähköpostit normaalisti.',
       back: 'Kirjaudu takaisin',
@@ -120,6 +119,34 @@ export const fi = {
         register: 'Luo tili',
       },
     },
+  },
+  footer: {
+    legalNav: 'Oikeudelliset tiedot',
+    mapCredit: 'Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.',
+    copyright: (year: number) => `© ${year} Metsävahti`,
+  },
+  app: {
+    nav: {
+      label: 'Päävalikko',
+      watchAreas: 'Vahtialueet',
+      alerts: 'Ilmoitukset',
+      account: 'Tili',
+      unread: (count: string) => `(${count} lukematonta)`,
+    },
+    titles: {
+      newWatchArea: 'Uusi vahtialue',
+      security: 'Turvallisuus',
+      notificationSettings: 'Ilmoitusasetukset',
+      privacy: 'Tietosuoja ja tiedot',
+      deleteAccount: 'Poista tili',
+    },
+    accountMenu: {
+      trigger: 'Tilivalikko',
+      account: 'Tili',
+      settings: 'Asetukset',
+      logout: 'Kirjaudu ulos',
+    },
+    comingSoon: 'Tämä sivu on vielä rakenteilla.',
   },
   emails: {
     verify: {

@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test'
 import {
   ACCOUNT_PASSWORD as PASSWORD,
   createVerifiedAccount,
+  logOut,
   registerAccount,
   useOwnAddress,
   verificationLinks,
@@ -77,8 +78,7 @@ test.describe('login and logout', () => {
     expect(ttl).toBeGreaterThan(DAY - 120)
     expect(ttl).toBeLessThanOrEqual(DAY)
 
-    await page.getByRole('button', { name: 'Kirjaudu ulos' }).click()
-    await expect(page).toHaveURL('/kirjauduttu-ulos')
+    await logOut(page)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Olet kirjautunut ulos')
     await expect(page.getByRole('link', { name: 'Kirjaudu takaisin' })).toHaveAttribute(
       'href',
@@ -112,8 +112,7 @@ test.describe('login and logout', () => {
     expect(ttl).toBeLessThanOrEqual(30 * DAY)
 
     // The token still works after a logout elsewhere ended a different session: log out here.
-    await page.getByRole('button', { name: 'Kirjaudu ulos' }).click()
-    await expect(page).toHaveURL('/kirjauduttu-ulos')
+    await logOut(page)
 
     // A same-origin path is followed (the dashboard is the only app page today).
     await page.goto('/kirjaudu?next=%2Fdashboard%3Ftab%3Dalueet')

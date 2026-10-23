@@ -5,6 +5,7 @@ import {
   ACCOUNT_PASSWORD as PASSWORD,
   adminApi,
   createVerifiedAccount,
+  logOut,
   registerAccount,
   resetLinks,
   useOwnAddress,
@@ -106,8 +107,7 @@ test.describe('auth (E03)', () => {
     await page.goto('/kirjaudu?next=https%3A%2F%2Fexample.com%2F')
     await expect(page).toHaveURL('/dashboard')
 
-    await page.getByRole('button', { name: 'Kirjaudu ulos' }).click()
-    await expect(page).toHaveURL('/kirjauduttu-ulos')
+    await logOut(page)
     await page.goto('/dashboard')
     await expect(page).toHaveURL('/kirjaudu?next=%2Fdashboard')
 

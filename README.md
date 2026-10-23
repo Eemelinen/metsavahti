@@ -154,7 +154,7 @@ See [tests/README.md](tests/README.md) for details. In short:
 
 ```
 src/
-  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing, 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/dashboard
+  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing, 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
   app/(payload)/          generated Payload admin + REST/GraphQL routes
   app/api/health          liveness + PostGIS check
   app/api/jobs/run        cron entrypoint (Bearer CRON_SECRET)
