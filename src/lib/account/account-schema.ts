@@ -70,3 +70,27 @@ export function fieldErrorsOf<Field extends string>(
   }
   return fieldErrors
 }
+
+export const NOTIFICATION_MODES = ['immediate', 'daily', 'weekly'] as const
+export type NotificationMode = (typeof NOTIFICATION_MODES)[number]
+
+/**
+ * Input of the `updateNotificationPrefs` Server Action (`/tili/ilmoitukset`, E04 MV-054): the
+ * global switch and the delivery mode. Each control saves on its own, so both are optional;
+ * an empty object changes nothing.
+ */
+export const notificationPrefsSchema = z.object({
+  enabled: z.boolean().optional(),
+  mode: z.enum(NOTIFICATION_MODES).optional(),
+})
+
+export type NotificationPrefsInput = z.infer<typeof notificationPrefsSchema>
+
+/** Input of `setWatchAreaNotifications`: one watch area's own on/off switch. */
+export const watchAreaNotificationsSchema = z.object({
+  id: z.number().int().positive(),
+  enabled: z.boolean(),
+})
+
+/** Input of `setMarketingConsent`: the "Palvelun uutiset" switch. */
+export const marketingConsentSchema = z.object({ granted: z.boolean() })

@@ -1020,7 +1020,7 @@
       "area": "account",
       "title": "Notification settings /tili/ilmoitukset",
       "user_visible_behavior": "Global enabled toggle, mode radio (immediate/daily/weekly), per-watch-area override table (reads watch areas; if none, empty state), marketing consent toggle writing `consent_events`, \"Lähetä testisähköposti\" (rate-limited 3/h) sending a sample `AlertImmediate` with fixture data.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-035", "F-040", "F-050"],
       "ticket": "MV-054",
       "epic": "E04",
