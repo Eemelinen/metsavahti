@@ -883,10 +883,12 @@ async function waitForMerge(pr: string, auto: boolean) {
   for (let poll = 0; ; poll++) {
     const checks = sh('gh', ['pr', 'checks', pr, '--json', 'name,bucket'], { quiet: true })
     let pending = 0
+    const failed: string[] = []
     if (checks.out.startsWith('[')) {
       for (const c of JSON.parse(checks.out) as { name: string; bucket: string }[]) {
         if (c.bucket === 'pending') pending++
-        else if (!reported.has(c.name)) {
+        if (c.bucket === 'fail' || c.bucket === 'cancel') failed.push(c.name)
+        if (c.bucket !== 'pending' && !reported.has(c.name)) {
           reported.add(c.name)
           log(`${c.bucket === 'pass' ? '✓' : '✗'} CI ${c.name}: ${c.bucket}`)
         }
@@ -900,6 +902,12 @@ async function waitForMerge(pr: string, auto: boolean) {
         return
       }
       if (info.state === 'CLOSED') throw new Error(`PR ${pr} was closed without merging`)
+    }
+    // Auto-merge never fires on a red check, so waiting longer only hangs the loop. A fix pushed
+    // to the branch still merges the PR; the next loop run starts from the merged main.
+    if (auto && pending === 0 && failed.length > 0) {
+      notify(`CI failed on ${pr} (${failed.join(', ')}) — fix the branch; auto-merge stays armed`)
+      throw new Error(`CI failed on ${pr}: ${failed.join(', ')}`)
     }
     if (poll > 0 && poll % 5 === 0)
       log(
