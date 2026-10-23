@@ -94,9 +94,21 @@ test.describe('system pages', () => {
   })
 
   test('a deeper unknown URL is also a 404', async ({ page }) => {
+    const response = await page.goto('/tata/ei/ole')
+    expect(response?.status()).toBe(404)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sivua ei löytynyt')
+  })
+
+  test('an unknown URL under an app route is a 404 once signed in (guests go to the login)', async ({
+    browser,
+  }) => {
+    // `src/proxy.ts` sends a guest from every `/dashboard/…` path to the login first (MV-046).
+    const context = await browser.newContext({ storageState: AUTH_STATE })
+    const page = await context.newPage()
     const response = await page.goto('/dashboard/ei/ole')
     expect(response?.status()).toBe(404)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sivua ei löytynyt')
+    await context.close()
   })
 
   test('/huolto shows the maintenance page', async ({ page }) => {

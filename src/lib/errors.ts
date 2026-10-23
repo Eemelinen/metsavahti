@@ -12,7 +12,8 @@ import { type Logger, logger as defaultLogger } from '@/lib/logger'
  * with a generic Finnish message; their real message is logged, never sent.
  */
 
-export type ErrorCode = 'not_found' | 'forbidden' | 'rate_limited' | 'external_service' | 'internal'
+export type ErrorCode =
+  'unauthorized' | 'not_found' | 'forbidden' | 'rate_limited' | 'external_service' | 'internal'
 
 /** The error shape a client receives. `message` is Finnish UI copy. */
 export interface ActionError {
@@ -26,6 +27,7 @@ export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: Action
 
 /** Generic messages used whenever the real message must not reach the client. */
 export const publicMessages: Record<ErrorCode, string> = {
+  unauthorized: 'Kirjaudu sisään jatkaaksesi.',
   not_found: 'Kohdetta ei löytynyt.',
   forbidden: 'Ei käyttöoikeutta.',
   rate_limited: 'Liikaa pyyntöjä. Yritä hetken kuluttua uudelleen.',
@@ -64,6 +66,14 @@ export class AppError extends Error {
   /** What the client sees. Hides `message` unless it was marked safe. */
   toActionError(): ActionError {
     return { code: this.code, message: this.expose ? this.message : publicMessages[this.code] }
+  }
+}
+
+/** No verified session behind the request (`requireUser()` in a Server Action or Route Handler). */
+export class Unauthorized extends AppError {
+  constructor(message?: string, options: AppErrorOptions = {}) {
+    super('unauthorized', 401, message, { expose: true, ...options })
+    this.name = 'Unauthorized'
   }
 }
 

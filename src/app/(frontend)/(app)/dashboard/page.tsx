@@ -1,21 +1,18 @@
 import type { Metadata } from 'next'
-import { headers as getHeaders } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import { LogoutButton } from '@/components/auth/logout-button'
 import { WatchAreaMapClient } from '@/components/map/map-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { loginPath } from '@/lib/auth/login-schema'
+import { requireUser } from '@/lib/auth/guards'
 
 export const metadata: Metadata = { title: 'Vahtialueet' }
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await getHeaders() })
-  if (!user) redirect(loginPath('/dashboard'))
+  const user = await requireUser({ next: '/dashboard' })
 
   const [{ docs: areas }, { totalDocs: pendingAlerts }] = await Promise.all([
     payload.find({

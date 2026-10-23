@@ -66,7 +66,7 @@ pnpm db:migrate                 # applies src/payload/migrations to the dev DB
 pnpm dev                        # http://localhost:3000
 ```
 
-- `/` — landing page, `/rekisteroidy` — create an account (verification email → `/vahvista-sahkoposti`, resend with a 60 s cooldown), `/vahvista?token=` — the link from the email (verified / expired / used), `/kirjaudu` — sign in (remember-me, `?next=`), `/unohtunut-salasana` — request a reset link (neutral answer), `/uusi-salasana?token=` — set a new password (ends every session) → `/kirjaudu?reset=1`, `/kirjaudu-ulos` — log out (POST) → `/kirjauduttu-ulos`, `/dashboard` — your watch areas on a map
+- `/` — landing page, `/rekisteroidy` — create an account (verification email → `/vahvista-sahkoposti`, resend with a 60 s cooldown), `/vahvista?token=` — the link from the email (verified / expired / used), `/kirjaudu` — sign in (remember-me, `?next=`), `/unohtunut-salasana` — request a reset link (neutral answer), `/uusi-salasana?token=` — set a new password (ends every session) → `/kirjaudu?reset=1`, `/kirjaudu-ulos` — log out (POST) → `/kirjauduttu-ulos`, `/dashboard` — your watch areas on a map. `src/proxy.ts` sends guests from the app pages to `/kirjaudu?next=`, signed-in users skip the login, registration and forgot-password pages, and every response carries a nonce-based CSP, HSTS and `X-Frame-Options: DENY`
 - `/admin` — Payload admin. The **first account created becomes admin**; use
   `/admin/create-first-user` or `pnpm db:seed` (creates `admin@metsavahti.local`).
 - Mailpit UI: http://localhost:8025 — every email sent locally ends up here.
@@ -172,7 +172,8 @@ src/
   lib/privacy             ip.ts (IP → network prefix before storage)
   components/             site header/footer/frame, brand mark, system pages, attribution, map (MapLibre), forms/ (PasswordInput, FormError, FormSuccess), shadcn ui/
   i18n/fi.ts              Finnish UI copy (new strings go here)
-  lib/auth                password-strength.ts (zxcvbn score + E03 thresholds)
+  proxy.ts                Next 16 middleware: maintenance mode, login redirect, security headers (lib/auth/route-protection.ts, lib/security-headers.ts)
+  lib/auth                password-strength.ts (zxcvbn score + E03 thresholds), guards.ts (getSessionUser, requireUser, redirectSignedInUser), page-access.ts (assertOwner)
 tests/
   unit/  integration/  e2e/  live/  helpers/  fixtures/wfs/
 scripts/                  seed.ts, run-jobs.ts, record-fixtures.ts
@@ -189,6 +190,7 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
 - Schedule `POST /api/jobs/run` with `Authorization: Bearer $CRON_SECRET` at
   09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates).
 - Migrations run automatically on boot in production (`prodMigrations`).
+- Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.
 
 ## Roadmap (not yet built)
 
