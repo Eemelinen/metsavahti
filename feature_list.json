@@ -964,7 +964,7 @@
       "area": "account",
       "title": "Profile and security pages /tili, /tili/turvallisuus",
       "user_visible_behavior": "`/tili`: name, locale, timezone edits (Server Action `updateProfile`); email shows current + \"Vaihda\" starting change flow (MV-052). `/tili/turvallisuus`: change password (current required; invalidates other sessions), sessions list (device/UA, created, last seen, current flag), \"Kirjaa ulos muista laitteista\".",
-      "status": "in_progress",
+      "status": "passing",
       "depends_on": ["F-044", "F-046", "F-050"],
       "ticket": "MV-051",
       "epic": "E04",
@@ -978,7 +978,11 @@
         "L2: pnpm test:integration tests/integration/profile-security.int.test.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)",
         "L3: pnpm test:e2e tests/e2e/profile-security.spec.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-23 pnpm check → pass (working tree on b7494c0)",
+        "2026-10-23 pnpm test:integration tests/integration/profile-security.int.test.ts → pass (working tree on b7494c0, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/profile-security.spec.ts → pass (working tree on b7494c0, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration owner-only; integration: other session invalid after password change; E2E edit name + change password. Status (ticket): absorbs MV-053 (merged 2026-09-20, ledger P11)."
     },
