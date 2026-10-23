@@ -251,7 +251,7 @@ export function ticketToFeature(
       .filter((d) => d !== id),
     ticket: ticket.id,
     epic: ticket.epic,
-    spec: `${path.relative(ROOT, ticket.file)}#${ticket.anchor}`,
+    spec: `${path.relative(ROOT, ticket.file).split(path.sep).join('/')}#${ticket.anchor}`,
     verification: done ? ['L1: pnpm check'] : deriveVerification(ticket),
     evidence: done ? [scaffoldEvidence] : [],
     attempts: 0,

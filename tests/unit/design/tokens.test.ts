@@ -44,7 +44,7 @@ describe('design tokens', () => {
   it('src/ contains no colour literals outside the token sources', () => {
     const offenders: string[] = []
     for (const file of walk(path.join(root, 'src'))) {
-      const rel = path.relative(root, file)
+      const rel = path.relative(root, file).split(path.sep).join('/')
       if (allowedHexFiles.has(rel) || rel.startsWith('src/app/(payload)/')) continue
       const source = readFileSync(file, 'utf8')
       const lines = source.split('\n')
