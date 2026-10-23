@@ -886,10 +886,18 @@
         "2026-10-23 pnpm check → pass (working tree on 652b1a6)",
         "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 652b1a6)",
         "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 652b1a6, Docker available)",
-        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 652b1a6, Docker available)"
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 652b1a6, Docker available, CI=1: next start on a .env.test production build, retries 2, whole suite)",
+        "2026-10-23 pnpm check → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 86d4e71, Docker available)",
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 86d4e71, Docker available, CI=1: next start on the last build, retries 2)",
+        "2026-10-23 pnpm check → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 86d4e71, Docker available)",
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 86d4e71, Docker available, CI=1: next start on the last build, retries 2)"
       ],
       "attempts": 1,
-      "notes": "Tests (ticket): unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no violations on `/` and `/vahtialueet` (console check); consolidated `tests/e2e/auth.spec.ts` covering all E03 flows (register, verify, login/logout, reset, route protection) on Chromium + Mobile Chrome with axe on all auth pages. Status (ticket): absorbs MV-047 and MV-049 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-23: evaluator: Revise"
+      "notes": "Tests (ticket): unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no violations on `/` and `/vahtialueet` (console check); consolidated `tests/e2e/auth.spec.ts` covering all E03 flows (register, verify, login/logout, reset, route protection) on Chromium + Mobile Chrome with axe on all auth pages. Status (ticket): absorbs MV-047 and MV-049 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-23: evaluator: Revise. Attempt 2: the `-- <file>` filter in the L2/L3 commands is not applied, so both run the whole suite; L3 ran as CI runs it (CI=1 after a .env.test build); two consecutive gate runs, see PROGRESS session 029"
     },
     {
       "id": "F-048",

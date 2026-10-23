@@ -153,7 +153,7 @@ export function toActionError(
  * ```ts
  * export async function deleteWatchArea(id: string) {
  *   return actionResult(async () => {
- *     const user = await requireUser()      // throws Forbidden
+ *     const user = await requireUser()      // throws Unauthorized
  *     ...
  *     return { id }
  *   })

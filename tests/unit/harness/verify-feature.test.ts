@@ -23,6 +23,7 @@ const quiet = {
   commit: 'abc1234',
   user: 'tester',
   treeDirty: false,
+  ci: false,
 }
 
 describe('parseStep', () => {
@@ -98,6 +99,15 @@ describe('verifyFeature', () => {
     expect(f.evidence).toEqual([
       '2026-09-06 pnpm test:integration → pass (working tree on abc1234, Docker available)',
       '2026-09-06 manual: look at the page → observed by tester: page renders in Figtree (working tree on abc1234)',
+    ])
+  })
+
+  it('says when L3 ran in CI mode (production build, retries)', () => {
+    const f = feature(['L2: pnpm test:integration', 'L3: pnpm test:e2e'])
+    verifyFeature(f, { ...quiet, ci: true, dockerAvailable: () => true, run: () => 0 })
+    expect(f.evidence).toEqual([
+      '2026-09-06 pnpm test:integration → pass (commit abc1234, Docker available)',
+      '2026-09-06 pnpm test:e2e → pass (commit abc1234, Docker available, CI=1: next start on the last build, retries 2)',
     ])
   })
 
