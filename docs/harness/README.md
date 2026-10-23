@@ -148,7 +148,9 @@ blocks are visible); the `result` line at the end carries `num_turns`, `total_co
 `permission_denials`. The evaluator's JSON is next to it. The PR body repeats the evidence lines, the
 verdict table and the cost.
 
-**Intervening.** Merge or close the PR (a closed PR stops the loop for that feature); unblock a feature
+**Intervening.** Merge or close the PR (a closed PR stops the loop for that feature). A failed CI check
+on an auto-merge PR also stops the loop: push a fix to the branch (auto-merge stays armed), then start
+the loop again once it has merged. Unblock a feature
 with `pnpm harness:feature unblock F-NNN` after fixing the cause; edit the ticket or the deviations
 ledger and re-import; lower or raise the caps in `harness.config.json`; add an allow rule when
 `permission_denials` shows the same legitimate command denied twice. After each of the first 3–5 runs,
