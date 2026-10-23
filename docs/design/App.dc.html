@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./data.js"></script>
+<script src="./map.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+html,body{margin:0;height:100%;background:#F7F5F0;color:#1B211D;font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#root{height:100%}
+a{color:#2B6247;text-decoration:none}a:hover{color:#1E4A37;text-decoration:underline}
+*{box-sizing:border-box}button,input,select{font-family:inherit}
+input:focus-visible,button:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #2B6247;outline-offset:2px}
+@keyframes mvShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes mvSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="height:100%;display:flex;flex-direction:column;background:#F7F5F0;position:relative;overflow:hidden;font-size:15px">
+
+<!-- ============ AUTH LAYOUT ============ -->
+<sc-if value="{{ isAuth }}" hint-placeholder-val="{{ true }}">
+<div data-screen style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;gap:24px">
+    <a href="Landing.dc.html" style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4A37"><span style="width:28px;height:28px;border-radius:8px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</a>
+    <div style="width:100%;max-width:440px;background:#fff;border:1px solid #DDE3DE;border-radius:16px;padding:28px 24px;box-shadow:0 1px 2px rgba(27,33,29,.06),0 4px 16px rgba(27,33,29,.06);display:flex;flex-direction:column;gap:18px">
+
+      <sc-if value="{{ r_kirjaudu }}" hint-placeholder-val="{{ true }}">
+        <h1 data-screen-label="Kirjaudu" style="margin:0;font-size:24px;color:#1E4A37;letter-spacing:-0.01em">Kirjaudu</h1>
+        <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}"><div role="alert" style="background:#FBDDD2;color:#A33E1A;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.45">{{ loginError }} <sc-if value="{{ loginUnverified }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resend }}" style="background:none;border:0;padding:0;color:#A33E1A;font-weight:600;text-decoration:underline;cursor:pointer;font-size:14px">Lähetä vahvistuslinkki uudelleen</button></sc-if></div></sc-if>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Sähköposti<input type="email" value="{{ f.email }}" onChange="{{ setEmail }}" autoComplete="email" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;background:#fff;font-weight:400"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Salasana<div style="position:relative"><input type="{{ pwType }}" value="{{ f.pw }}" onChange="{{ setPw }}" autoComplete="current-password" style="width:100%;padding:12px 44px 12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;background:#fff;font-weight:400"><button type="button" onClick="{{ togglePw }}" aria-label="Näytä salasana" style="position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;background:none;color:#5C6B62;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px" style-hover="background:#EFECE5">{{ pwToggleLabel }}</button></div></label>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" checked="{{ f.remember }}" onChange="{{ toggleRemember }}" style="width:18px;height:18px;accent-color:#1E4A37">Muista minut</label><button onClick="{{ goUnohtunut }}" style="background:none;border:0;padding:0;color:#2B6247;cursor:pointer;font-size:14px" style-hover="text-decoration:underline">Unohditko salasanan?</button></div>
+        <button onClick="{{ doLogin }}" disabled="{{ busy }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;display:flex;justify-content:center;gap:10px;align-items:center;min-height:48px" style-hover="background:#2B6247"><sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}"><span style="width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:mvSpin .8s linear infinite"></span></sc-if>Kirjaudu</button>
+        <p style="margin:0;font-size:14px;color:#5C6B62;text-align:center">Ei vielä tiliä? <button onClick="{{ goRekisteroidy }}" style="background:none;border:0;padding:0;color:#2B6247;font-weight:600;cursor:pointer;font-size:14px" style-hover="text-decoration:underline">Luo tili</button></p>
+        <details style="font-size:12px;color:#8A9E93"><summary style="cursor:pointer">Prototyypin testitilat</summary><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button onClick="{{ demoWrong }}" style="border:1px solid #DDE3DE;background:#fff;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer">Väärä salasana</button><button onClick="{{ demoUnverified }}" style="border:1px solid #DDE3DE;background:#fff;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer">Vahvistamaton</button></div></details>
+      </sc-if>
+
+      <sc-if value="{{ r_rekisteroidy }}" hint-placeholder-val="{{ false }}">
+        <h1 data-screen-label="Luo tili" style="margin:0;font-size:24px;color:#1E4A37;letter-spacing:-0.01em">Luo tili</h1>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Sähköposti<input type="email" value="{{ f.email }}" onChange="{{ setEmail }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Salasana<div style="position:relative"><input type="{{ pwType }}" value="{{ f.pw }}" onChange="{{ setPw }}" style="width:100%;padding:12px 44px 12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"><button type="button" onClick="{{ togglePw }}" style="position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;background:none;color:#5C6B62;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">{{ pwToggleLabel }}</button></div>
+          <div style="display:flex;gap:4px;margin-top:4px"><span style="flex:1;height:4px;border-radius:2px;background:{{ pwBar1 }}"></span><span style="flex:1;height:4px;border-radius:2px;background:{{ pwBar2 }}"></span><span style="flex:1;height:4px;border-radius:2px;background:{{ pwBar3 }}"></span><span style="flex:1;height:4px;border-radius:2px;background:{{ pwBar4 }}"></span></div><span style="font-weight:400;font-size:13px;color:#5C6B62">{{ pwLabel }}</span></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Salasana uudelleen<input type="password" value="{{ f.pw2 }}" onChange="{{ setPw2 }}" style="width:100%;padding:12px 14px;border:1px solid {{ pw2Border }};border-radius:10px;font-size:16px;font-weight:400"><sc-if value="{{ pw2Error }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-weight:400;font-size:13px;color:#B8321C">Salasanat eivät täsmää.</span></sc-if></label>
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;cursor:pointer"><input type="checkbox" checked="{{ f.terms }}" onChange="{{ toggleTerms }}" style="width:18px;height:18px;accent-color:#1E4A37;flex:none;margin-top:2px"><span>Olen lukenut <a href="Legal.dc.html#tietosuoja">tietosuojaselosteen</a> ja hyväksyn <a href="Legal.dc.html#kayttoehdot">käyttöehdot</a>. <span style="color:#B8321C">*</span></span></label>
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;cursor:pointer"><input type="checkbox" checked="{{ f.marketing }}" onChange="{{ toggleMarketing }}" style="width:18px;height:18px;accent-color:#1E4A37;flex:none;margin-top:2px"><span>Saa lähettää palveluun liittyviä uutisia.</span></label>
+        <button onClick="{{ doRegister }}" disabled="{{ registerDisabled }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px;opacity:{{ registerOpacity }}" style-hover="background:#2B6247">Luo tili</button>
+        <p style="margin:0;font-size:14px;color:#5C6B62;text-align:center">Onko sinulla jo tili? <button onClick="{{ goKirjaudu }}" style="background:none;border:0;padding:0;color:#2B6247;font-weight:600;cursor:pointer;font-size:14px">Kirjaudu</button></p>
+      </sc-if>
+
+      <sc-if value="{{ r_vahvista }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Vahvista sähköposti" style="display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+          <span style="width:56px;height:56px;border-radius:50%;background:#E9F0EB;display:inline-flex;align-items:center;justify-content:center;color:#1E4A37;font-size:24px">✉</span>
+          <h1 style="margin:0;font-size:24px;color:#1E4A37">Vahvista sähköposti</h1>
+          <p style="margin:0;color:#5C6B62;line-height:1.5">Lähetimme vahvistuslinkin osoitteeseen <strong style="color:#1B211D">{{ emailShown }}</strong>. Linkki on voimassa 24 tuntia.</p>
+          <button onClick="{{ resend }}" disabled="{{ cooldownActive }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px;width:100%">{{ resendLabel }}</button>
+          <button onClick="{{ goRekisteroidy }}" style="background:none;border:0;color:#2B6247;cursor:pointer;font-size:14px">Vaihda sähköpostiosoite</button>
+          <button onClick="{{ demoVerified }}" style="background:none;border:1px dashed #B7C4BC;color:#8A9E93;cursor:pointer;font-size:12px;padding:6px 10px;border-radius:6px">Prototyyppi: simuloi linkin klikkaus</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_vahvistettu }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Sähköposti vahvistettu" style="display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+          <span style="width:56px;height:56px;border-radius:50%;background:#E9F0EB;display:inline-flex;align-items:center;justify-content:center;color:#1E4A37;font-size:26px">✓</span>
+          <h1 style="margin:0;font-size:24px;color:#1E4A37">Sähköposti vahvistettu</h1>
+          <p style="margin:0;color:#5C6B62;line-height:1.5">Tilisi on valmis. Seuraavaksi merkitään ensimmäinen paikka kartalle.</p>
+          <button onClick="{{ goAloita }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;width:100%;min-height:48px">Luo ensimmäinen vahtialue</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_unohtunut }}" hint-placeholder-val="{{ false }}">
+        <h1 data-screen-label="Unohtunut salasana" style="margin:0;font-size:24px;color:#1E4A37">Unohtunut salasana</h1>
+        <sc-if value="{{ resetSent }}" hint-placeholder-val="{{ false }}"><div role="status" style="background:#E9F0EB;color:#1E4A37;border-radius:10px;padding:14px;line-height:1.5">Jos osoite on rekisteröity, lähetimme ohjeet salasanan vaihtamiseen sähköpostiin.</div></sc-if>
+        <sc-if value="{{ resetNotSent }}" hint-placeholder-val="{{ true }}">
+          <p style="margin:0;color:#5C6B62;line-height:1.5">Kirjoita tilisi sähköpostiosoite. Lähetämme linkin uuden salasanan asettamiseen.</p>
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Sähköposti<input type="email" value="{{ f.email }}" onChange="{{ setEmail }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+          <button onClick="{{ sendReset }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Lähetä ohjeet</button>
+        </sc-if>
+        <button onClick="{{ goKirjaudu }}" style="background:none;border:0;color:#2B6247;cursor:pointer;font-size:14px">Takaisin kirjautumiseen</button>
+      </sc-if>
+
+      <sc-if value="{{ r_uusi_salasana }}" hint-placeholder-val="{{ false }}">
+        <h1 data-screen-label="Uusi salasana" style="margin:0;font-size:24px;color:#1E4A37">Aseta uusi salasana</h1>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Uusi salasana<input type="password" value="{{ f.pw }}" onChange="{{ setPw }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Salasana uudelleen<input type="password" value="{{ f.pw2 }}" onChange="{{ setPw2 }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+        <button onClick="{{ savePassword }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Tallenna ja kirjaudu</button>
+      </sc-if>
+
+      <sc-if value="{{ r_kirjauduttu_ulos }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Kirjauduttu ulos" style="display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+          <h1 style="margin:0;font-size:24px;color:#1E4A37">Olet kirjautunut ulos</h1>
+          <p style="margin:0;color:#5C6B62;line-height:1.5">Vahtialueesi jatkavat seurantaa ja saat sähköpostit normaalisti.</p>
+          <button onClick="{{ goKirjaudu }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;width:100%;min-height:48px">Kirjaudu takaisin</button>
+          <a href="Landing.dc.html" style="font-size:14px">Etusivulle</a>
+        </div>
+      </sc-if>
+    </div>
+    <nav style="display:flex;gap:8px 16px;flex-wrap:wrap;justify-content:center;font-size:13px;color:#5C6B62;max-width:440px;text-align:center"><a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a><a href="Legal.dc.html#kayttoehdot">Käyttöehdot</a><a href="Legal.dc.html#evasteet">Evästeet</a><a href="Legal.dc.html#saavutettavuus">Saavutettavuus</a><button onClick="{{ openConsent }}" style="background:none;border:0;padding:0;color:#2B6247;cursor:pointer;font-size:13px">Evästeasetukset</button></nav>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ SYSTEM PAGES ============ -->
+<sc-if value="{{ isSystem }}" hint-placeholder-val="{{ false }}">
+<div data-screen style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;text-align:center;gap:16px">
+  <span style="font-family:ui-monospace,monospace;font-size:13px;color:#8A9E93;letter-spacing:.08em">{{ sysCode }}</span>
+  <h1 data-screen-label="Järjestelmäsivu" style="margin:0;font-size:clamp(26px,4vw,36px);color:#1E4A37;letter-spacing:-0.02em;text-wrap:balance">{{ sysTitle }}</h1>
+  <p style="margin:0;color:#5C6B62;line-height:1.5;max-width:440px;text-wrap:pretty">{{ sysBody }}</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button onClick="{{ goVahtialueet }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">{{ sysCta }}</button>
+    <sc-if value="{{ sysShowResend }}" hint-placeholder-val="{{ false }}"><button onClick="{{ resend }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Lähetä vahvistuslinkki uudelleen</button></sc-if>
+    <a href="Landing.dc.html" style="padding:12px 20px;font-weight:600;font-size:15px;display:inline-flex;align-items:center">Etusivulle</a>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ APP LAYOUT ============ -->
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex">
+  <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+  <aside style="width:232px;flex:none;background:#fff;border-right:1px solid #DDE3DE;display:flex;flex-direction:column;padding:20px 14px;gap:6px">
+    <a href="Landing.dc.html" style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;color:#1E4A37;padding:4px 10px 18px"><span style="width:26px;height:26px;border-radius:7px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:9px;height:9px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</a>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+      <button onClick="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:0;font-size:15px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s;background:{{ n.bg }};color:{{ n.fg }}" style-hover="background:#EFECE5"><span style="width:8px;height:8px;border-radius:50%;background:{{ n.dot }}"></span>{{ n.label }}<sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;background:#D98A1E;color:#fff;font-size:12px;border-radius:9999px;padding:2px 8px">{{ n.badge }}</span></sc-if></button>
+    </sc-for>
+    <div style="margin-top:auto;padding:12px 10px;font-size:12px;color:#8A9E93;line-height:1.5">Tiedot päivitetty viimeksi<br><strong style="color:#5C6B62">6.9.2026 klo 06:10</strong> (Metsäkeskus)</div>
+  </aside>
+  </sc-if>
+
+  <main data-screen style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:auto;position:relative">
+    <header style="position:sticky;top:0;z-index:5;background:rgba(247,245,240,.9);backdrop-filter:blur(8px);border-bottom:1px solid #DDE3DE;padding:12px 20px;display:flex;align-items:center;gap:12px;min-height:60px">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:17px;color:#1E4A37"><span style="width:24px;height:24px;border-radius:7px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</span></sc-if>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}"><span style="font-weight:600;color:#5C6B62;font-size:14px">{{ pageTitle }}</span></sc-if>
+      <div style="margin-left:auto;position:relative">
+        <button onClick="{{ toggleMenu }}" aria-haspopup="menu" aria-expanded="{{ menuOpen }}" style="width:40px;height:40px;border-radius:50%;background:#E9F0EB;color:#1E4A37;font-weight:700;border:0;cursor:pointer;font-size:14px" style-hover="background:#D3E1D8">AK</button>
+        <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div role="menu" style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #DDE3DE;border-radius:12px;box-shadow:0 8px 32px rgba(27,33,29,.16);min-width:200px;padding:6px;display:flex;flex-direction:column;z-index:10">
+          <div style="padding:10px 12px;font-size:13px;color:#8A9E93;border-bottom:1px solid #DDE3DE;margin-bottom:4px">anna.korhonen@example.fi</div>
+          <button onClick="{{ goTili }}" role="menuitem" style="text-align:left;background:none;border:0;padding:10px 12px;border-radius:8px;font-size:15px;cursor:pointer" style-hover="background:#EFECE5">Tili</button>
+          <button onClick="{{ goIlmoitusasetukset }}" role="menuitem" style="text-align:left;background:none;border:0;padding:10px 12px;border-radius:8px;font-size:15px;cursor:pointer" style-hover="background:#EFECE5">Asetukset</button>
+          <button onClick="{{ logout }}" role="menuitem" style="text-align:left;background:none;border:0;padding:10px 12px;border-radius:8px;font-size:15px;cursor:pointer;color:#A33E1A" style-hover="background:#FBDDD2">Kirjaudu ulos</button>
+        </div>
+        </sc-if>
+      </div>
+    </header>
+
+    <!-- ONBOARDING -->
+    <sc-if value="{{ r_aloita }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Aloita – vahtialueen luonti" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div style="padding:16px 20px 0;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><span style="font-size:13px;font-weight:600;color:#5C6B62">Vaihe {{ wizStep }} / 3</span><button onClick="{{ skipWizard }}" style="background:none;border:0;color:#5C6B62;font-size:14px;cursor:pointer" style-hover="text-decoration:underline">Ohita</button></div>
+        <div style="display:flex;gap:6px"><span style="flex:1;height:4px;border-radius:2px;background:#1E4A37"></span><span style="flex:1;height:4px;border-radius:2px;background:{{ wizBar2 }}"></span><span style="flex:1;height:4px;border-radius:2px;background:{{ wizBar3 }}"></span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;flex:1;min-height:0;gap:0">
+        <div style="flex:1 1 380px;min-height:320px;position:relative;margin:16px 20px;border-radius:16px;overflow:hidden;border:1px solid #DDE3DE;background:#EFECE5">
+          <div ref="{{ wizMapRef }}" style="position:absolute;inset:0"></div>
+          <sc-if value="{{ wizStep1 }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:12px;bottom:12px;right:60px;max-width:max-content;background:rgba(255,255,255,.95);border-radius:10px;padding:8px 12px;font-size:13px;color:#5C6B62;box-shadow:0 4px 16px rgba(27,33,29,.12)">Napauta karttaa tai vedä merkkiä</div></sc-if>
+        </div>
+        <div style="flex:1 1 320px;padding:8px 20px 24px;display:flex;flex-direction:column;gap:18px;max-width:520px">
+          <sc-if value="{{ wizStep1 }}" hint-placeholder-val="{{ true }}">
+            <h1 style="margin:0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em">Merkitse sijainti</h1>
+            <p style="margin:0;color:#5C6B62;line-height:1.5">Hae osoitteella tai paikannimellä, käytä nykyistä sijaintia tai napauta karttaa.</p>
+            <div style="position:relative"><input type="search" value="{{ wiz.query }}" onChange="{{ setQuery }}" placeholder="Osoite tai paikka, esim. Mökkitie 4, Rääkkylä" aria-label="Hae osoitetta" style="width:100%;padding:13px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;background:#fff">
+              <sc-if value="{{ showSuggest }}" hint-placeholder-val="{{ false }}"><div role="listbox" style="position:absolute;left:0;right:0;top:52px;background:#fff;border:1px solid #DDE3DE;border-radius:10px;box-shadow:0 8px 32px rgba(27,33,29,.16);z-index:6;overflow:hidden"><sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="2"><button onClick="{{ sg.pick }}" role="option" style="display:block;width:100%;text-align:left;background:none;border:0;padding:12px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid #EFECE5" style-hover="background:#F7F5F0">{{ sg.label }}<span style="display:block;font-size:13px;color:#8A9E93">{{ sg.sub }}</span></button></sc-for></div></sc-if>
+            </div>
+            <button onClick="{{ useMyLocation }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 16px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;display:flex;gap:10px;align-items:center;justify-content:center;min-height:46px" style-hover="border-color:#B7C4BC"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #2B6247"></span>Käytä sijaintiani</button>
+            <div style="background:#fff;border:1px solid #DDE3DE;border-radius:10px;padding:12px 14px;font-size:14px;color:#5C6B62;line-height:1.5">Valittu piste<br><strong style="color:#1B211D;font-family:ui-monospace,monospace;font-size:13px">{{ wizCoords }}</strong></div>
+            <div style="display:flex;gap:10px;margin-top:auto"><button onClick="{{ wizNext }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px" style-hover="background:#2B6247">Seuraava</button></div>
+          </sc-if>
+          <sc-if value="{{ wizStep2 }}" hint-placeholder-val="{{ false }}">
+            <h1 style="margin:0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em">Valitse säde</h1>
+            <p style="margin:0;color:#5C6B62;line-height:1.5">Kuinka läheltä haluat tietää suunnitelluista hakkuista?</p>
+            <div role="radiogroup" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#EFECE5;padding:4px;border-radius:12px"><sc-for list="{{ radiusOptions }}" as="ro" hint-placeholder-count="4"><button onClick="{{ ro.pick }}" role="radio" aria-checked="{{ ro.on }}" style="border:0;padding:10px 4px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;transition:background .15s;background:{{ ro.bg }};color:{{ ro.fg }};box-shadow:{{ ro.shadow }}">{{ ro.label }}</button></sc-for></div>
+            <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600;color:#5C6B62">Mukautettu säde: <span style="color:#1B211D">{{ radiusLabel }}</span><input type="range" min="100" max="5000" step="50" value="{{ wiz.radius }}" onChange="{{ setRadius }}" style="width:100%;accent-color:#1E4A37"></label>
+            <div style="background:#E9F0EB;border-radius:10px;padding:14px;font-size:15px;line-height:1.5;color:#1E4A37">Alueella on tällä hetkellä <strong>{{ wizCount }}</strong> voimassa olevaa metsänkäyttöilmoitusta.</div>
+            <div style="display:flex;gap:10px;margin-top:auto"><button onClick="{{ wizBack }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Takaisin</button><button onClick="{{ wizNext }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px" style-hover="background:#2B6247">Seuraava</button></div>
+          </sc-if>
+          <sc-if value="{{ wizStep3 }}" hint-placeholder-val="{{ false }}">
+            <h1 style="margin:0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em">Nimeä ja vahvista</h1>
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Vahtialueen nimi<input type="text" value="{{ wiz.name }}" onChange="{{ setName }}" placeholder="Mökki, Rääkkylä" style="width:100%;padding:13px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px;border:1px solid #DDE3DE;border-radius:10px;background:#fff"><div><div style="font-weight:600">Sähköposti-ilmoitukset</div><div style="font-size:14px;color:#5C6B62">Heti, kun uusi ilmoitus löytyy</div></div><button onClick="{{ toggleWizNotify }}" role="switch" aria-checked="{{ wiz.notify }}" style="flex:none;width:48px;height:28px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ wizNotifyBg }}"><span style="position:absolute;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;left:{{ wizNotifyKnob }}"></span></button></div>
+            <dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px;color:#5C6B62"><dt>Säde</dt><dd style="margin:0;color:#1B211D;font-weight:600">{{ radiusLabel }}</dd><dt>Ilmoituksia nyt</dt><dd style="margin:0;color:#1B211D;font-weight:600">{{ wizCount }}</dd></dl>
+            <div style="display:flex;gap:10px;margin-top:auto"><button onClick="{{ wizBack }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Takaisin</button><button onClick="{{ saveArea }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px" style-hover="background:#2B6247">Tallenna vahtialue</button></div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- DASHBOARD -->
+    <sc-if value="{{ r_vahtialueet }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Vahtialueet" style="padding:20px;display:flex;flex-direction:column;gap:20px;max-width:1100px;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div><h1 style="margin:0;font-size:28px;color:#1E4A37;letter-spacing:-0.015em">Vahtialueet</h1><p style="margin:4px 0 0;font-size:14px;color:#8A9E93">Tiedot päivitetty viimeksi 6.9.2026 klo 06:10 (Metsäkeskus)</p></div>
+        <div style="position:relative"><button onClick="{{ newArea }}" disabled="{{ limitReached }}" title="{{ limitTooltip }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px;opacity:{{ newAreaOpacity }}" style-hover="background:#2B6247">+ Uusi vahtialue</button></div>
+      </div>
+      <sc-if value="{{ loadingAreas }}" hint-placeholder-val="{{ false }}"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px"><div style="height:150px;border-radius:14px;background:linear-gradient(90deg,#EFECE5 25%,#F7F5F0 50%,#EFECE5 75%);background-size:200% 100%;animation:mvShimmer 1.4s infinite"></div><div style="height:150px;border-radius:14px;background:linear-gradient(90deg,#EFECE5 25%,#F7F5F0 50%,#EFECE5 75%);background-size:200% 100%;animation:mvShimmer 1.4s infinite"></div></div></sc-if>
+      <sc-if value="{{ hasAreas }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+        <sc-for list="{{ areaCards }}" as="a" hint-placeholder-count="2">
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;position:relative;transition:box-shadow .2s" style-hover="box-shadow:0 1px 2px rgba(27,33,29,.06),0 4px 16px rgba(27,33,29,.08)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+              <button onClick="{{ a.open }}" style="background:none;border:0;padding:0;text-align:left;cursor:pointer;font-size:18px;font-weight:700;color:#1E4A37;font-family:inherit" style-hover="text-decoration:underline">{{ a.name }}</button>
+              <div style="position:relative"><button onClick="{{ a.toggleKebab }}" aria-label="Lisää toimintoja" style="width:36px;height:36px;border-radius:8px;border:0;background:none;cursor:pointer;color:#5C6B62;font-size:18px;line-height:1" style-hover="background:#EFECE5">⋯</button>
+                <sc-if value="{{ a.kebabOpen }}" hint-placeholder-val="{{ false }}"><div role="menu" style="position:absolute;right:0;top:40px;background:#fff;border:1px solid #DDE3DE;border-radius:10px;box-shadow:0 8px 32px rgba(27,33,29,.16);min-width:150px;padding:6px;display:flex;flex-direction:column;z-index:4"><button onClick="{{ a.edit }}" style="text-align:left;background:none;border:0;padding:10px 12px;border-radius:8px;font-size:15px;cursor:pointer" style-hover="background:#EFECE5">Muokkaa</button><button onClick="{{ a.remove }}" style="text-align:left;background:none;border:0;padding:10px 12px;border-radius:8px;font-size:15px;cursor:pointer;color:#A33E1A" style-hover="background:#FBDDD2">Poista</button></div></sc-if>
+              </div>
+            </div>
+            <div style="font-size:14px;color:#5C6B62">{{ a.place }} · säde {{ a.radiusLabel }}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span style="font-size:14px;background:#EFECE5;border-radius:9999px;padding:4px 10px">{{ a.count }} voimassa</span>
+              <sc-if value="{{ a.hasNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;background:#D98A1E;color:#fff;border-radius:9999px;padding:4px 10px;font-weight:600">Uusia: {{ a.newCount }}</span></sc-if>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #EFECE5;padding-top:12px;font-size:13px;color:#8A9E93">Tarkistettu {{ a.lastChecked }}
+              <button onClick="{{ a.toggleNotify }}" role="switch" aria-checked="{{ a.notify }}" aria-label="Sähköposti-ilmoitukset" style="flex:none;width:44px;height:26px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ a.notifyBg }}"><span style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;left:{{ a.notifyKnob }}"></span></button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid #DDE3DE;background:#EFECE5;height:clamp(260px,40vh,420px)">
+        <div ref="{{ overviewMapRef }}" style="position:absolute;inset:0"></div>
+        <div style="position:absolute;left:12px;top:12px;background:rgba(255,255,255,.95);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;color:#1E4A37;box-shadow:0 4px 16px rgba(27,33,29,.12)">Kaikki vahtialueet</div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ noAreas }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px dashed #B7C4BC;border-radius:16px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+        <div style="width:96px;height:96px;border-radius:50%;background:repeating-linear-gradient(135deg,#E9F0EB 0 6px,#DFE8E2 6px 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:10px;color:#5C6B62">kuvitus</div>
+        <h2 style="margin:0;font-size:22px;color:#1E4A37">Ei vielä vahtialueita</h2>
+        <p style="margin:0;color:#5C6B62;line-height:1.5;max-width:380px">Merkitse ensimmäinen paikka kartalle, niin alamme seurata sen ympäristöä.</p>
+        <button onClick="{{ newArea }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Luo vahtialue</button>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- AREA DETAIL -->
+    <sc-if value="{{ r_alue }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Vahtialue" style="display:flex;flex-wrap:wrap;flex:1;min-height:0">
+      <div style="flex:1 1 460px;min-height:min(60vh,520px);position:relative;background:#EFECE5">
+        <div ref="{{ areaMapRef }}" style="position:absolute;inset:0"></div>
+        <div style="position:absolute;left:12px;top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ goVahtialueet }}" style="background:rgba(255,255,255,.95);border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600;color:#1E4A37;cursor:pointer;box-shadow:0 4px 16px rgba(27,33,29,.12);min-height:40px">← Vahtialueet</button>
+          <button onClick="{{ recenterArea }}" style="background:rgba(255,255,255,.95);border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600;color:#1E4A37;cursor:pointer;box-shadow:0 4px 16px rgba(27,33,29,.12);min-height:40px">Keskitä vahtialueeseen</button>
+        </div>
+        <div style="position:absolute;left:12px;bottom:12px;right:60px;max-width:max-content;background:rgba(255,255,255,.95);border-radius:10px;padding:8px 12px;box-shadow:0 4px 16px rgba(27,33,29,.12);display:flex;gap:8px 12px;font-size:12px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#D9572B"></span>Uudistushakkuu</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#F0B35A"></span>Harvennus</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#9AA39D"></span>Muu</span></div>
+        <sc-if value="{{ picked }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:12px;bottom:44px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 32px rgba(27,33,29,.2);max-width:280px;display:flex;flex-direction:column;gap:6px;font-size:14px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><strong style="color:{{ picked.color }}">{{ picked.typeLabel }}</strong><button onClick="{{ clearPick }}" aria-label="Sulje" style="background:none;border:0;cursor:pointer;color:#8A9E93;font-size:16px;line-height:1">×</button></div>
+          <div style="color:#5C6B62">{{ picked.ha }} ha · {{ picked.distLabel }} keskipisteestä</div><div style="color:#5C6B62">Ilmoitus saapunut {{ picked.received }}</div>
+          <button onClick="{{ picked.open }}" style="margin-top:4px;background:#1E4A37;color:#fff;border:0;padding:8px 12px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;min-height:36px">Näytä tiedot</button>
+        </div>
+        </sc-if>
+      </div>
+      <div style="flex:1 1 340px;max-width:100%;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><h1 style="margin:0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em">{{ area.name }}</h1><p style="margin:4px 0 0;font-size:14px;color:#5C6B62">{{ area.place }} · säde {{ area.radiusLabel }} · tarkistettu {{ area.lastChecked }}</p></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onClick="{{ editArea }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px" style-hover="border-color:#B7C4BC">Muokkaa</button>
+            <button onClick="{{ goIlmoitusasetukset }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px" style-hover="border-color:#B7C4BC">Ilmoitusasetukset</button>
+            <button onClick="{{ removeArea }}" style="background:#fff;color:#A33E1A;border:1px solid #DDE3DE;padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px" style-hover="border-color:#D9572B">Poista</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" role="group" aria-label="Suodattimet">
+          <sc-for list="{{ typeFilters }}" as="tf" hint-placeholder-count="4"><button onClick="{{ tf.pick }}" aria-pressed="{{ tf.on }}" style="border:1px solid;padding:8px 12px;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;min-height:38px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;background:{{ tf.bg }};color:{{ tf.fg }};border-color:{{ tf.border }}"><sc-if value="{{ tf.dot }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:2px;background:{{ tf.dot }}"></span></sc-if>{{ tf.label }}</button></sc-for>
+          <button onClick="{{ toggleOnlyNew }}" aria-pressed="{{ onlyNew }}" style="border:1px solid;padding:8px 12px;border-radius:9999px;font-size:14px;font-weight:600;cursor:pointer;min-height:38px;background:{{ onlyNewBg }};color:{{ onlyNewFg }};border-color:{{ onlyNewBorder }}">Vain uudet</button>
+        </div>
+        <div style="font-size:14px;color:#8A9E93">{{ declCountLabel }}</div>
+        <sc-if value="{{ noDecls }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px dashed #B7C4BC;border-radius:14px;padding:32px 20px;text-align:center;color:#5C6B62;line-height:1.5">Ei ilmoituksia näillä suodattimilla.</div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ declRows }}" as="d" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;overflow:hidden">
+              <button onClick="{{ d.toggle }}" aria-expanded="{{ d.open }}" style="width:100%;text-align:left;background:none;border:0;padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:center;font-family:inherit" style-hover="background:#FBFAF7">
+                <span style="flex:none;width:12px;height:36px;border-radius:4px;background:{{ d.color }}"></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong style="font-size:15px;color:#1B211D">{{ d.typeLabel }}</strong><sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;background:#D98A1E;color:#fff;border-radius:9999px;padding:2px 8px;font-weight:600">Uusi</span></sc-if></div><span style="font-size:14px;color:#5C6B62">{{ d.ha }} ha · {{ d.distLabel }} · saapunut {{ d.received }}</span></div>
+                <span style="flex:none;color:#8A9E93;transition:transform .25s;transform:{{ d.chev }}">⌄</span>
+              </button>
+              <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 16px 16px 40px;display:flex;flex-direction:column;gap:12px">
+                <dl style="margin:0;display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:6px 16px;font-size:14px"><dt style="color:#5C6B62">Hakkuutapa</dt><dd style="margin:0">{{ d.method }}</dd><dt style="color:#5C6B62">Pääpuulaji</dt><dd style="margin:0">{{ d.species }}</dd><dt style="color:#5C6B62">Uudistaminen</dt><dd style="margin:0">{{ d.regen }}</dd><dt style="color:#5C6B62">Pinta-ala</dt><dd style="margin:0">{{ d.ha }} ha</dd><dt style="color:#5C6B62">Etäisyys</dt><dd style="margin:0">{{ d.distLabel }} vahtialueen keskipisteestä</dd><dt style="color:#5C6B62">Voimassa</dt><dd style="margin:0">3 vuotta ilmoituspäivästä</dd></dl>
+                <p style="margin:0;font-size:13px;color:#5C6B62;background:#F7F5F0;border-radius:8px;padding:10px 12px;line-height:1.45">Ilmoitus on hakkuuaikomus, ei velvoite hakata.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ d.openDetail }}" style="background:#1E4A37;color:#fff;border:0;padding:9px 14px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px">Avaa ilmoitus</button><button onClick="{{ d.focus }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:9px 14px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px">Näytä kartalla</button></div>
+              </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- AREA EDIT -->
+    <sc-if value="{{ r_alue_muokkaa }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Muokkaa vahtialuetta" style="padding:20px;display:flex;flex-direction:column;gap:20px;max-width:900px;width:100%">
+      <div><button onClick="{{ backToArea }}" style="background:none;border:0;color:#2B6247;font-size:14px;cursor:pointer;padding:0;font-weight:600" style-hover="text-decoration:underline">← Takaisin</button><h1 style="margin:8px 0 0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em">Muokkaa vahtialuetta</h1></div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px">
+        <div style="flex:1 1 360px;min-height:320px;position:relative;border-radius:16px;overflow:hidden;border:1px solid #DDE3DE;background:#EFECE5"><div ref="{{ wizMapRef }}" style="position:absolute;inset:0"></div></div>
+        <div style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px">
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Nimi<input type="text" value="{{ wiz.name }}" onChange="{{ setName }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Sijainti<input type="search" value="{{ wiz.query }}" onChange="{{ setQuery }}" placeholder="Osoite tai paikka" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"><span style="font-weight:400;font-size:13px;color:#8A9E93;font-family:ui-monospace,monospace">{{ wizCoords }}</span></label>
+          <div role="radiogroup" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#EFECE5;padding:4px;border-radius:12px"><sc-for list="{{ radiusOptions }}" as="ro" hint-placeholder-count="4"><button onClick="{{ ro.pick }}" role="radio" aria-checked="{{ ro.on }}" style="border:0;padding:10px 4px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;background:{{ ro.bg }};color:{{ ro.fg }};box-shadow:{{ ro.shadow }}">{{ ro.label }}</button></sc-for></div>
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600;color:#5C6B62">Säde: <span style="color:#1B211D">{{ radiusLabel }}</span><input type="range" min="100" max="5000" step="50" value="{{ wiz.radius }}" onChange="{{ setRadius }}" style="width:100%;accent-color:#1E4A37"></label>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px;border:1px solid #DDE3DE;border-radius:10px;background:#fff"><div style="font-weight:600">Sähköposti-ilmoitukset</div><button onClick="{{ toggleWizNotify }}" role="switch" aria-checked="{{ wiz.notify }}" style="flex:none;width:48px;height:28px;border-radius:9999px;border:0;cursor:pointer;position:relative;background:{{ wizNotifyBg }}"><span style="position:absolute;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;left:{{ wizNotifyKnob }}"></span></button></div>
+          <div style="display:flex;gap:10px"><button onClick="{{ backToArea }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Peruuta</button><button onClick="{{ saveArea }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px">Tallenna muutokset</button></div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ALERT FEED -->
+    <sc-if value="{{ r_ilmoitukset }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Ilmoitukset" style="padding:20px;display:flex;flex-direction:column;gap:20px;max-width:760px;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h1 style="margin:0;font-size:28px;color:#1E4A37;letter-spacing:-0.015em">Ilmoitukset</h1><sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><button onClick="{{ markAllRead }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:9px 14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px" style-hover="border-color:#B7C4BC">Merkitse kaikki luetuiksi</button></sc-if></div>
+      <sc-if value="{{ noAlerts }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px dashed #B7C4BC;border-radius:16px;padding:48px 24px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center"><span style="width:56px;height:56px;border-radius:50%;background:#E9F0EB;display:inline-flex;align-items:center;justify-content:center;color:#1E4A37;font-size:24px">✓</span><h2 style="margin:0;font-size:20px;color:#1E4A37">Ei uusia ilmoituksia — hyvä merkki.</h2><p style="margin:0;color:#5C6B62">Tarkistamme aineiston seuraavan kerran tänään klo 18.</p></div></sc-if>
+      <sc-for list="{{ alertGroups }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <h2 style="margin:0;font-size:13px;font-weight:600;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em">{{ g.date }}</h2>
+          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;opacity:{{ it.opacity }}">
+              <span style="flex:none;width:12px;height:40px;border-radius:4px;background:{{ it.color }}"></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong style="font-size:15px">{{ it.typeLabel }}</strong><sc-if value="{{ it.unread }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:50%;background:#D98A1E"></span></sc-if></div>
+                <span style="font-size:14px;color:#5C6B62">{{ it.areaName }} · {{ it.ha }} ha · {{ it.distLabel }} · klo {{ it.time }}</span>
+              </div>
+              <button onClick="{{ it.open }}" style="flex:none;background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:8px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;min-height:40px" style-hover="border-color:#B7C4BC">Näytä kartalla</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <!-- ALERT DETAIL -->
+    <sc-if value="{{ r_ilmoitus }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Ilmoitus" style="display:flex;flex-wrap:wrap;flex:1;min-height:0">
+      <div style="flex:1 1 460px;min-height:min(50vh,460px);position:relative;background:#EFECE5">
+        <div ref="{{ alertMapRef }}" style="position:absolute;inset:0"></div>
+        <button onClick="{{ goIlmoitukset }}" style="position:absolute;left:12px;top:12px;background:rgba(255,255,255,.95);border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600;color:#1E4A37;cursor:pointer;box-shadow:0 4px 16px rgba(27,33,29,.12);min-height:40px">← Ilmoitukset</button>
+      </div>
+      <div style="flex:1 1 340px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="display:flex;gap:10px;align-items:center"><span style="width:14px;height:14px;border-radius:3px;background:{{ det.color }}"></span><span style="font-size:13px;font-weight:600;color:#5C6B62;text-transform:uppercase;letter-spacing:.06em">{{ det.typeLabel }}</span></div>
+        <h1 style="margin:0;font-size:26px;color:#1E4A37;letter-spacing:-0.015em;text-wrap:balance">{{ det.ha }} ha, {{ det.distLabel }} vahtialueesta {{ det.areaName }}</h1>
+        <dl style="margin:0;display:grid;grid-template-columns:minmax(130px,auto) 1fr;gap:8px 16px;font-size:15px;background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:16px"><dt style="color:#5C6B62">Ilmoitus saapunut</dt><dd style="margin:0">{{ det.received }}</dd><dt style="color:#5C6B62">Hakkuutapa</dt><dd style="margin:0">{{ det.method }}</dd><dt style="color:#5C6B62">Pääpuulaji</dt><dd style="margin:0">{{ det.species }}</dd><dt style="color:#5C6B62">Uudistaminen</dt><dd style="margin:0">{{ det.regen }}</dd><dt style="color:#5C6B62">Voimassa</dt><dd style="margin:0">3 vuotta ilmoituspäivästä</dd><dt style="color:#5C6B62">Aikaisintaan</dt><dd style="margin:0">10 päivää ilmoituksesta</dd></dl>
+        <details style="background:#E9F0EB;border-radius:14px;padding:14px 16px;color:#1E4A37;line-height:1.5"><summary style="font-weight:600;cursor:pointer">Mitä tämä tarkoittaa?</summary><p style="margin:10px 0 0;font-size:14px;text-wrap:pretty">Metsänomistaja on ilmoittanut Metsäkeskukselle aikomuksestaan hakata tämä alue. Ilmoitus ei velvoita hakkaamaan, ja osa ilmoitetuista hakkuista jää toteutumatta. Hakkuu voi alkaa aikaisintaan 10 päivää ilmoituksen jättämisestä ja ilmoitus on voimassa kolme vuotta.</p></details>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick="{{ det.openArea }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Avaa vahtialue</button><a href="#" onClick="{{ noop }}" style="display:inline-flex;align-items:center;padding:12px 18px;border:1px solid #DDE3DE;border-radius:10px;font-weight:600;font-size:15px;background:#fff">Metsäkeskuksen karttapalvelu ↗</a></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ACCOUNT -->
+    <sc-if value="{{ isTili }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Tili" style="padding:20px;display:flex;flex-direction:column;gap:20px;max-width:820px;width:100%">
+      <h1 style="margin:0;font-size:28px;color:#1E4A37;letter-spacing:-0.015em">Tili ja asetukset</h1>
+      <nav style="display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid #DDE3DE;padding-bottom:0;scrollbar-width:none"><sc-for list="{{ tiliTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.go }}" aria-current="{{ t.current }}" style="flex:none;background:none;border:0;border-bottom:2px solid;padding:10px 12px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;margin-bottom:-1px;color:{{ t.fg }};border-color:{{ t.border }}" style-hover="color:#1E4A37">{{ t.label }}</button></sc-for></nav>
+
+      <sc-if value="{{ r_tili }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:18px;max-width:560px">
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Sähköposti<div style="display:flex;gap:8px;flex-wrap:wrap"><input type="email" defaultValue="anna.korhonen@example.fi" style="flex:1;min-width:200px;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"><button onClick="{{ changeEmail }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:0 14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Vaihda</button></div><span style="font-weight:400;font-size:13px;color:#8A9E93">Uusi osoite vahvistetaan sähköpostilla ennen käyttöönottoa.</span></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px"><span>Nimi <span style="font-weight:400;color:#8A9E93">(valinnainen)</span></span><input type="text" defaultValue="Anna Korhonen" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Kieli<select defaultValue="fi" style="padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;background:#fff;font-weight:400"><option value="fi">Suomi</option><option value="en">English</option></select></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Aikavyöhyke<select defaultValue="hki" style="padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;background:#fff;font-weight:400"><option value="hki">Europe/Helsinki</option><option value="sto">Europe/Stockholm</option></select></label>
+          </div>
+          <div><button onClick="{{ saveSettings }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Tallenna</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_turvallisuus }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px"><h2 style="margin:0;font-size:18px;color:#1E4A37">Vaihda salasana</h2><label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Nykyinen salasana<input type="password" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px"></label><label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Uusi salasana<input type="password" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px"></label><div><button onClick="{{ saveSettings }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Vaihda salasana</button></div></div>
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px"><h2 style="margin:0;font-size:18px;color:#1E4A37">Aktiiviset istunnot</h2>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #EFECE5;font-size:14px"><div><strong>Tämä laite</strong> · Safari, iPhone<br><span style="color:#8A9E93">Helsinki · nyt</span></div><span style="color:#2B6247;font-weight:600">Aktiivinen</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:14px"><div><strong>Chrome, Windows</strong><br><span style="color:#8A9E93">Joensuu · 2.9.2026</span></div></div>
+            <div><button onClick="{{ logoutOthers }}" style="background:#fff;color:#A33E1A;border:1px solid #DDE3DE;padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Kirjaa ulos muista laitteista</button></div></div>
+          <div style="border:1px dashed #B7C4BC;border-radius:14px;padding:16px 20px;color:#8A9E93;font-size:14px">Kaksivaiheinen tunnistus — tulossa myöhemmin.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_ilmoitusasetukset }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:640px">
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><div style="font-weight:600">Sähköposti-ilmoitukset</div><div style="font-size:14px;color:#5C6B62">Koskee kaikkia vahtialueita</div></div><button onClick="{{ toggleGlobalNotify }}" role="switch" aria-checked="{{ globalNotify }}" style="flex:none;width:48px;height:28px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ globalNotifyBg }}"><span style="position:absolute;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;left:{{ globalNotifyKnob }}"></span></button></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-weight:600;font-size:14px">Lähetystapa</span><div role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;background:#EFECE5;padding:4px;border-radius:12px"><sc-for list="{{ digestOptions }}" as="dg" hint-placeholder-count="3"><button onClick="{{ dg.pick }}" role="radio" aria-checked="{{ dg.on }}" style="border:0;padding:10px 8px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;background:{{ dg.bg }};color:{{ dg.fg }};box-shadow:{{ dg.shadow }}">{{ dg.label }}</button></sc-for></div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px"><h2 style="margin:0;font-size:18px;color:#1E4A37">Vahtialuekohtaiset asetukset</h2>
+            <sc-for list="{{ areaCards }}" as="a" hint-placeholder-count="2"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #EFECE5;font-size:15px"><div><strong>{{ a.name }}</strong><br><span style="font-size:13px;color:#8A9E93">{{ a.place }}</span></div><button onClick="{{ a.toggleNotify }}" role="switch" aria-checked="{{ a.notify }}" style="flex:none;width:44px;height:26px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ a.notifyBg }}"><span style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;left:{{ a.notifyKnob }}"></span></button></div></sc-for>
+          </div>
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><div style="font-weight:600">Palvelun uutiset</div><div style="font-size:14px;color:#5C6B62">Harvoin lähetettäviä tiedotteita uusista ominaisuuksista</div></div><button onClick="{{ toggleMarketingPref }}" role="switch" aria-checked="{{ marketingPref }}" style="flex:none;width:48px;height:28px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ marketingBg }}"><span style="position:absolute;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;left:{{ marketingKnob }}"></span></button></div>
+            <div><button onClick="{{ sendTest }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Lähetä testisähköposti</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_tietosuoja }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:640px">
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px"><h2 style="margin:0;font-size:18px;color:#1E4A37">Lataa tietoni</h2><p style="margin:0;font-size:14px;color:#5C6B62;line-height:1.5">Saat tilitietosi, vahtialueet (JSON ja GeoJSON) ja ilmoitushistorian yhtenä pakettina. Linkki on voimassa 24 tuntia.</p>
+            <sc-if value="{{ exportIdle }}" hint-placeholder-val="{{ true }}"><div><button onClick="{{ startExport }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Lataa tietoni</button></div></sc-if>
+            <sc-if value="{{ exportBusy }}" hint-placeholder-val="{{ false }}"><div role="status" style="display:flex;gap:10px;align-items:center;background:#E9F0EB;border-radius:10px;padding:12px 14px;color:#1E4A37;font-size:14px"><span style="width:16px;height:16px;border:2px solid #B7C4BC;border-top-color:#1E4A37;border-radius:50%;animation:mvSpin .8s linear infinite;flex:none"></span>Valmistellaan… lähetämme linkin sähköpostiin.</div></sc-if>
+          </div>
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px"><h2 style="margin:0 0 6px;font-size:18px;color:#1E4A37">Suostumushistoria</h2>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:8px 0;border-bottom:1px solid #EFECE5"><span>Käyttöehdot ja tietosuojaseloste hyväksytty</span><span style="color:#8A9E93;flex:none">12.5.2026</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:8px 0;border-bottom:1px solid #EFECE5"><span>Analytiikkaevästeet hyväksytty</span><span style="color:#8A9E93;flex:none">12.5.2026</span></div>
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:8px 0"><span>Palvelun uutiset: ei suostumusta</span><span style="color:#8A9E93;flex:none">12.5.2026</span></div>
+          </div>
+          <div style="display:flex;gap:8px 20px;flex-wrap:wrap;font-size:14px"><button onClick="{{ openConsent }}" style="background:none;border:0;padding:0;color:#2B6247;font-weight:600;cursor:pointer;font-size:14px" style-hover="text-decoration:underline">Evästeasetukset</button><a href="Legal.dc.html#tietosuoja" style="font-weight:600">Tietosuojaseloste</a><a href="#" onClick="{{ noop }}" style="font-weight:600">Tietosuojavaltuutetun toimisto ↗</a></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ r_poista }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:560px">
+          <sc-if value="{{ notDeleted }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <h2 style="margin:0;font-size:18px;color:#A33E1A">Poista tili</h2>
+            <p style="margin:0;font-size:14px;color:#5C6B62;line-height:1.5">Poistamme tilisi, kaikki vahtialueet ja ilmoitushistorian välittömästi. Anonymisoituja teknisiä lokeja säilytetään enintään 12 kuukautta tietoturvasyistä. Toimintoa ei voi perua.</p>
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px"><span>Kirjoita <span style="font-family:ui-monospace,monospace">POISTA</span> vahvistukseksi</span><input type="text" value="{{ del.confirm }}" onChange="{{ setDelConfirm }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Salasana<input type="password" value="{{ del.pw }}" onChange="{{ setDelPw }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+            <div><button onClick="{{ doDelete }}" disabled="{{ delDisabled }}" style="background:#B8321C;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px;opacity:{{ delOpacity }}">Poista tili pysyvästi</button></div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ deleted }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:32px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center"><h2 style="margin:0;font-size:22px;color:#1E4A37">Tilisi on poistettu</h2><p style="margin:0;color:#5C6B62;line-height:1.5">Kiitos, että käytit Metsävahtia. Lähetimme vahvistuksen sähköpostiin.</p><a href="Landing.dc.html" style="font-weight:600">Etusivulle</a></div></sc-if>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <footer style="margin-top:auto;padding:20px;font-size:12px;color:#8A9E93;line-height:1.5;border-top:1px solid #DDE3DE"><div style="display:flex;gap:6px 14px;flex-wrap:wrap;margin-bottom:6px"><a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a><a href="Legal.dc.html#kayttoehdot">Käyttöehdot</a><a href="Legal.dc.html#evasteet">Evästeet</a><a href="Legal.dc.html#saavutettavuus">Saavutettavuusseloste</a><button onClick="{{ openConsent }}" style="background:none;border:0;padding:0;color:#2B6247;cursor:pointer;font-size:12px">Evästeasetukset</button></div>Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa 09/2026. Kartta © OpenStreetMapin tekijät, Maanmittauslaitos. © 2026 Metsävahti</footer>
+  </main>
+</div>
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Päävalikko" style="flex:none;background:#fff;border-top:1px solid #DDE3DE;display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px 10px">
+  <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+    <button onClick="{{ n.go }}" aria-current="{{ n.current }}" style="background:none;border:0;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;min-height:52px;position:relative;color:{{ n.fg }}"><span style="width:28px;height:6px;border-radius:3px;background:{{ n.dot }}"></span>{{ n.label }}<sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:2px;right:calc(50% - 26px);background:#D98A1E;color:#fff;font-size:11px;border-radius:9999px;padding:1px 6px">{{ n.badge }}</span></sc-if></button>
+  </sc-for>
+</nav>
+</sc-if>
+</sc-if>
+
+<!-- ============ OVERLAYS ============ -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position:absolute;left:16px;right:16px;bottom:88px;z-index:60;display:flex;justify-content:center;pointer-events:none"><div style="background:#1B211D;color:#fff;border-radius:12px;padding:12px 16px;font-size:14px;box-shadow:0 8px 32px rgba(27,33,29,.24);display:flex;gap:10px;align-items:center;max-width:420px"><span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ toast.color }}"></span>{{ toast.msg }}</div></div>
+</sc-if>
+
+<sc-if value="{{ confirm }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:70;background:rgba(27,33,29,.45);display:flex;align-items:center;justify-content:center;padding:16px" onClick="{{ cancelConfirm }}">
+  <div role="alertdialog" aria-modal="true" onClick="{{ stop }}" style="background:#fff;border-radius:16px;padding:24px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(27,33,29,.2)">
+    <h2 style="margin:0;font-size:20px;color:#1E4A37">{{ confirm.title }}</h2>
+    <p style="margin:0;color:#5C6B62;line-height:1.5">{{ confirm.body }}</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap"><button onClick="{{ cancelConfirm }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:11px 16px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Peruuta</button><button onClick="{{ confirm.ok }}" style="background:#B8321C;color:#fff;border:0;padding:11px 16px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">{{ confirm.okLabel }}</button></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showUpsell }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:70;background:rgba(27,33,29,.45);display:flex;align-items:center;justify-content:center;padding:16px" onClick="{{ closeUpsell }}">
+  <div role="dialog" aria-modal="true" onClick="{{ stop }}" style="background:#fff;border-radius:16px;padding:24px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(27,33,29,.2)">
+    <span style="font-size:13px;font-weight:600;color:#D98A1E;text-transform:uppercase;letter-spacing:.06em">Ilmainen taso</span>
+    <h2 style="margin:0;font-size:22px;color:#1E4A37">Kaksi vahtialuetta käytössä</h2>
+    <p style="margin:0;color:#5C6B62;line-height:1.5">Ilmaisella tasolla voit seurata kahta paikkaa. Laajempi taso on tulossa; voit myös poistaa vanhan alueen tehdäksesi tilaa uudelle.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap"><button onClick="{{ closeUpsell }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:11px 16px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Sulje</button><button onClick="{{ closeUpsell }}" style="background:#1E4A37;color:#fff;border:0;padding:11px 16px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Ilmoita kun taso julkaistaan</button></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showBanner }}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-label="Evästeet" style="position:absolute;left:12px;right:12px;bottom:12px;z-index:65;margin:0 auto;max-width:640px;background:#fff;border:1px solid #DDE3DE;border-radius:16px;padding:18px;box-shadow:0 8px 32px rgba(27,33,29,.16);display:flex;flex-direction:column;gap:12px">
+  <p style="margin:0;line-height:1.5;font-size:14px">Käytämme välttämättömiä evästeitä palvelun toimintaan ja valinnaisesti analytiikkaevästeitä sen kehittämiseen. <a href="Legal.dc.html#evasteet">Lue lisää</a> · <a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a></p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button onClick="{{ acceptAll }}" style="flex:1;min-width:150px;background:#1E4A37;color:#fff;border:0;padding:12px 16px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Hyväksy kaikki</button><button onClick="{{ acceptNecessary }}" style="flex:1;min-width:150px;background:#fff;color:#1E4A37;border:1px solid #1E4A37;padding:12px 16px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Vain välttämättömät</button><button onClick="{{ openConsent }}" style="background:none;border:0;color:#2B6247;font-weight:600;font-size:15px;cursor:pointer;padding:12px 8px">Mukauta</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showConsentModal }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:80;background:rgba(27,33,29,.45);display:flex;align-items:center;justify-content:center;padding:16px" onClick="{{ closeConsent }}">
+  <div role="dialog" aria-modal="true" aria-label="Evästeasetukset" onClick="{{ stop }}" style="background:#fff;border-radius:16px;padding:24px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px;box-shadow:0 8px 32px rgba(27,33,29,.2)">
+    <h2 style="margin:0;font-size:22px;color:#1E4A37">Evästeasetukset</h2>
+    <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Välttämättömät</div><div style="font-size:14px;color:#5C6B62">Kirjautuminen, suostumusvalinnat, tietoturva. Aina käytössä.</div></div><span style="flex:none;width:44px;height:26px;border-radius:9999px;background:#B7C4BC;position:relative"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
+    <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Analytiikka</div><div style="font-size:14px;color:#5C6B62">Anonyymi käyttötilasto palvelun kehittämiseen.</div></div><button onClick="{{ toggleAnalytics }}" role="switch" aria-checked="{{ analytics }}" style="flex:none;width:44px;height:26px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ analyticsBg }}"><span style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;left:{{ analyticsKnob }}"></span></button></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick="{{ saveConsent }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Tallenna valinnat</button><button onClick="{{ closeConsent }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Sulje</button></div>
+  </div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;viewport&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;desktop&quot;,&quot;mobile&quot;],&quot;default&quot;:&quot;desktop&quot;,&quot;tsType&quot;:&quot;'desktop'|'mobile'&quot;,&quot;section&quot;:&quot;Näkymä&quot;},&quot;route&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;kirjaudu&quot;,&quot;rekisteroidy&quot;,&quot;vahvista&quot;,&quot;vahvistettu&quot;,&quot;unohtunut&quot;,&quot;uusi_salasana&quot;,&quot;kirjauduttu_ulos&quot;,&quot;aloita&quot;,&quot;vahtialueet&quot;,&quot;alue&quot;,&quot;alue_muokkaa&quot;,&quot;ilmoitukset&quot;,&quot;ilmoitus&quot;,&quot;tili&quot;,&quot;turvallisuus&quot;,&quot;ilmoitusasetukset&quot;,&quot;tietosuoja&quot;,&quot;poista&quot;,&quot;404&quot;,&quot;500&quot;,&quot;huolto&quot;,&quot;rajoitus&quot;,&quot;vahvistus_vaaditaan&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Näkymä&quot;}}">
+class Component extends DCLogic {
+  state = {
+    route: { name: null, id: null }, menuOpen: false, kebab: null, toast: null, confirm: null, showUpsell: false,
+    showBanner: false, showConsentModal: false, analytics: false,
+    f: { email: '', pw: '', pw2: '', remember: true, terms: false, marketing: false }, showPw: false, busy: false, loginError: '', loginUnverified: false, resetSent: false, cooldown: 0,
+    wiz: { step: 1, lng: 29.6212, lat: 62.3115, radius: 500, name: '', notify: true, query: '' }, editingId: null,
+    areas: null, alerts: null, loadingAreas: false,
+    typeFilter: 'all', onlyNew: false, openDecl: null, picked: null, focusDecl: null,
+    globalNotify: true, digest: 'heti', marketingPref: false, exportState: 'idle',
+    del: { confirm: '', pw: '' }, deleted: false
+  };
+  D() { return window.MV_DATA || { TYPES: {}, areas: [], decl: [], alerts: [], circlePoly: () => [] }; }
+  componentDidMount() {
+    const h = (location.hash || '').replace('#', '');
+    const init = this.props.route || h || 'kirjaudu';
+    const [name, id] = init.split('/');
+    this.setState({ route: { name, id: id || null } });
+    try { if (!localStorage.getItem('mv_consent')) this.setState({ showBanner: true }); } catch (e) {}
+    if (!window.MV_DATA) { const t = setInterval(() => { if (window.MV_DATA) { clearInterval(t); this.forceUpdate(); } }, 100); }
+  }
+  componentDidUpdate(prev) { if (this.props.route && this.props.route !== prev.route) { const [name, id] = this.props.route.split('/'); this.nav(name, id); } }
+  nav(name, id) {
+    id = id || null;
+    this.setState({ route: { name, id }, menuOpen: false, kebab: null, picked: null, openDecl: null }, () => {
+      if (window.gsap) gsap.fromTo('[data-screen]', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', clearProps: 'all' });
+      const m = document.querySelector('main[data-screen]'); if (m) m.scrollTop = 0;
+    });
+    if (!this.props.route) { try { history.replaceState(null, '', '#' + name + (id ? '/' + id : '')); } catch (e) {} }
+  }
+  toast(msg, type) { const color = type === 'error' ? '#D9572B' : type === 'info' ? '#F0B35A' : '#7EA58F'; this.setState({ toast: { msg, color } }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: null }), 3200); }
+  areas() { return this.state.areas || this.D().areas; }
+  alerts() { return this.state.alerts || this.D().alerts; }
+  dist(a, b) { const R = 6371000, toR = x => x * Math.PI / 180; const dLat = toR(b[1] - a[1]), dLng = toR(b[0] - a[0]); const s = Math.sin(dLat / 2) ** 2 + Math.cos(toR(a[1])) * Math.cos(toR(b[1])) * Math.sin(dLng / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); }
+  centroid(poly) { const n = poly.length - 1; let x = 0, y = 0; for (let i = 0; i < n; i++) { x += poly[i][0]; y += poly[i][1]; } return [x / n, y / n]; }
+  fmtDist(m) { return m >= 1000 ? (m / 1000).toFixed(1).replace('.', ',') + ' km' : Math.round(m) + ' m'; }
+  fmtRadius(m) { return m >= 1000 ? (m / 1000).toString().replace('.', ',') + ' km' : m + ' m'; }
+  setF(k) { return e => this.setState({ f: { ...this.state.f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value } }); }
+  setW(k, fn) { return e => this.setState({ wiz: { ...this.state.wiz, [k]: fn ? fn(e) : e.target.value } }); }
+  pwScore(p) { let s = 0; if (p.length >= 8) s++; if (/[A-ZÅÄÖ]/.test(p) && /[a-zåäö]/.test(p)) s++; if (/\d/.test(p)) s++; if (/[^\w]/.test(p) || p.length >= 14) s++; return s; }
+  wizDecls() { const w = this.state.wiz, D = this.D(); return D.decl.filter(d => this.dist([w.lng, w.lat], this.centroid(d.poly)) <= w.radius + 150); }
+  startCooldown() { this.setState({ cooldown: 30 }); clearInterval(this._cd); this._cd = setInterval(() => { if (this.state.cooldown <= 1) { clearInterval(this._cd); this.setState({ cooldown: 0 }); } else this.setState({ cooldown: this.state.cooldown - 1 }); }, 1000); }
+  saveArea() {
+    const w = this.state.wiz, list = [...this.areas()];
+    const q = w.query || 'Valittu sijainti'; const place = w.query ? w.query.split(',').slice(-1)[0].trim() : 'Rääkkylä';
+    if (this.state.editingId) { const i = list.findIndex(a => a.id === this.state.editingId); list[i] = { ...list[i], name: w.name || list[i].name, lng: w.lng, lat: w.lat, radius: w.radius, notify: w.notify }; this.setState({ areas: list }); this.toast('Vahtialue päivitetty'); this.nav('alue', this.state.editingId); }
+    else { const id = 'a' + (Date.now() % 100000); list.push({ id, name: w.name || q, place, lng: w.lng, lat: w.lat, radius: w.radius, notify: w.notify, newCount: 0, lastChecked: 'juuri nyt' }); this.setState({ areas: list, loadingAreas: true }); this.toast('Vahtialue tallennettu. Ensimmäinen tarkistus on tehty.'); this.nav('vahtialueet'); setTimeout(() => this.setState({ loadingAreas: false }), 900); }
+  }
+  renderVals() {
+    const s = this.state, D = this.D(), r = s.route.name, mobile = (this.props.viewport || 'desktop') === 'mobile';
+    const authRoutes = ['kirjaudu', 'rekisteroidy', 'vahvista', 'vahvistettu', 'unohtunut', 'uusi_salasana', 'kirjauduttu_ulos'];
+    const sysRoutes = ['404', '500', 'huolto', 'rajoitus', 'vahvistus_vaaditaan'];
+    const tiliRoutes = ['tili', 'turvallisuus', 'ilmoitusasetukset', 'tietosuoja', 'poista'];
+    const isAuth = authRoutes.includes(r), isSystem = sysRoutes.includes(r), isApp = !!r && !isAuth && !isSystem;
+    const R = {}; [...authRoutes, 'aloita', 'vahtialueet', 'alue', 'alue_muokkaa', 'ilmoitukset', 'ilmoitus', ...tiliRoutes].forEach(k => R['r_' + k] = r === k);
+    const areas = this.areas(), alerts = this.alerts();
+    const decls = D.decl.map(d => { const a = areas.find(x => x.id === d.area); return { ...d, distM: a ? this.dist([a.lng, a.lat], this.centroid(d.poly)) : d.dist }; });
+    const unread = alerts.filter(a => !a.read).length;
+    const T = D.TYPES;
+    const navItems = [
+      { label: 'Vahtialueet', key: 'vahtialueet', match: ['vahtialueet', 'alue', 'alue_muokkaa', 'aloita'] },
+      { label: 'Ilmoitukset', key: 'ilmoitukset', match: ['ilmoitukset', 'ilmoitus'], badge: unread ? String(unread) : false },
+      { label: 'Tili', key: 'tili', match: tiliRoutes }
+    ].map(n => { const cur = n.match.includes(r); return { ...n, current: cur ? 'page' : undefined, go: () => this.nav(n.key), bg: cur ? '#E9F0EB' : 'transparent', fg: cur ? '#1E4A37' : '#5C6B62', dot: cur ? '#2B6247' : '#B7C4BC' }; });
+    const titles = { aloita: 'Uusi vahtialue', vahtialueet: 'Vahtialueet', alue: 'Vahtialue', alue_muokkaa: 'Muokkaa vahtialuetta', ilmoitukset: 'Ilmoitukset', ilmoitus: 'Ilmoitus', tili: 'Tili', turvallisuus: 'Turvallisuus', ilmoitusasetukset: 'Ilmoitusasetukset', tietosuoja: 'Tietosuoja ja tiedot', poista: 'Poista tili' };
+    // auth
+    const score = this.pwScore(s.f.pw), pwColors = ['#B7C4BC', '#D9572B', '#F0B35A', '#7EA58F', '#2B6247'];
+    const bar = i => score >= i ? pwColors[score] : '#EFECE5';
+    const pw2Error = s.f.pw2.length > 0 && s.f.pw2 !== s.f.pw;
+    const registerDisabled = !s.f.terms || !s.f.email || score < 2 || s.f.pw !== s.f.pw2;
+    // wizard
+    const w = s.wiz, wizDecls = this.wizDecls();
+    const radiusOptions = [250, 500, 1000, 2000].map(v => { const on = w.radius === v; return { label: this.fmtRadius(v), on, pick: () => this.setState({ wiz: { ...w, radius: v } }), bg: on ? '#fff' : 'transparent', fg: on ? '#1E4A37' : '#5C6B62', shadow: on ? '0 1px 3px rgba(27,33,29,.12)' : 'none' }; });
+    const suggestions = w.query.length >= 3 && s.route.name === 'aloita' && w.step === 1 && !w.picked ? [
+      { label: w.query.charAt(0).toUpperCase() + w.query.slice(1), sub: 'Rääkkylä, Pohjois-Karjala', lng: 29.6212, lat: 62.3115 },
+      { label: w.query.charAt(0).toUpperCase() + w.query.slice(1), sub: 'Vihti, Uusimaa', lng: 24.5541, lat: 60.3187 }
+    ].map(sg => ({ ...sg, pick: () => this.setState({ wiz: { ...w, query: sg.label + ', ' + sg.sub.split(',')[0], lng: sg.lng, lat: sg.lat, picked: true } }) })) : [];
+    const wizAreas = [{ id: 'w', lng: w.lng, lat: w.lat, radius: w.radius, name: w.name }];
+    const wizMapRef = el => el && window.MVMap && window.MV_DATA && window.MVMap.mount(el, { center: [w.lng, w.lat], zoom: 13, areas: wizAreas, decls: decls, draggable: true, fit: false, cooperative: false,
+      onDrag: p => this.setState({ wiz: { ...this.state.wiz, lng: p[0], lat: p[1], picked: true } }), onMapClick: p => { if (this.state.wiz.step === 1 || this.state.route.name === 'alue_muokkaa') this.setState({ wiz: { ...this.state.wiz, lng: p[0], lat: p[1], picked: true } }); } });
+    // dashboard
+    const areaCards = areas.map(a => { const cnt = decls.filter(d => d.area === a.id).length; const newCount = decls.filter(d => d.area === a.id && d.isNew).length; return { ...a, count: cnt, newCount, hasNew: newCount > 0, radiusLabel: this.fmtRadius(a.radius), kebabOpen: s.kebab === a.id,
+      open: () => this.nav('alue', a.id), toggleKebab: e => { e.stopPropagation(); this.setState({ kebab: s.kebab === a.id ? null : a.id }); },
+      edit: () => { this.setState({ wiz: { ...w, lng: a.lng, lat: a.lat, radius: a.radius, name: a.name, notify: a.notify, query: a.place }, editingId: a.id, kebab: null }); this.nav('alue_muokkaa', a.id); },
+      remove: () => this.setState({ kebab: null, confirm: { title: 'Poistetaanko vahtialue?', body: `”${a.name}” ja sen ilmoitushistoria poistetaan. Toimintoa ei voi perua.`, okLabel: 'Poista', ok: () => { this.setState({ areas: areas.filter(x => x.id !== a.id), alerts: alerts.filter(x => x.areaId !== a.id), confirm: null }); this.toast('Vahtialue poistettu'); this.nav('vahtialueet'); } } }),
+      toggleNotify: () => { this.setState({ areas: areas.map(x => x.id === a.id ? { ...x, notify: !x.notify } : x) }); this.toast(a.notify ? 'Ilmoitukset pois: ' + a.name : 'Ilmoitukset päällä: ' + a.name); },
+      notifyBg: a.notify ? '#2B6247' : '#B7C4BC', notifyKnob: a.notify ? '21px' : '3px' }; });
+    const limitReached = areas.length >= 2;
+    const overviewMapRef = el => el && window.MVMap && window.MV_DATA && window.MVMap.mount(el, { center: [27, 61.5], zoom: 5, areas, decls: decls, fit: true, cooperative: true });
+    // area detail
+    const area = areas.find(a => a.id === s.route.id) || areas[0] || { name: '', place: '', radius: 0 };
+    const areaDecls = decls.filter(d => d.area === area.id).sort((a, b) => (b.isNew - a.isNew) || (b.received.split('.').reverse().join('') > a.received.split('.').reverse().join('') ? 1 : -1));
+    const filtered = areaDecls.filter(d => (s.typeFilter === 'all' || d.type === s.typeFilter) && (!s.onlyNew || d.isNew));
+    const typeFilters = [{ key: 'all', label: 'Kaikki' }, { key: 'uudistus', label: 'Uudistushakkuu', dot: '#D9572B' }, { key: 'harvennus', label: 'Harvennus', dot: '#F0B35A' }, { key: 'muu', label: 'Muu', dot: '#9AA39D' }].map(t => { const on = s.typeFilter === t.key; return { ...t, on, dot: t.dot || false, pick: () => this.setState({ typeFilter: t.key }), bg: on ? '#1E4A37' : '#fff', fg: on ? '#fff' : '#1B211D', border: on ? '#1E4A37' : '#DDE3DE' }; });
+    const declRow = d => ({ ...d, typeLabel: T[d.type]?.label || d.type, color: T[d.type]?.color || '#9AA39D', distLabel: this.fmtDist(d.distM), ha: String(d.ha).replace('.', ','), open: s.openDecl === d.id, chev: s.openDecl === d.id ? 'rotate(180deg)' : 'rotate(0deg)',
+      toggle: () => this.setState({ openDecl: s.openDecl === d.id ? null : d.id }), openDetail: () => this.nav('ilmoitus', d.id), focus: () => this.setState({ focusDecl: d.id, picked: d.id }) });
+    const declRows = filtered.map(declRow);
+    const pickedD = s.picked ? decls.find(d => d.id === s.picked) : null;
+    const focusD = s.focusDecl ? decls.find(d => d.id === s.focusDecl) : null;
+    const areaMapRef = el => el && window.MVMap && window.MV_DATA && area.id && window.MVMap.mount(el, { center: [area.lng, area.lat], zoom: 13, areas: [area], decls: areaDecls, fit: !focusD, flyTo: focusD ? this.centroid(focusD.poly) : null, cooperative: mobile, onPick: id => this.setState({ picked: id, focusDecl: null }) });
+    // alerts
+    const alertItems = alerts.map(al => { const d = decls.find(x => x.id === al.declId), a = areas.find(x => x.id === al.areaId); if (!d || !a) return null; return { ...al, typeLabel: T[d.type]?.label, color: T[d.type]?.color, ha: String(d.ha).replace('.', ','), distLabel: this.fmtDist(d.distM), areaName: a.name, unread: !al.read, opacity: al.read ? 0.72 : 1, open: () => { this.setState({ alerts: alerts.map(x => x.id === al.id ? { ...x, read: true } : x) }); this.nav('ilmoitus', d.id); } }; }).filter(Boolean);
+    const groups = []; alertItems.forEach(it => { let g = groups.find(x => x.date === it.date); if (!g) { g = { date: it.date, items: [] }; groups.push(g); } g.items.push(it); });
+    // alert detail
+    const detD = decls.find(d => d.id === s.route.id) || decls[0]; const detA = detD ? areas.find(a => a.id === detD.area) : null;
+    const det = detD ? { ...declRow(detD), areaName: detA ? detA.name : '', openArea: () => this.nav('alue', detD.area) } : {};
+    const alertMapRef = el => el && window.MVMap && window.MV_DATA && detD && window.MVMap.mount(el, { center: this.centroid(detD.poly), zoom: 14, areas: detA ? [detA] : [], decls: [detD], fit: true, cooperative: mobile });
+    // tili
+    const tiliTabs = [{ key: 'tili', label: 'Tili' }, { key: 'turvallisuus', label: 'Turvallisuus' }, { key: 'ilmoitusasetukset', label: 'Ilmoitusasetukset' }, { key: 'tietosuoja', label: 'Tietosuoja ja tiedot' }, { key: 'poista', label: 'Poista tili' }].map(t => { const cur = r === t.key; return { ...t, current: cur ? 'page' : undefined, go: () => this.nav(t.key), fg: cur ? '#1E4A37' : '#5C6B62', border: cur ? '#1E4A37' : 'transparent' }; });
+    const digestOptions = [{ key: 'heti', label: 'Heti' }, { key: 'paivittain', label: 'Päivittäin klo 09' }, { key: 'viikoittain', label: 'Viikoittain' }].map(o => { const on = s.digest === o.key; return { ...o, on, pick: () => this.setState({ digest: o.key }), bg: on ? '#fff' : 'transparent', fg: on ? '#1E4A37' : '#5C6B62', shadow: on ? '0 1px 3px rgba(27,33,29,.12)' : 'none' }; });
+    const delDisabled = s.del.confirm !== 'POISTA' || s.del.pw.length < 1;
+    const sys = { '404': { code: '404', title: 'Sivua ei löytynyt', body: 'Osoite saattaa olla vanhentunut tai kirjoitettu väärin.', cta: 'Vahtialueisiin' }, '500': { code: '500', title: 'Jotain meni pieleen', body: 'Palvelussa tapahtui virhe. Yritä hetken päästä uudelleen. Vahtialueesi seuranta jatkuu normaalisti.', cta: 'Yritä uudelleen' }, huolto: { code: 'HUOLTO', title: 'Metsävahti on huoltotauolla', body: 'Palaamme noin klo 07.00. Sähköposti-ilmoitukset lähetetään huollon jälkeen normaalisti.', cta: 'Yritä uudelleen' }, rajoitus: { code: '429', title: 'Liian monta pyyntöä', body: 'Odota hetki ja yritä uudelleen.', cta: 'Yritä uudelleen' }, vahvistus_vaaditaan: { code: 'VAHVISTUS', title: 'Vahvista sähköpostiosoitteesi ensin', body: 'Lähetimme vahvistuslinkin sähköpostiisi. Vahtialueet avautuvat, kun osoite on vahvistettu.', cta: 'Avaa sähköposti', resend: true } }[r] || {};
+    const save = analytics => { try { localStorage.setItem('mv_consent', JSON.stringify({ necessary: true, analytics, at: new Date().toISOString() })); } catch (e) {} this.setState({ showBanner: false, showConsentModal: false, analytics }); };
+    return {
+      ...R, isAuth, isSystem, isApp, isMobile: mobile, isDesktop: !mobile, isTili: tiliRoutes.includes(r), navItems, pageTitle: titles[r] || '',
+      menuOpen: s.menuOpen, toggleMenu: () => this.setState({ menuOpen: !s.menuOpen }), logout: () => this.nav('kirjauduttu_ulos'),
+      goTili: () => this.nav('tili'), goIlmoitusasetukset: () => this.nav('ilmoitusasetukset'), goVahtialueet: () => this.nav(r === '500' || r === 'huolto' || r === 'rajoitus' ? 'vahtialueet' : 'vahtialueet'), goIlmoitukset: () => this.nav('ilmoitukset'), goKirjaudu: () => this.setState({ loginError: '', resetSent: false }, () => this.nav('kirjaudu')), goRekisteroidy: () => this.nav('rekisteroidy'), goUnohtunut: () => this.nav('unohtunut'), goAloita: () => this.setState({ wiz: { ...w, step: 1, name: '', query: '', picked: false }, editingId: null }, () => this.nav('aloita')),
+      // auth
+      f: s.f, setEmail: this.setF('email'), setPw: this.setF('pw'), setPw2: this.setF('pw2'), toggleRemember: this.setF('remember'), toggleTerms: this.setF('terms'), toggleMarketing: this.setF('marketing'),
+      pwType: s.showPw ? 'text' : 'password', pwToggleLabel: s.showPw ? 'Piilota' : 'Näytä', togglePw: () => this.setState({ showPw: !s.showPw }),
+      busy: s.busy, loginError: s.loginError, loginUnverified: s.loginUnverified,
+      doLogin: () => { if (!s.f.email || !s.f.pw) { this.setState({ loginError: 'Täytä sähköposti ja salasana.', loginUnverified: false }); return; } this.setState({ busy: true }); setTimeout(() => { this.setState({ busy: false, loginError: '' }); this.nav(areas.length ? 'vahtialueet' : 'aloita'); }, 700); },
+      demoWrong: () => this.setState({ loginError: 'Sähköposti tai salasana on väärä.', loginUnverified: false }), demoUnverified: () => this.setState({ loginError: 'Sähköpostiosoitetta ei ole vielä vahvistettu.', loginUnverified: true }),
+      pwBar1: bar(1), pwBar2: bar(2), pwBar3: bar(3), pwBar4: bar(4), pwLabel: s.f.pw ? ['Liian lyhyt', 'Heikko', 'Kohtalainen', 'Hyvä', 'Vahva'][score] : 'Vähintään 8 merkkiä', pw2Border: pw2Error ? '#B8321C' : '#B7C4BC', pw2Error,
+      registerDisabled, registerOpacity: registerDisabled ? 0.55 : 1, doRegister: () => { this.startCooldown(); this.nav('vahvista'); },
+      emailShown: s.f.email || 'sinun@sahkoposti.fi', cooldownActive: s.cooldown > 0, resendLabel: s.cooldown > 0 ? `Lähetä uudelleen (${s.cooldown} s)` : 'Lähetä uudelleen', resend: () => { this.startCooldown(); this.toast('Vahvistuslinkki lähetetty uudelleen'); }, demoVerified: () => this.nav('vahvistettu'),
+      resetSent: s.resetSent, resetNotSent: !s.resetSent, sendReset: () => this.setState({ resetSent: true }), savePassword: () => { this.toast('Salasana vaihdettu'); this.nav('kirjaudu'); },
+      // system
+      sysCode: sys.code || '', sysTitle: sys.title || '', sysBody: sys.body || '', sysCta: sys.cta || '', sysShowResend: !!sys.resend,
+      // wizard
+      wiz: w, wizStep: w.step, wizStep1: w.step === 1, wizStep2: w.step === 2, wizStep3: w.step === 3, wizBar2: w.step >= 2 ? '#1E4A37' : '#DDE3DE', wizBar3: w.step >= 3 ? '#1E4A37' : '#DDE3DE',
+      wizNext: () => this.setState({ wiz: { ...w, step: Math.min(3, w.step + 1) } }), wizBack: () => this.setState({ wiz: { ...w, step: Math.max(1, w.step - 1) } }), skipWizard: () => this.nav('vahtialueet'),
+      setQuery: this.setW('query', e => e.target.value), setName: this.setW('name'), setRadius: this.setW('radius', e => Number(e.target.value)), toggleWizNotify: () => this.setState({ wiz: { ...w, notify: !w.notify } }),
+      useMyLocation: () => this.setState({ wiz: { ...w, lng: 24.9384, lat: 60.1699, query: 'Nykyinen sijainti', picked: true } }),
+      showSuggest: suggestions.length > 0, suggestions, wizCoords: w.lat.toFixed(5) + ' N, ' + w.lng.toFixed(5) + ' E', radiusOptions, radiusLabel: this.fmtRadius(w.radius), wizCount: wizDecls.length, wizNotifyBg: w.notify ? '#2B6247' : '#B7C4BC', wizNotifyKnob: w.notify ? '23px' : '3px', wizMapRef, saveArea: () => this.saveArea(),
+      // dashboard
+      areaCards, hasAreas: areas.length > 0 && !s.loadingAreas, noAreas: areas.length === 0 && !s.loadingAreas, loadingAreas: s.loadingAreas, limitReached, limitTooltip: limitReached ? 'Ilmaisella tasolla enintään 2 vahtialuetta' : '', newAreaOpacity: limitReached ? 0.55 : 1,
+      newArea: () => { if (limitReached) { this.setState({ showUpsell: true }); return; } this.setState({ wiz: { ...w, step: 1, name: '', query: '', picked: false }, editingId: null }, () => this.nav('aloita')); }, overviewMapRef,
+      // area detail
+      area: { ...area, radiusLabel: this.fmtRadius(area.radius || 0) }, areaMapRef, recenterArea: () => { this.setState({ focusDecl: null, picked: null }); document.querySelectorAll('[class*=maplibregl-map]').forEach(el => window.MVMap.recenter(el)); },
+      typeFilters, onlyNew: s.onlyNew, toggleOnlyNew: () => this.setState({ onlyNew: !s.onlyNew }), onlyNewBg: s.onlyNew ? '#D98A1E' : '#fff', onlyNewFg: s.onlyNew ? '#fff' : '#1B211D', onlyNewBorder: s.onlyNew ? '#D98A1E' : '#DDE3DE',
+      declRows, noDecls: filtered.length === 0, declCountLabel: `${filtered.length} ilmoitusta · ${areaDecls.filter(d => d.isNew).length} uutta`,
+      picked: pickedD ? declRow(pickedD) : false, clearPick: () => this.setState({ picked: null }),
+      editArea: () => { this.setState({ wiz: { ...w, lng: area.lng, lat: area.lat, radius: area.radius, name: area.name, notify: area.notify, query: area.place }, editingId: area.id }); this.nav('alue_muokkaa', area.id); },
+      removeArea: () => areaCards.find(a => a.id === area.id)?.remove(), backToArea: () => this.nav('alue', s.editingId || area.id),
+      // alerts
+      alertGroups: groups, hasUnread: unread > 0, noAlerts: alertItems.length === 0, markAllRead: () => { this.setState({ alerts: alerts.map(a => ({ ...a, read: true })) }); this.toast('Kaikki merkitty luetuiksi'); }, det, alertMapRef,
+      // tili
+      tiliTabs, changeEmail: () => this.toast('Lähetimme vahvistuslinkin uuteen osoitteeseen', 'info'), saveSettings: () => this.toast('Asetukset tallennettu'), logoutOthers: () => this.toast('Muut istunnot kirjattu ulos'),
+      globalNotify: s.globalNotify, toggleGlobalNotify: () => this.setState({ globalNotify: !s.globalNotify }), globalNotifyBg: s.globalNotify ? '#2B6247' : '#B7C4BC', globalNotifyKnob: s.globalNotify ? '23px' : '3px',
+      digestOptions, marketingPref: s.marketingPref, toggleMarketingPref: () => this.setState({ marketingPref: !s.marketingPref }), marketingBg: s.marketingPref ? '#2B6247' : '#B7C4BC', marketingKnob: s.marketingPref ? '23px' : '3px', sendTest: () => this.toast('Testisähköposti lähetetty osoitteeseen anna.korhonen@example.fi'),
+      exportIdle: s.exportState === 'idle', exportBusy: s.exportState === 'busy', startExport: () => { this.setState({ exportState: 'busy' }); setTimeout(() => { this.setState({ exportState: 'idle' }); this.toast('Latauslinkki lähetetty sähköpostiin'); }, 2500); },
+      del: s.del, setDelConfirm: e => this.setState({ del: { ...s.del, confirm: e.target.value } }), setDelPw: e => this.setState({ del: { ...s.del, pw: e.target.value } }), delDisabled, delOpacity: delDisabled ? 0.55 : 1, doDelete: () => this.setState({ deleted: true }), deleted: s.deleted, notDeleted: !s.deleted,
+      // overlays
+      toast: s.toast || false, confirm: s.confirm || false, cancelConfirm: () => this.setState({ confirm: null }), showUpsell: s.showUpsell, closeUpsell: () => this.setState({ showUpsell: false }), stop: e => e.stopPropagation(), noop: e => e.preventDefault(),
+      showBanner: s.showBanner, showConsentModal: s.showConsentModal, analytics: s.analytics, analyticsBg: s.analytics ? '#2B6247' : '#B7C4BC', analyticsKnob: s.analytics ? '21px' : '3px',
+      acceptAll: () => save(true), acceptNecessary: () => save(false), saveConsent: () => save(s.analytics), openConsent: () => this.setState({ showConsentModal: true, showBanner: false }), closeConsent: () => this.setState({ showConsentModal: false }), toggleAnalytics: () => this.setState({ analytics: !s.analytics })
+    };
+  }
+}
+</script>
+</body>
+</html>

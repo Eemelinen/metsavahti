@@ -1,0 +1,68 @@
+# Local infrastructure for Metsävahti. Everything runs in Docker Desktop.
+#
+#   db       - development PostGIS (port 5432), data persisted in a named volume
+#   db_test  - end-to-end test PostGIS (port 5433), tmpfs-backed and tuned for speed;
+#              data is discarded every time the container stops
+#   mailpit  - SMTP catcher (1025) + web UI / REST API (8025) for dev and tests
+#
+# Integration tests do NOT use these services: they start a throwaway PostGIS
+# container per run via Testcontainers.
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: metsavahti-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: metsavahti
+      POSTGRES_PASSWORD: metsavahti
+      POSTGRES_DB: metsavahti
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U metsavahti -d metsavahti']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  db_test:
+    image: postgis/postgis:16-3.4
+    container_name: metsavahti-db-test
+    environment:
+      POSTGRES_USER: metsavahti
+      POSTGRES_PASSWORD: metsavahti
+      POSTGRES_DB: metsavahti_e2e
+    command: >-
+      postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off
+      -c shared_buffers=128MB -c max_connections=50
+    ports:
+      - '5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    volumes:
+      - ./docker/db-test-init.sql:/docker-entrypoint-initdb.d/zz-metsavahti-test.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U metsavahti -d metsavahti_e2e']
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: metsavahti-mailpit
+    restart: unless-stopped
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8025/livez']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:

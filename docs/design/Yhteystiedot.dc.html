@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#F7F5F0;color:#1B211D;font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2B6247;text-decoration:none}a:hover{color:#1E4A37;text-decoration:underline}
+*{box-sizing:border-box}button,input,select,textarea{font-family:inherit}
+input:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #2B6247;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:20;background:rgba(247,245,240,.88);backdrop-filter:blur(10px);border-bottom:1px solid #DDE3DE">
+    <div style="max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <a href="Landing.dc.html" style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4A37"><span style="width:28px;height:28px;border-radius:8px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</a>
+      <nav style="display:flex;gap:20px;margin-left:auto;align-items:center;flex-wrap:wrap;font-size:15px;font-weight:500">
+        <a href="Miten.dc.html" style="color:#1B211D">Miten se toimii</a>
+        <a href="Hinnoittelu.dc.html" style="color:#1B211D">Hinnoittelu</a>
+        <a href="App.dc.html#kirjaudu" style="color:#1B211D">Kirjaudu</a>
+        <a href="App.dc.html#rekisteroidy" style="background:#1E4A37;color:#fff;padding:10px 18px;border-radius:9999px;font-weight:600" style-hover="background:#2B6247;text-decoration:none">Luo tili</a>
+      </nav>
+    </div>
+  </header>
+  <div style="max-width:1120px;margin:0 auto;padding:64px 20px 96px;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <h1 style="margin:0;font-size:clamp(32px,4.5vw,44px);line-height:1.05;letter-spacing:-0.02em;color:#1E4A37">{{ title }}</h1>
+      <p style="margin:0;font-size:18px;line-height:1.5;color:#5C6B62;text-wrap:pretty">{{ intro }}</p>
+      <div style="display:flex;gap:6px;background:#EFECE5;padding:4px;border-radius:12px;width:fit-content">
+        <button onClick="{{ goContact }}" aria-pressed="{{ isContact }}" style="border:0;padding:10px 16px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;background:{{ contactBg }};color:{{ contactFg }};box-shadow:{{ contactShadow }}">Yhteydenotto</button>
+        <button onClick="{{ goRequest }}" aria-pressed="{{ isRequest }}" style="border:0;padding:10px 16px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;background:{{ requestBg }};color:{{ requestFg }};box-shadow:{{ requestShadow }}">Tietopyyntö</button>
+      </div>
+      <dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:15px;line-height:1.5"><dt style="color:#5C6B62">Sähköposti</dt><dd style="margin:0"><a href="mailto:tuki@metsavahti.fi">tuki@metsavahti.fi</a></dd><dt style="color:#5C6B62">Tietosuoja</dt><dd style="margin:0"><a href="mailto:tietosuoja@metsavahti.fi">tietosuoja@metsavahti.fi</a></dd><dt style="color:#5C6B62">Vastausaika</dt><dd style="margin:0">Yleensä 2 arkipäivää, tietopyynnöt 30 päivän kuluessa.</dd></dl>
+    </div>
+    <div style="grid-column:span 2;min-width:0;max-width:600px;background:#fff;border:1px solid #DDE3DE;border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 1px 2px rgba(27,33,29,.06),0 4px 16px rgba(27,33,29,.06)">
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;padding:24px 0">
+          <span style="width:56px;height:56px;border-radius:50%;background:#E9F0EB;display:inline-flex;align-items:center;justify-content:center;color:#1E4A37;font-size:26px">✓</span>
+          <h2 style="margin:0;font-size:22px;color:#1E4A37">{{ sentTitle }}</h2>
+          <p style="margin:0;color:#5C6B62;line-height:1.5;max-width:400px">{{ sentBody }}</p>
+          <button onClick="{{ reset }}" style="background:none;border:0;color:#2B6247;font-weight:600;cursor:pointer;font-size:14px">Lähetä toinen viesti</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ isContact }}" hint-placeholder-val="{{ true }}">
+          <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px">Nimi<input type="text" value="{{ f.name }}" onChange="{{ setName }}" style="width:100%;padding:12px 14px;border:1px solid #B7C4BC;border-radius:10px;font-size:16px;font-weight:400"></label>
+        </sc-if>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px"><span>Sähköposti <span style="color:#B8321C">*</span></span><input type="email" value="{{ f.email }}" onChange="{{ setEmail }}" style="width:100%;padding:12px 14px;border:1px solid {{ emailBorder }};border-radius:10px;font-size:16px;font-weight:400"><sc-if value="{{ emailError }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-weight:400;font-size:13px;color:#B8321C">Anna toimiva sähköpostiosoite.</span></sc-if></label>
+        <sc-if value="{{ isRequest }}" hint-placeholder-val="{{ false }}">
+          <fieldset style="border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px"><legend style="font-weight:600;font-size:14px;margin-bottom:8px">Pyynnön tyyppi <span style="color:#B8321C">*</span></legend>
+            <sc-for list="{{ requestTypes }}" as="rt" hint-placeholder-count="3"><label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid {{ rt.border }};border-radius:10px;cursor:pointer;background:{{ rt.bg }}"><input type="radio" name="rtype" checked="{{ rt.on }}" onChange="{{ rt.pick }}" style="width:18px;height:18px;accent-color:#1E4A37;margin-top:1px;flex:none"><span style="line-height:1.4"><strong>{{ rt.label }}</strong><br><span style="font-size:13px;color:#5C6B62">{{ rt.sub }}</span></span></label></sc-for>
+          </fieldset>
+          <p style="margin:0;font-size:13px;color:#5C6B62;line-height:1.5;background:#F7F5F0;border-radius:8px;padding:10px 12px">Jos sinulla on tili, nopein tapa on tehdä pyyntö itse kohdassa <a href="App.dc.html#tietosuoja">Tili → Tietosuoja ja tiedot</a>. Tunnistamme pyynnön lähettämällä vahvistuslinkin antamaasi osoitteeseen.</p>
+        </sc-if>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px"><span>Viesti <span style="color:#B8321C">*</span></span><textarea rows="5" value="{{ f.message }}" onChange="{{ setMessage }}" style="width:100%;padding:12px 14px;border:1px solid {{ messageBorder }};border-radius:10px;font-size:16px;font-weight:400;resize:vertical;line-height:1.5"></textarea><sc-if value="{{ messageError }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-weight:400;font-size:13px;color:#B8321C">Kirjoita viesti.</span></sc-if></label>
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;cursor:pointer"><input type="checkbox" checked="{{ f.consent }}" onChange="{{ toggleConsent }}" style="width:18px;height:18px;accent-color:#1E4A37;flex:none;margin-top:2px"><span>Hyväksyn, että viestini ja yhteystietoni käsitellään <a href="Legal.dc.html#tietosuoja">tietosuojaselosteen</a> mukaisesti vastaamista varten. <span style="color:#B8321C">*</span></span></label>
+        <sc-if value="{{ consentError }}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size:13px;color:#B8321C;margin-top:-10px">Suostumus tarvitaan, jotta voimme vastata.</span></sc-if>
+        <button onClick="{{ submit }}" style="background:#1E4A37;color:#fff;border:0;padding:13px 20px;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;min-height:48px" style-hover="background:#2B6247">{{ submitLabel }}</button>
+      </sc-if>
+    </div>
+  </div>
+  <footer style="border-top:1px solid #DDE3DE;background:#EFECE5;margin-top:auto">
+    <div style="max-width:1120px;margin:0 auto;padding:32px 20px;display:flex;flex-direction:column;gap:20px;font-size:14px;color:#5C6B62">
+      <nav style="display:flex;gap:8px 20px;flex-wrap:wrap"><a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a><a href="Legal.dc.html#kayttoehdot">Käyttöehdot</a><a href="Legal.dc.html#evasteet">Evästeet</a><a href="Legal.dc.html#saavutettavuus">Saavutettavuusseloste</a><a href="Yhteystiedot.dc.html">Yhteystiedot</a><a href="Legal.dc.html#evasteet">Evästeasetukset</a></nav>
+      <p style="margin:0;line-height:1.5">Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa 09/2026. Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.</p>
+      <p style="margin:0">© 2026 Metsävahti</p>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: 'contact', f: { name: '', email: '', message: '', consent: false, type: 'tarkastus' }, errors: {}, sent: false };
+  componentDidMount() { if (location.hash === '#tietopyynto') this.setState({ mode: 'request' }); }
+  set(k) { return e => this.setState({ f: { ...this.state.f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }, errors: { ...this.state.errors, [k]: false } }); }
+  go(mode) { return () => { this.setState({ mode, errors: {}, sent: false }); try { history.replaceState(null, '', mode === 'request' ? '#tietopyynto' : '#'); } catch (e) {} }; }
+  renderVals() {
+    const s = this.state, f = s.f, isContact = s.mode === 'contact', isRequest = !isContact;
+    const seg = on => ({ bg: on ? '#fff' : 'transparent', fg: on ? '#1E4A37' : '#5C6B62', shadow: on ? '0 1px 3px rgba(27,33,29,.12)' : 'none' });
+    const c = seg(isContact), r = seg(isRequest);
+    const requestTypes = [{ key: 'tarkastus', label: 'Tarkastus', sub: 'Haluan tietää, mitä tietoja minusta on tallennettu.' }, { key: 'poisto', label: 'Poisto', sub: 'Haluan, että tietoni poistetaan.' }, { key: 'muu', label: 'Muu pyyntö', sub: 'Oikaisu, rajoittaminen, siirto tai vastustaminen.' }].map(t => ({ ...t, on: f.type === t.key, pick: () => this.setState({ f: { ...f, type: t.key } }), border: f.type === t.key ? '#1E4A37' : '#DDE3DE', bg: f.type === t.key ? '#E9F0EB' : '#fff' }));
+    return {
+      title: isContact ? 'Yhteystiedot' : 'Tietopyyntö', intro: isContact ? 'Kysymys palvelusta, virhe aineistossa tai idea? Vastaamme yleensä parin arkipäivän sisällä.' : 'Voit käyttää rekisteröidyn oikeuksiasi tällä lomakkeella myös ilman tiliä. Vastaamme 30 päivän kuluessa.',
+      isContact, isRequest, goContact: this.go('contact'), goRequest: this.go('request'), contactBg: c.bg, contactFg: c.fg, contactShadow: c.shadow, requestBg: r.bg, requestFg: r.fg, requestShadow: r.shadow,
+      f, setName: this.set('name'), setEmail: this.set('email'), setMessage: this.set('message'), toggleConsent: this.set('consent'), requestTypes,
+      emailError: !!s.errors.email, emailBorder: s.errors.email ? '#B8321C' : '#B7C4BC', messageError: !!s.errors.message, messageBorder: s.errors.message ? '#B8321C' : '#B7C4BC', consentError: !!s.errors.consent,
+      submitLabel: isContact ? 'Lähetä viesti' : 'Lähetä tietopyyntö', sent: s.sent, notSent: !s.sent,
+      sentTitle: isContact ? 'Kiitos viestistäsi' : 'Tietopyyntö vastaanotettu', sentBody: isContact ? 'Vastaamme osoitteeseen ' + f.email + ' yleensä kahden arkipäivän kuluessa.' : 'Lähetimme vahvistuslinkin osoitteeseen ' + f.email + '. Käsittely alkaa, kun olet vahvistanut osoitteen.',
+      submit: () => { const errors = { email: !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email), message: f.message.trim().length < 3, consent: !f.consent }; if (Object.values(errors).some(Boolean)) { this.setState({ errors }); return; } this.setState({ sent: true }); },
+      reset: () => this.setState({ sent: false, f: { ...f, message: '', consent: false } })
+    };
+  }
+}
+</script>
+</body>
+</html>

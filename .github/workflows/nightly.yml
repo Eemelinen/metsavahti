@@ -1,0 +1,21 @@
+name: Nightly WFS contract test
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC, after the 21:00 EET Metsäkeskus update
+  workflow_dispatch:
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Contract test against avoin.metsakeskus.fi
+        run: pnpm test:live

@@ -1,0 +1,524 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "forestusedeclaration.27613405",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              399971.56,
+              6688514.06
+            ],
+            [
+              399996.95,
+              6688538.15
+            ],
+            [
+              400001.95,
+              6688552.15
+            ],
+            [
+              400015.45,
+              6688573.15
+            ],
+            [
+              400016.95,
+              6688591.65
+            ],
+            [
+              400024.96,
+              6688605.3
+            ],
+            [
+              400040.83,
+              6688635.05
+            ],
+            [
+              400039.95,
+              6688648.65
+            ],
+            [
+              400043.95,
+              6688665.15
+            ],
+            [
+              400051.95,
+              6688680.15
+            ],
+            [
+              400062.45,
+              6688689.65
+            ],
+            [
+              400070.62,
+              6688693.44
+            ],
+            [
+              400073.49,
+              6688695.44
+            ],
+            [
+              400080.36,
+              6688702.84
+            ],
+            [
+              400084.98,
+              6688708.17
+            ],
+            [
+              400084.22,
+              6688710.66
+            ],
+            [
+              400084.34,
+              6688713.28
+            ],
+            [
+              400082.32,
+              6688717.89
+            ],
+            [
+              400078.95,
+              6688719.15
+            ],
+            [
+              400045.92,
+              6688720.49
+            ],
+            [
+              400027.45,
+              6688731.65
+            ],
+            [
+              400013.54,
+              6688736.58
+            ],
+            [
+              400018.54,
+              6688759.58
+            ],
+            [
+              400016.73,
+              6688771.8
+            ],
+            [
+              400002.54,
+              6688772.47
+            ],
+            [
+              399995.04,
+              6688771.97
+            ],
+            [
+              399979.92,
+              6688774.45
+            ],
+            [
+              399979.38,
+              6688764.78
+            ],
+            [
+              399964.84,
+              6688734.32
+            ],
+            [
+              399964.04,
+              6688733.22
+            ],
+            [
+              399965.23,
+              6688728.18
+            ],
+            [
+              399961.59,
+              6688712.45
+            ],
+            [
+              399956.1,
+              6688701.57
+            ],
+            [
+              399950.17,
+              6688695.05
+            ],
+            [
+              399946.41,
+              6688690.92
+            ],
+            [
+              399943.16,
+              6688689.56
+            ],
+            [
+              399942.01,
+              6688686.03
+            ],
+            [
+              399960.52,
+              6688665.46
+            ],
+            [
+              399972.24,
+              6688659.69
+            ],
+            [
+              399961.24,
+              6688639.69
+            ],
+            [
+              399952.24,
+              6688626.19
+            ],
+            [
+              399941.74,
+              6688605.69
+            ],
+            [
+              399929.74,
+              6688578.69
+            ],
+            [
+              399922.24,
+              6688555.69
+            ],
+            [
+              399919.59,
+              6688549.2
+            ],
+            [
+              399916.95,
+              6688538.15
+            ],
+            [
+              399910.95,
+              6688517.65
+            ],
+            [
+              399909.88,
+              6688503.94
+            ],
+            [
+              399922.6,
+              6688493.31
+            ],
+            [
+              399924.64,
+              6688491.72
+            ],
+            [
+              399935.1,
+              6688484.81
+            ],
+            [
+              399937.64,
+              6688484.97
+            ],
+            [
+              399940.02,
+              6688484.47
+            ],
+            [
+              399942.65,
+              6688483.38
+            ],
+            [
+              399953.02,
+              6688487.47
+            ],
+            [
+              399960.52,
+              6688495.47
+            ],
+            [
+              399967.89,
+              6688503.97
+            ],
+            [
+              399971.56,
+              6688514.06
+            ]
+          ]
+        ]
+      },
+      "geometry_name": "GEOMETRY",
+      "properties": {
+        "FORESTUSEDECLARATIONNUMBER": "1-2025-111387",
+        "DECLARATIONREFERENCE": null,
+        "PROCESSINGAREANUMBER": 1,
+        "DECLARATIONSTATE": "40",
+        "DECLARATIONSTATEDATASOURCE": 2,
+        "VALID_NOW": 1,
+        "DECLARATIONSTANDREFERENCE": null,
+        "STANDNUMBER": 16,
+        "STANDNUMBEREXTENSION": 0,
+        "AREA": 2.2216,
+        "MAINGROUP": 1,
+        "SUBGROUP": 1,
+        "FERTILITYCLASS": 2,
+        "SOILTYPE": 20,
+        "DECLARATIONDEVELOPMENTCLASS": 8,
+        "DECLARATIONMAINTREESPECIES": 2,
+        "MEANAGE": 60,
+        "MEANDIAMETER": 29,
+        "HABITATCODE": 0,
+        "DETAILEDHABITATCODE": 0,
+        "OTHERHABITATCODE": null,
+        "CUTTINGPURPOSE": 3,
+        "CUTTINGREALIZATIONPRACTICE": 5,
+        "REGENERATIONCOMMITMENT": 0,
+        "DECLSOILPREPARATIONOPERATION": 521,
+        "DECLREGENERATIONOPERATION": 302,
+        "HABITATOPERATION": null,
+        "FORESTDAMAGEQUALIFIER": null,
+        "COMPLETIONYEAR": null,
+        "REGENSOILPREPARATIONOPERATION": null,
+        "REGENERATIONYEAR": null,
+        "REGENERATIONOPERATION": null,
+        "REGERATIONAREA": null,
+        "DECLARATIONARRIVALDATE": "2025-10-28T15:30:18+02:00",
+        "DECLARATIONARRIVALYEAR": "2025",
+        "DECLARATIONARRIVALMETHOD": 2,
+        "STANDARRIVALDATE": "2025-10-28T15:30:18+02:00",
+        "STANDARRIVALMETHOD": 2,
+        "REGENERATIONARRIVALDATE": null,
+        "DATASOURCE": null,
+        "CREATIONTIME": null,
+        "UPDATETIME": "2025-11-08T00:09:09+02:00"
+      },
+      "bbox": [
+        399909.88,
+        6688483.3803,
+        400084.98,
+        6688774.4502
+      ]
+    },
+    {
+      "type": "Feature",
+      "id": "forestusedeclaration.28061692",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              399919.76,
+              6689326.85
+            ],
+            [
+              399913.25,
+              6689344.69
+            ],
+            [
+              399855.63,
+              6689259.02
+            ],
+            [
+              399855.94,
+              6689258.99
+            ],
+            [
+              399832.86,
+              6689224.54
+            ],
+            [
+              399882.37,
+              6689199.54
+            ],
+            [
+              399963.12,
+              6689210.37
+            ],
+            [
+              399963.54,
+              6689209.38
+            ],
+            [
+              399973.8,
+              6689210.99
+            ],
+            [
+              399987.06,
+              6689210.43
+            ],
+            [
+              400006.11,
+              6689206.69
+            ],
+            [
+              400019.77,
+              6689204.99
+            ],
+            [
+              400015.3,
+              6689215.72
+            ],
+            [
+              400005.36,
+              6689237.35
+            ],
+            [
+              400008.12,
+              6689242.02
+            ],
+            [
+              400020.78,
+              6689262.23
+            ],
+            [
+              400031.15,
+              6689286.83
+            ],
+            [
+              400032.79,
+              6689308.3
+            ],
+            [
+              400034.19,
+              6689338.95
+            ],
+            [
+              400016.49,
+              6689338.61
+            ],
+            [
+              400006.08,
+              6689316.84
+            ],
+            [
+              400005.38,
+              6689320.34
+            ],
+            [
+              400004.21,
+              6689320.44
+            ],
+            [
+              399998.17,
+              6689323.71
+            ],
+            [
+              399983.19,
+              6689341.05
+            ],
+            [
+              399977.52,
+              6689345.93
+            ],
+            [
+              399971.11,
+              6689348.79
+            ],
+            [
+              399966.68,
+              6689349.12
+            ],
+            [
+              399960.13,
+              6689346.58
+            ],
+            [
+              399954.68,
+              6689340.7
+            ],
+            [
+              399950.62,
+              6689333.16
+            ],
+            [
+              399943.43,
+              6689314.13
+            ],
+            [
+              399938.76,
+              6689308.76
+            ],
+            [
+              399934.77,
+              6689307.9
+            ],
+            [
+              399930.14,
+              6689310.3
+            ],
+            [
+              399924.83,
+              6689316.7
+            ],
+            [
+              399919.76,
+              6689326.85
+            ]
+          ]
+        ]
+      },
+      "geometry_name": "GEOMETRY",
+      "properties": {
+        "FORESTUSEDECLARATIONNUMBER": "1-2026-48868",
+        "DECLARATIONREFERENCE": null,
+        "PROCESSINGAREANUMBER": 1,
+        "DECLARATIONSTATE": "40",
+        "DECLARATIONSTATEDATASOURCE": 2,
+        "VALID_NOW": 1,
+        "DECLARATIONSTANDREFERENCE": null,
+        "STANDNUMBER": 5,
+        "STANDNUMBEREXTENSION": 1,
+        "AREA": 1.97,
+        "MAINGROUP": 0,
+        "SUBGROUP": null,
+        "FERTILITYCLASS": 3,
+        "SOILTYPE": 10,
+        "DECLARATIONDEVELOPMENTCLASS": 8,
+        "DECLARATIONMAINTREESPECIES": 2,
+        "MEANAGE": 0,
+        "MEANDIAMETER": null,
+        "HABITATCODE": 0,
+        "DETAILEDHABITATCODE": 0,
+        "OTHERHABITATCODE": null,
+        "CUTTINGPURPOSE": 3,
+        "CUTTINGREALIZATIONPRACTICE": 8,
+        "REGENERATIONCOMMITMENT": 0,
+        "DECLSOILPREPARATIONOPERATION": 500,
+        "DECLREGENERATIONOPERATION": 101,
+        "HABITATOPERATION": null,
+        "FORESTDAMAGEQUALIFIER": null,
+        "COMPLETIONYEAR": null,
+        "REGENSOILPREPARATIONOPERATION": null,
+        "REGENERATIONYEAR": null,
+        "REGENERATIONOPERATION": null,
+        "REGERATIONAREA": null,
+        "DECLARATIONARRIVALDATE": "2026-04-28T11:42:52+03:00",
+        "DECLARATIONARRIVALYEAR": "2026",
+        "DECLARATIONARRIVALMETHOD": 2,
+        "STANDARRIVALDATE": "2026-04-28T11:42:52+03:00",
+        "STANDARRIVALMETHOD": 2,
+        "REGENERATIONARRIVALDATE": null,
+        "DATASOURCE": null,
+        "CREATIONTIME": null,
+        "UPDATETIME": "2026-05-09T00:01:49+03:00"
+      },
+      "bbox": [
+        399832.8604,
+        6689199.54,
+        400034.1865,
+        6689349.1172
+      ]
+    }
+  ],
+  "totalFeatures": "unknown",
+  "numberReturned": 2,
+  "timeStamp": "2026-09-06T12:27:17.957Z",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::3067"
+    }
+  },
+  "bbox": [
+    399832.8604,
+    6688483.3803,
+    400084.98,
+    6689349.1172
+  ]
+}

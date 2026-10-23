@@ -1,0 +1,51 @@
+{
+  "$comment": "Ticket → design artboard references. Consumed by scripts/import-tickets.ts (feature `design` field) and read by agents before building a page. Anchors: App.dc.html#route=<route enum value>, Email.dc.html#template=<1-7>, Landing.dc.html#hero=B (chosen variant), Legal.dc.html#<doc>, Yhteystiedot.dc.html#tietopyynto.",
+  "MV-011": [
+    "docs/design/Landing.dc.html#header-footer",
+    "docs/design/App.dc.html#route=404",
+    "docs/design/App.dc.html#route=500",
+    "docs/design/App.dc.html#route=huolto",
+    "docs/design/App.dc.html#route=rajoitus"
+  ],
+  "MV-040": ["docs/design/Email.dc.html#layout"],
+  "MV-041": ["docs/design/App.dc.html#route=kirjaudu"],
+  "MV-042": ["docs/design/App.dc.html#route=rekisteroidy", "docs/design/App.dc.html#route=vahvista", "docs/design/Email.dc.html#template=1"],
+  "MV-043": [
+    "docs/design/App.dc.html#route=vahvista",
+    "docs/design/App.dc.html#route=vahvistettu",
+    "docs/design/App.dc.html#route=vahvistus_vaaditaan"
+  ],
+  "MV-044": ["docs/design/App.dc.html#route=kirjaudu", "docs/design/App.dc.html#route=kirjauduttu_ulos"],
+  "MV-045": ["docs/design/App.dc.html#route=unohtunut", "docs/design/App.dc.html#route=uusi_salasana", "docs/design/Email.dc.html#template=2"],
+  "MV-046": ["docs/design/App.dc.html#route=huolto", "docs/design/App.dc.html#route=vahvistus_vaaditaan"],
+  "MV-048": ["docs/design/App.dc.html#route=rajoitus"],
+  "MV-050": ["docs/design/App.dc.html#route=vahtialueet", "docs/design/Metsävahti.dc.html"],
+  "MV-051": ["docs/design/App.dc.html#route=tili", "docs/design/App.dc.html#route=turvallisuus"],
+  "MV-052": ["docs/design/Email.dc.html#template=7"],
+  "MV-054": ["docs/design/App.dc.html#route=ilmoitusasetukset"],
+  "MV-060": ["docs/design/App.dc.html#route=alue", "docs/design/App.dc.html#route=aloita"],
+  "MV-061": ["docs/design/App.dc.html#route=alue"],
+  "MV-062": ["docs/design/App.dc.html#route=aloita"],
+  "MV-065": ["docs/design/App.dc.html#route=aloita"],
+  "MV-066": ["docs/design/App.dc.html#route=vahtialueet"],
+  "MV-067": ["docs/design/App.dc.html#route=alue"],
+  "MV-068": ["docs/design/App.dc.html#route=alue_muokkaa"],
+  "MV-073": ["docs/design/Email.dc.html#template=3", "docs/design/Email.dc.html#template=4"],
+  "MV-080": ["docs/design/App.dc.html#route=ilmoitukset"],
+  "MV-082": ["docs/design/App.dc.html#route=ilmoitus"],
+  "MV-083": ["docs/design/App.dc.html#route=vahtialueet"],
+  "MV-086": ["docs/design/App.dc.html#route=vahtialueet"],
+  "MV-090": ["docs/design/Landing.dc.html#consent", "docs/design/Legal.dc.html#evasteet"],
+  "MV-091": [
+    "docs/design/Legal.dc.html#tietosuoja",
+    "docs/design/Legal.dc.html#kayttoehdot",
+    "docs/design/Legal.dc.html#evasteet",
+    "docs/design/Legal.dc.html#saavutettavuus"
+  ],
+  "MV-092": ["docs/design/Legal.dc.html#tietosuoja"],
+  "MV-093": ["docs/design/App.dc.html#route=tietosuoja", "docs/design/Email.dc.html#template=5"],
+  "MV-094": ["docs/design/App.dc.html#route=poista", "docs/design/Email.dc.html#template=6"],
+  "MV-095": ["docs/design/Yhteystiedot.dc.html#tietopyynto", "docs/design/Yhteystiedot.dc.html"],
+  "MV-100": ["docs/design/Landing.dc.html#hero=B", "docs/design/Landing.dc.html#faq"],
+  "MV-101": ["docs/design/Miten.dc.html", "docs/design/Hinnoittelu.dc.html", "docs/design/Landing.dc.html#hero=B"]
+}

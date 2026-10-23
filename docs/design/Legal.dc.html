@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#F7F5F0;color:#1B211D;font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2B6247;text-decoration:none}a:hover{color:#1E4A37;text-decoration:underline}
+*{box-sizing:border-box}button{font-family:inherit}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:20;background:rgba(247,245,240,.9);backdrop-filter:blur(10px);border-bottom:1px solid #DDE3DE">
+    <div style="max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <a href="Landing.dc.html" style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4A37"><span style="width:28px;height:28px;border-radius:8px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</a>
+      <nav style="display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;font-size:14px;font-weight:600">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.go }}" aria-current="{{ p.current }}" style="border:0;padding:8px 12px;border-radius:9999px;cursor:pointer;font-size:14px;font-weight:600;background:{{ p.bg }};color:{{ p.fg }}" style-hover="background:#EFECE5">{{ p.label }}</button></sc-for>
+      </nav>
+    </div>
+  </header>
+  <div style="max-width:1120px;margin:0 auto;padding:48px 20px 80px;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:40px;align-items:start">
+    <aside style="position:sticky;top:84px;display:flex;flex-direction:column;gap:6px;font-size:14px;max-width:280px">
+      <span style="font-size:12px;font-weight:600;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Sisältö</span>
+      <sc-for list="{{ toc }}" as="t" hint-placeholder-count="6"><a href="{{ t.href }}" style="color:#5C6B62;padding:6px 10px;border-left:2px solid #DDE3DE;line-height:1.35" style-hover="color:#1E4A37;border-color:#2B6247;text-decoration:none">{{ t.title }}</a></sc-for>
+    </aside>
+    <article style="grid-column:span 2;min-width:0;max-width:720px;display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:14px;color:#8A9E93">Päivitetty {{ updated }}</span><h1 style="margin:0;font-size:clamp(30px,4vw,40px);color:#1E4A37;letter-spacing:-0.02em;line-height:1.1">{{ title }}</h1><p style="margin:0;font-size:18px;color:#5C6B62;line-height:1.5;text-wrap:pretty">{{ intro }}</p></div>
+      <sc-if value="{{ isEvasteet }}" hint-placeholder-val="{{ false }}"><div><button onClick="{{ openConsent }}" style="background:#1E4A37;color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#2B6247">Avaa evästeasetukset</button></div></sc-if>
+      <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="6">
+        <section id="{{ sec.id }}" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:90px">
+          <h2 style="margin:0;font-size:22px;color:#1E4A37;letter-spacing:-0.01em">{{ sec.n }}. {{ sec.title }}</h2>
+          <sc-for list="{{ sec.paras }}" as="p" hint-placeholder-count="1"><p style="margin:0;font-size:16px;line-height:1.65;color:#1B211D;text-wrap:pretty">{{ p }}</p></sc-for>
+          <sc-if value="{{ sec.bullets }}" hint-placeholder-val="{{ false }}"><ul style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;line-height:1.55"><sc-for list="{{ sec.bullets }}" as="b" hint-placeholder-count="3"><li>{{ b }}</li></sc-for></ul></sc-if>
+          <sc-if value="{{ sec.table }}" hint-placeholder-val="{{ false }}">
+            <div style="overflow-x:auto;border:1px solid #DDE3DE;border-radius:12px;background:#fff"><table style="border-collapse:collapse;width:100%;font-size:14px;min-width:520px"><thead><tr style="background:#EFECE5;text-align:left"><th style="padding:10px 12px;font-weight:600">Nimi</th><th style="padding:10px 12px;font-weight:600">Tarkoitus</th><th style="padding:10px 12px;font-weight:600">Luokka</th><th style="padding:10px 12px;font-weight:600">Voimassa</th></tr></thead><tbody>
+              <sc-for list="{{ sec.table }}" as="row" hint-placeholder-count="4"><tr style="border-top:1px solid #EFECE5"><td style="padding:10px 12px;font-family:ui-monospace,monospace;font-size:13px">{{ row.name }}</td><td style="padding:10px 12px">{{ row.purpose }}</td><td style="padding:10px 12px">{{ row.cat }}</td><td style="padding:10px 12px">{{ row.life }}</td></tr></sc-for>
+            </tbody></table></div>
+          </sc-if>
+          <sc-if value="{{ sec.links }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ sec.links }}" as="l" hint-placeholder-count="2"><a href="{{ l.href }}" style="display:inline-flex;align-items:center;padding:9px 14px;border:1px solid #DDE3DE;border-radius:9999px;font-size:14px;font-weight:600;background:#fff" style-hover="border-color:#B7C4BC;text-decoration:none">{{ l.label }}</a></sc-for></div></sc-if>
+        </section>
+      </sc-for>
+    </article>
+  </div>
+  <footer style="border-top:1px solid #DDE3DE;background:#EFECE5;margin-top:auto">
+    <div style="max-width:1120px;margin:0 auto;padding:32px 20px;display:flex;flex-direction:column;gap:16px;font-size:14px;color:#5C6B62">
+      <nav style="display:flex;gap:8px 20px;flex-wrap:wrap"><a href="#tietosuoja" onClick="{{ goTietosuoja }}">Tietosuojaseloste</a><a href="#kayttoehdot" onClick="{{ goKayttoehdot }}">Käyttöehdot</a><a href="#evasteet" onClick="{{ goEvasteet }}">Evästeet</a><a href="#saavutettavuus" onClick="{{ goSaavutettavuus }}">Saavutettavuusseloste</a><a href="Yhteystiedot.dc.html">Yhteystiedot</a><button onClick="{{ openConsent }}" style="background:none;border:0;padding:0;color:#2B6247;font-size:14px;cursor:pointer">Evästeasetukset</button></nav>
+      <p style="margin:0;line-height:1.5">Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa 09/2026. Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.</p>
+      <p style="margin:0">© 2026 Metsävahti</p>
+    </div>
+  </footer>
+  <sc-if value="{{ showConsentModal }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(27,33,29,.45);display:flex;align-items:center;justify-content:center;padding:16px" onClick="{{ closeConsent }}">
+    <div role="dialog" aria-modal="true" onClick="{{ stop }}" style="background:#fff;border-radius:16px;padding:24px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:16px;box-shadow:0 8px 32px rgba(27,33,29,.2)">
+      <h2 style="margin:0;font-size:22px;color:#1E4A37">Evästeasetukset</h2>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Välttämättömät</div><div style="font-size:14px;color:#5C6B62">Aina käytössä.</div></div><span style="flex:none;width:44px;height:26px;border-radius:9999px;background:#B7C4BC;position:relative"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Analytiikka</div><div style="font-size:14px;color:#5C6B62">Anonyymi käyttötilasto.</div></div><button onClick="{{ toggleAnalytics }}" role="switch" aria-checked="{{ analytics }}" style="flex:none;width:44px;height:26px;border-radius:9999px;border:0;cursor:pointer;position:relative;background:{{ analyticsBg }}"><span style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;left:{{ analyticsKnob }}"></span></button></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick="{{ saveConsent }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Tallenna valinnat</button><button onClick="{{ closeConsent }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px">Sulje</button></div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { page: null, showConsentModal: false, analytics: false };
+  componentDidMount() { const h = (location.hash || '').replace('#', ''); if (this.docs()[h]) this.setState({ page: h }); window.addEventListener('hashchange', () => { const x = location.hash.replace('#', ''); if (this.docs()[x]) this.setState({ page: x }); }); }
+  docs() {
+    return {
+      tietosuoja: { label: 'Tietosuojaseloste', title: 'Tietosuojaseloste', updated: '1.9.2026', intro: 'Tämä seloste kertoo, mitä henkilötietoja Metsävahti käsittelee, miksi ja millä perusteella, sekä miten voit käyttää oikeuksiasi.', sections: [
+        { title: 'Rekisterinpitäjä ja yhteystiedot', paras: ['Metsävahti Oy (Y-tunnus 1234567-8), Metsäkatu 1, 80100 Joensuu. Tietosuoja-asioissa: tietosuoja@metsavahti.fi.'] },
+        { title: 'Mitä tietoja keräämme', paras: ['Käsittelemme vain palvelun toiminnan kannalta tarpeellisia tietoja.'], bullets: ['Tilin sähköpostiosoite ja salasanan tiiviste', 'Nimi (valinnainen)', 'Vahtialueiden koordinaatit, säde ja nimi', 'Ilmoitushistoria (mitkä metsänkäyttöilmoitukset on lähetetty sinulle ja milloin)', 'Kirjautumis- ja tekniset lokit (IP-osoite, selain, ajankohta)', 'Eväste- ja suostumusvalinnat'] },
+        { title: 'Käsittelyn tarkoitus ja oikeusperuste', paras: ['Palvelun tarjoaminen ja ilmoitusten lähettäminen perustuu sopimukseen (GDPR 6.1 b). Analytiikkaevästeet ja palvelun uutiskirje perustuvat suostumukseen (6.1 a). Tietoturvalokit ja väärinkäytösten estäminen perustuvat oikeutettuun etuun (6.1 f).'] },
+        { title: 'Tietolähteet', paras: ['Tiedot saadaan sinulta itseltäsi. Metsänkäyttöilmoitukset haetaan Suomen metsäkeskuksen avoimesta aineistosta; se ei sisällä maanomistajien henkilötietoja eikä Metsävahti yhdistä niitä käyttäjiin.'] },
+        { title: 'Säilytysajat', paras: ['Tilin tiedot säilytetään tilin olemassaolon ajan. Kun poistat tilin, tiedot poistetaan välittömästi. Anonymisoituja teknisiä lokeja säilytetään enintään 12 kuukautta.'] },
+        { title: 'Tietojen luovutukset ja käsittelijät', paras: ['Käytämme seuraavia käsittelijöitä sopimusperusteisesti:'], bullets: ['Sähköpostin lähetyspalvelu (EU)', 'Palvelinhosting (EU, Suomi)', 'Analytiikka (vain suostumuksella, anonymisoitu)'] },
+        { title: 'Siirrot EU/ETA-alueen ulkopuolelle', paras: ['Tietoja ei siirretä EU- tai ETA-alueen ulkopuolelle.'] },
+        { title: 'Rekisteröidyn oikeudet', paras: ['Sinulla on oikeus tarkastaa, oikaista ja poistaa tietosi, rajoittaa tai vastustaa käsittelyä, siirtää tiedot toiseen järjestelmään, peruuttaa suostumus milloin tahansa sekä tehdä valitus tietosuojavaltuutetulle. Useimmat toiminnot voit tehdä itse tilin asetuksissa.'], links: [{ label: 'Lataa tietoni', href: 'App.dc.html#tietosuoja' }, { label: 'Poista tili', href: 'App.dc.html#poista' }, { label: 'Tietopyyntölomake', href: 'Yhteystiedot.dc.html#tietopyynto' }, { label: 'Tietosuojavaltuutetun toimisto ↗', href: '#' }] },
+        { title: 'Automaattinen päätöksenteko', paras: ['Palvelussa ei tehdä automaattista päätöksentekoa eikä profilointia.'] },
+        { title: 'Muutokset selosteeseen', paras: ['Ilmoitamme olennaisista muutoksista sähköpostilla ja palvelussa. Päivityspäivä näkyy sivun yläreunassa.'] }
+      ] },
+      kayttoehdot: { label: 'Käyttöehdot', title: 'Käyttöehdot', updated: '1.9.2026', intro: 'Nämä ehdot koskevat Metsävahti-palvelun käyttöä. Luomalla tilin hyväksyt ehdot.', sections: [
+        { title: 'Palvelun kuvaus', paras: ['Metsävahti seuraa Suomen metsäkeskuksen avointa metsänkäyttöilmoitusaineistoa käyttäjän määrittelemillä vahtialueilla ja lähettää ilmoituksia sähköpostilla.'] },
+        { title: 'Tietojen luonne', paras: ['Ilmoitukset ovat informatiivisia ja perustuvat kolmannen osapuolen avoimeen dataan. Metsänkäyttöilmoitus on aikomus, ei tae hakkuun toteutumisesta. Emme takaa aineiston täydellisyyttä, oikeellisuutta tai ajantasaisuutta.'] },
+        { title: 'Hyväksyttävä käyttö', paras: ['Palvelua ei saa käyttää lainvastaiseen tarkoitukseen, maanomistajien häirintään tai aineiston automaattiseen keräämiseen.'] },
+        { title: 'Tilin päättäminen', paras: ['Voit poistaa tilisi milloin tahansa. Voimme sulkea tilin, jos ehtoja rikotaan.'] },
+        { title: 'Vastuunrajoitus', paras: ['Palvelu tarjotaan sellaisenaan. Emme vastaa välillisistä vahingoista, jotka johtuvat ilmoituksen puuttumisesta, viivästymisestä tai virheellisyydestä.'] },
+        { title: 'Sovellettava laki', paras: ['Ehtoihin sovelletaan Suomen lakia. Riidat ratkaistaan ensisijaisesti neuvottelemalla, toissijaisesti Pohjois-Karjalan käräjäoikeudessa.'] },
+        { title: 'Muutokset', paras: ['Voimme päivittää ehtoja. Olennaisista muutoksista ilmoitetaan 30 päivää etukäteen.'] }
+      ] },
+      evasteet: { label: 'Evästeet', title: 'Evästeet', updated: '1.9.2026', intro: 'Käytämme evästeitä palvelun toimintaan ja suostumuksellasi sen kehittämiseen.', sections: [
+        { title: 'Käytetyt evästeet', paras: [], table: [
+          { name: 'mv_session', purpose: 'Kirjautumisistunto', cat: 'Välttämätön', life: 'Istunto / 30 pv (Muista minut)' },
+          { name: 'mv_consent', purpose: 'Suostumusvalinnat', cat: 'Välttämätön', life: '12 kk' },
+          { name: 'mv_csrf', purpose: 'Lomakkeiden suojaus', cat: 'Välttämätön', life: 'Istunto' },
+          { name: '_pa_id', purpose: 'Anonyymi käyttötilasto', cat: 'Analytiikka', life: '13 kk' }
+        ] },
+        { title: 'Suostumuksen hallinta', paras: ['Voit muuttaa valintojasi milloin tahansa yllä olevasta painikkeesta tai sivun alareunan Evästeasetukset-linkistä.'] }
+      ] },
+      saavutettavuus: { label: 'Saavutettavuus', title: 'Saavutettavuusseloste', updated: '1.9.2026', intro: 'Metsävahti pyrkii täyttämään WCAG 2.1 -ohjeistuksen AA-tason.', sections: [
+        { title: 'Saavutettavuuden tila', paras: ['Palvelu täyttää vaatimukset suurimmaksi osaksi. Alla luetellut puutteet korjataan vuoden 2026 aikana.'] },
+        { title: 'Tunnetut puutteet', paras: [], bullets: ['Karttaa ei voi kaikilta osin käyttää näppäimistöllä. Vahtialueen voi kuitenkin luoda osoite- ja sädekentillä ilman karttaa.', 'Sähköpostien staattiset karttakuvat sisältävät yleisluontoisen vaihtoehtoisen tekstin.'] },
+        { title: 'Palaute', paras: ['Jos huomaat saavutettavuuspuutteen, kerro siitä osoitteeseen saavutettavuus@metsavahti.fi. Vastaamme 14 päivän kuluessa.'] },
+        { title: 'Valvontaviranomainen', paras: ['Jos et ole tyytyväinen saamaasi vastaukseen, voit tehdä ilmoituksen Etelä-Suomen aluehallintovirastolle.'] }
+      ] }
+    };
+  }
+  go(p) { return e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ page: p }); try { history.replaceState(null, '', '#' + p); } catch (x) {} window.scrollTo(0, 0); }; }
+  renderVals() {
+    const docs = this.docs(), key = this.state.page || 'tietosuoja', d = docs[key];
+    const s = this.state;
+    const save = analytics => { try { localStorage.setItem('mv_consent', JSON.stringify({ necessary: true, analytics, at: new Date().toISOString() })); } catch (e) {} this.setState({ showConsentModal: false, analytics }); };
+    const sections = d.sections.map((sec, i) => ({ ...sec, n: i + 1, id: 's' + (i + 1), bullets: sec.bullets || false, table: sec.table || false, links: sec.links || false }));
+    return {
+      pages: Object.keys(docs).map(k => ({ label: docs[k].label, go: this.go(k), current: k === key ? 'page' : undefined, bg: k === key ? '#1E4A37' : 'transparent', fg: k === key ? '#fff' : '#1B211D' })),
+      title: d.title, updated: d.updated, intro: d.intro, sections, toc: sections.map(x => ({ title: x.title, href: '#' + x.id })), isEvasteet: key === 'evasteet',
+      goTietosuoja: this.go('tietosuoja'), goKayttoehdot: this.go('kayttoehdot'), goEvasteet: this.go('evasteet'), goSaavutettavuus: this.go('saavutettavuus'),
+      showConsentModal: s.showConsentModal, analytics: s.analytics, analyticsBg: s.analytics ? '#2B6247' : '#B7C4BC', analyticsKnob: s.analytics ? '21px' : '3px',
+      openConsent: () => this.setState({ showConsentModal: true }), closeConsent: () => this.setState({ showConsentModal: false }), saveConsent: () => save(s.analytics), toggleAnalytics: () => this.setState({ analytics: !s.analytics }), stop: e => e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

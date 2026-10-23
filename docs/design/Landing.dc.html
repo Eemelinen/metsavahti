@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./data.js"></script>
+<script src="./map.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<style>
+html,body{margin:0;background:#F7F5F0;color:#1B211D;font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}
+a{color:#2B6247;text-decoration:none}a:hover{color:#1E4A37;text-decoration:underline}
+*{box-sizing:border-box}button{font-family:inherit}
+[data-reveal]{opacity:0;transform:translateY(18px)}
+@keyframes mvPulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <header style="position:sticky;top:0;z-index:20;background:rgba(247,245,240,.88);backdrop-filter:blur(10px);border-bottom:1px solid #DDE3DE">
+    <div style="max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <a href="#" style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4A37;letter-spacing:-0.01em"><span style="width:28px;height:28px;border-radius:8px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti</a>
+      <nav style="display:flex;gap:20px;margin-left:auto;align-items:center;flex-wrap:wrap;font-size:15px;font-weight:500">
+        <a href="Miten.dc.html" style="color:#1B211D">Miten se toimii</a>
+        <a href="Hinnoittelu.dc.html" style="color:#1B211D">Hinnoittelu</a>
+        <a href="App.dc.html#kirjaudu" style="color:#1B211D">Kirjaudu</a>
+        <a href="App.dc.html#rekisteroidy" style="background:#1E4A37;color:#fff;padding:10px 18px;border-radius:9999px;font-weight:600;transition:background .2s" style-hover="background:#2B6247;text-decoration:none">Luo tili</a>
+      </nav>
+    </div>
+  </header>
+
+  <div style="position:fixed;right:16px;top:76px;z-index:30;background:#1B211D;color:#fff;border-radius:9999px;padding:6px 6px 6px 14px;display:flex;align-items:center;gap:8px;font-size:12px;box-shadow:0 8px 32px rgba(27,33,29,.24)">
+    <span style="opacity:.7">Hero</span>
+    <sc-for list="{{ heroOptions }}" as="h" hint-placeholder-count="3">
+      <button onClick="{{ h.pick }}" style="border:0;cursor:pointer;border-radius:9999px;padding:6px 12px;font-size:12px;font-weight:600;background:{{ h.bg }};color:{{ h.fg }}">{{ h.label }}</button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ heroA }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="Hero A – kartta" style="max-width:1120px;margin:0 auto;padding:72px 20px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:center;width:100%">
+    <div data-hero-copy style="display:flex;flex-direction:column;gap:24px">
+      <span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#2B6247;background:#E9F0EB;padding:6px 12px;border-radius:9999px;width:fit-content"><span style="width:8px;height:8px;border-radius:50%;background:#2B6247"></span>Tarkistaa Metsäkeskuksen aineiston kaksi kertaa päivässä</span>
+      <h1 style="margin:0;font-size:clamp(36px,5vw,56px);line-height:1.05;letter-spacing:-0.02em;font-weight:700;color:#1E4A37;text-wrap:balance">Tiedä, jos naapurimetsääsi ollaan hakkaamassa</h1>
+      <p style="margin:0;font-size:19px;line-height:1.5;color:#5C6B62;max-width:520px;text-wrap:pretty">Metsävahti seuraa virallisia metsänkäyttöilmoituksia tonttisi ympärillä ja lähettää sähköpostin, kun lähelle suunnitellaan hakkuuta.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="App.dc.html#aloita" style="background:#1E4A37;color:#fff;padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px;transition:transform .2s,background .2s" style-hover="background:#2B6247;text-decoration:none;transform:translateY(-1px)">Luo vahtialue</a>
+        <a href="#miten" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="border-color:#B7C4BC;text-decoration:none">Miten se toimii</a>
+      </div>
+      <p style="margin:0;font-size:14px;color:#8A9E93">Ilmainen · Ei maanomistajien henkilötietoja · Avoin data</p>
+    </div>
+    <div data-hero-map style="position:relative;border-radius:20px;overflow:hidden;border:1px solid #DDE3DE;box-shadow:0 1px 2px rgba(27,33,29,.06),0 24px 48px rgba(27,33,29,.10);background:#EFECE5;aspect-ratio:5/4;min-height:320px">
+      <div ref="{{ heroMapRef }}" style="position:absolute;inset:0"></div>
+      <div style="position:absolute;left:14px;top:14px;background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 4px 16px rgba(27,33,29,.12);display:flex;flex-direction:column;gap:6px;font-size:12px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#D9572B;opacity:.7"></span>Uudistushakkuu</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#F0B35A;opacity:.8"></span>Harvennushakkuu</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:50%;border:2px dashed #2B6247"></span>Vahtialueesi</div>
+      </div>
+      <div style="position:absolute;right:14px;bottom:14px;background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 4px 16px rgba(27,33,29,.12);display:flex;gap:10px;align-items:center;max-width:260px">
+        <span style="width:36px;height:36px;border-radius:10px;background:#FBDDD2;display:inline-flex;align-items:center;justify-content:center;flex:none"><span style="width:14px;height:14px;border-radius:3px;background:#D9572B"></span></span>
+        <div style="font-size:13px;line-height:1.35"><strong>Uusi ilmoitus 420 m päässä</strong><br><span style="color:#5C6B62">Uudistushakkuu · 3,4 ha · 5.9.2026</span></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ heroB }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Hero B – typografia" style="width:100%">
+    <div style="max-width:880px;margin:0 auto;padding:96px 20px 48px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:28px">
+      <h1 data-hero-copy style="margin:0;font-size:clamp(40px,6.5vw,76px);line-height:1;letter-spacing:-0.03em;font-weight:700;color:#1E4A37;text-wrap:balance">Tiedä, jos naapurimetsääsi ollaan hakkaamassa</h1>
+      <p data-hero-copy style="margin:0;font-size:20px;line-height:1.5;color:#5C6B62;max-width:560px;text-wrap:pretty">Metsävahti seuraa virallisia metsänkäyttöilmoituksia tonttisi ympärillä ja lähettää sähköpostin, kun lähelle suunnitellaan hakkuuta.</p>
+      <div data-hero-copy style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a href="App.dc.html#aloita" style="background:#1E4A37;color:#fff;padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="background:#2B6247;text-decoration:none">Luo vahtialue</a>
+        <a href="#miten" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="border-color:#B7C4BC;text-decoration:none">Miten se toimii</a>
+      </div>
+    </div>
+    <div data-hero-map style="max-width:1120px;margin:0 auto;padding:0 20px 40px">
+      <div style="position:relative;border-radius:20px;overflow:hidden;border:1px solid #DDE3DE;box-shadow:0 24px 48px rgba(27,33,29,.10);background:#EFECE5;height:clamp(320px,48vw,520px)">
+        <div ref="{{ heroMapRef }}" style="position:absolute;inset:0"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:120px;height:120px;border-radius:50%;background:rgba(43,98,71,.25);animation:mvPulse 2.4s ease-out infinite;pointer-events:none"></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ heroC }}" hint-placeholder-val="{{ false }}">
+  <section data-screen-label="Hero C – sähköposti" style="background:#1E4A37;color:#fff;width:100%">
+    <div style="max-width:1120px;margin:0 auto;padding:72px 20px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:end">
+      <div data-hero-copy style="display:flex;flex-direction:column;gap:24px;padding-bottom:72px">
+        <h1 style="margin:0;font-size:clamp(36px,5vw,56px);line-height:1.05;letter-spacing:-0.02em;font-weight:700;text-wrap:balance">Tiedä, jos naapurimetsääsi ollaan hakkaamassa</h1>
+        <p style="margin:0;font-size:19px;line-height:1.5;color:#D3E1D8;max-width:520px;text-wrap:pretty">Metsävahti seuraa virallisia metsänkäyttöilmoituksia tonttisi ympärillä ja lähettää sähköpostin, kun lähelle suunnitellaan hakkuuta.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="App.dc.html#aloita" style="background:#F0B35A;color:#1B211D;padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="background:#F5C47A;text-decoration:none">Luo vahtialue</a>
+          <a href="#miten" style="color:#fff;border:1px solid rgba(255,255,255,.35);padding:14px 24px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="border-color:#fff;text-decoration:none">Miten se toimii</a>
+        </div>
+      </div>
+      <div data-hero-map style="display:flex;justify-content:center">
+        <div style="width:min(360px,100%);background:#1B211D;border-radius:36px 36px 0 0;padding:12px 12px 0;box-shadow:0 -12px 48px rgba(0,0,0,.25)">
+          <div style="background:#F7F5F0;border-radius:26px 26px 0 0;overflow:hidden;color:#1B211D;font-size:13px">
+            <div style="padding:14px 16px 10px;border-bottom:1px solid #DDE3DE;display:flex;gap:10px;align-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#1E4A37;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">M</span><div><div style="font-weight:600">Metsävahti</div><div style="color:#8A9E93;font-size:12px">tänään 06:12</div></div></div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-weight:700;font-size:17px;line-height:1.25;color:#1E4A37">Uusi metsänkäyttöilmoitus vahtialueellasi Mökki, Rääkkylä</div>
+              <div style="height:140px;border-radius:12px;background:repeating-linear-gradient(135deg,#E9F0EB 0 8px,#DFE8E2 8px 16px);position:relative;overflow:hidden;border:1px solid #DDE3DE"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:11px;color:#5C6B62">staattinen karttakuva</div><div style="position:absolute;left:38%;top:30%;width:70px;height:48px;background:rgba(217,87,43,.6);border:1.5px solid #A33E1A;border-radius:6px"></div></div>
+              <div style="display:flex;flex-direction:column;gap:6px;color:#5C6B62"><div><strong style="color:#1B211D">Uudistushakkuu</strong> · 3,4 ha</div><div>420 m vahtialueen keskipisteestä</div><div>Ilmoitus saapunut 5.9.2026</div></div>
+              <div style="background:#1E4A37;color:#fff;text-align:center;padding:12px;border-radius:10px;font-weight:600">Näytä kartalla</div>
+              <div style="font-size:12px;color:#8A9E93;line-height:1.4">Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section id="miten" data-reveal style="max-width:1120px;margin:0 auto;padding:72px 20px;width:100%">
+    <h2 style="margin:0 0 32px;font-size:32px;letter-spacing:-0.015em;color:#1E4A37">Miten se toimii</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+        <div data-reveal style="background:#fff;border:1px solid #DDE3DE;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:14px">
+          <span style="width:36px;height:36px;border-radius:50%;background:#E9F0EB;color:#1E4A37;font-weight:700;display:inline-flex;align-items:center;justify-content:center">{{ s.n }}</span>
+          <h3 style="margin:0;font-size:19px;color:#1B211D">{{ s.title }}</h3>
+          <p style="margin:0;color:#5C6B62;line-height:1.5;text-wrap:pretty">{{ s.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-reveal style="max-width:1120px;margin:0 auto;padding:0 20px 72px;width:100%">
+    <div style="background:#E9F0EB;border-radius:20px;padding:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px">
+      <div>
+        <h2 style="margin:0 0 12px;font-size:28px;letter-spacing:-0.015em;color:#1E4A37">Mitä metsänkäyttöilmoitus on?</h2>
+        <p style="margin:0;color:#1B211D;line-height:1.55;text-wrap:pretty">Metsänomistajan Metsäkeskukselle tekemä ilmoitus suunnitellusta hakkuusta. Se on aikomus, ei takuu siitä että hakkuu toteutuu.</p>
+      </div>
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;color:#1B211D;line-height:1.5">
+        <li style="display:flex;gap:12px"><span style="flex:none;width:8px;height:8px;border-radius:50%;background:#2B6247;margin-top:8px"></span>Ilmoitus on tehtävä vähintään 10 päivää ennen hakkuun aloittamista.</li>
+        <li style="display:flex;gap:12px"><span style="flex:none;width:8px;height:8px;border-radius:50%;background:#2B6247;margin-top:8px"></span>Ilmoitus on voimassa kolme vuotta.</li>
+        <li style="display:flex;gap:12px"><span style="flex:none;width:8px;height:8px;border-radius:50%;background:#2B6247;margin-top:8px"></span>Pienet kotitarvehakkuut eivät vaadi ilmoitusta, eivätkä näy palvelussa.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section data-reveal style="max-width:1120px;margin:0 auto;padding:0 20px 72px;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;padding:0 4px"><span style="font-size:13px;font-weight:600;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em">Tietolähde</span><p style="margin:0;line-height:1.5;color:#1B211D">Suomen metsäkeskuksen avoin Metsänkäyttöilmoitukset-aineisto. Päivitetään palveluun kaksi kertaa päivässä.</p></div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:0 4px"><span style="font-size:13px;font-weight:600;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em">Yksityisyys</span><p style="margin:0;line-height:1.5;color:#1B211D">Palvelu ei näytä maanomistajien henkilötietoja. Näet vain hakkuualueen, tyypin ja ajankohdan.</p></div>
+    <div id="hinnoittelu" style="display:flex;flex-direction:column;gap:8px;padding:0 4px"><span style="font-size:13px;font-weight:600;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em">Hinta</span><p style="margin:0;line-height:1.5;color:#1B211D">Ilmainen: enintään kaksi vahtialuetta ja sähköposti-ilmoitukset. Laajempi taso tulossa myöhemmin.</p></div>
+  </section>
+
+  <section data-reveal style="max-width:1120px;margin:0 auto;padding:0 20px 72px;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px 48px;align-items:start">
+    <h2 style="margin:0;font-size:28px;letter-spacing:-0.015em;color:#1E4A37">Usein kysyttyä</h2>
+    <div style="grid-column:span 2;min-width:0;display:flex;flex-direction:column;border-top:1px solid #DDE3DE">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+        <div style="border-bottom:1px solid #DDE3DE">
+          <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;text-align:left;background:none;border:0;padding:18px 0;font-size:17px;font-weight:600;color:#1B211D;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center" style-hover="color:#1E4A37">{{ f.q }}<span style="flex:none;width:24px;height:24px;border-radius:50%;border:1px solid #B7C4BC;display:inline-flex;align-items:center;justify-content:center;font-weight:400;color:#5C6B62;transition:transform .25s;transform:{{ f.iconTransform }}">+</span></button>
+          <div style="overflow:hidden;transition:max-height .3s ease,opacity .3s;max-height:{{ f.maxH }};opacity:{{ f.opacity }}"><p style="margin:0 0 18px;color:#5C6B62;line-height:1.55;text-wrap:pretty">{{ f.a }}</p></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-reveal style="max-width:1120px;margin:0 auto;padding:0 20px 96px;width:100%">
+    <div style="background:#1E4A37;color:#fff;border-radius:20px;padding:48px 36px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px">
+      <h2 style="margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:-0.02em;text-wrap:balance">Merkitse tontti kartalle. Me vahdimme loput.</h2>
+      <a href="App.dc.html#aloita" style="background:#F0B35A;color:#1B211D;padding:14px 28px;border-radius:9999px;font-weight:600;font-size:16px" style-hover="background:#F5C47A;text-decoration:none">Luo vahtialue</a>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid #DDE3DE;background:#EFECE5;margin-top:auto">
+    <div style="max-width:1120px;margin:0 auto;padding:32px 20px;display:flex;flex-direction:column;gap:20px;font-size:14px;color:#5C6B62">
+      <nav style="display:flex;gap:8px 20px;flex-wrap:wrap">
+        <a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a><a href="Legal.dc.html#kayttoehdot">Käyttöehdot</a><a href="Legal.dc.html#evasteet">Evästeet</a><a href="Legal.dc.html#saavutettavuus">Saavutettavuusseloste</a><a href="Yhteystiedot.dc.html">Yhteystiedot</a><button onClick="{{ openConsent }}" style="background:none;border:0;padding:0;color:#2B6247;font-size:14px;cursor:pointer;font-family:inherit" style-hover="text-decoration:underline">Evästeasetukset</button>
+      </nav>
+      <p style="margin:0;line-height:1.5">Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa 09/2026. Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.</p>
+      <p style="margin:0">© 2026 Metsävahti</p>
+    </div>
+  </footer>
+
+  <sc-if value="{{ showBanner }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-label="Evästeet" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:40;margin:0 auto;max-width:720px;background:#fff;border:1px solid #DDE3DE;border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(27,33,29,.16);display:flex;flex-direction:column;gap:14px">
+    <p style="margin:0;line-height:1.5;font-size:15px">Käytämme välttämättömiä evästeitä palvelun toimintaan ja valinnaisesti analytiikkaevästeitä sen kehittämiseen. <a href="Legal.dc.html#evasteet">Lue lisää evästeistä</a> · <a href="Legal.dc.html#tietosuoja">Tietosuojaseloste</a></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button onClick="{{ acceptAll }}" style="flex:1;min-width:160px;background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer" style-hover="background:#2B6247">Hyväksy kaikki</button>
+      <button onClick="{{ acceptNecessary }}" style="flex:1;min-width:160px;background:#fff;color:#1E4A37;border:1px solid #1E4A37;padding:12px 18px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer" style-hover="background:#E9F0EB">Vain välttämättömät</button>
+      <button onClick="{{ openConsent }}" style="background:none;border:0;color:#2B6247;font-weight:600;font-size:15px;cursor:pointer;padding:12px 8px" style-hover="text-decoration:underline">Mukauta</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showConsentModal }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;background:rgba(27,33,29,.45);display:flex;align-items:center;justify-content:center;padding:16px" onClick="{{ closeConsent }}">
+    <div role="dialog" aria-modal="true" aria-label="Evästeasetukset" onClick="{{ stop }}" style="background:#fff;border-radius:16px;padding:24px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:18px;box-shadow:0 8px 32px rgba(27,33,29,.2)">
+      <h2 style="margin:0;font-size:22px;color:#1E4A37">Evästeasetukset</h2>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Välttämättömät</div><div style="font-size:14px;color:#5C6B62">Kirjautuminen, suostumusvalinnat, tietoturva. Aina käytössä.</div></div><span style="flex:none;width:44px;height:26px;border-radius:9999px;background:#B7C4BC;position:relative"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px;border:1px solid #DDE3DE;border-radius:10px"><div><div style="font-weight:600">Analytiikka</div><div style="font-size:14px;color:#5C6B62">Anonyymi käyttötilasto palvelun kehittämiseen.</div></div><button onClick="{{ toggleAnalytics }}" aria-pressed="{{ analytics }}" style="flex:none;width:44px;height:26px;border-radius:9999px;border:0;cursor:pointer;position:relative;transition:background .2s;background:{{ analyticsBg }}"><span style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;left:{{ analyticsKnob }}"></span></button></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button onClick="{{ saveConsent }}" style="flex:1;background:#1E4A37;color:#fff;border:0;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer">Tallenna valinnat</button><button onClick="{{ closeConsent }}" style="background:#fff;color:#1E4A37;border:1px solid #DDE3DE;padding:12px 18px;border-radius:10px;font-weight:600;cursor:pointer">Sulje</button></div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;hero&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;,&quot;C&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A'|'B'|'C'&quot;,&quot;section&quot;:&quot;Etusivu&quot;}}">
+class Component extends DCLogic {
+  state = { hero: null, openFaq: 0, showBanner: false, showConsentModal: false, analytics: false };
+  componentDidMount() {
+    try { if (!localStorage.getItem('mv_consent')) this.setState({ showBanner: true }); } catch (e) {}
+    this.mapEl = null;
+    setTimeout(() => this.initMotion(), 50);
+  }
+  initMotion() {
+    if (!window.gsap) return;
+    gsap.registerPlugin(ScrollTrigger);
+    if (window.Lenis && !this.lenis) {
+      this.lenis = new Lenis({ lerp: 0.1 });
+      this.lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add(t => this.lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+    }
+    this.animateHero();
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+  }
+  animateHero() {
+    if (!window.gsap) return;
+    gsap.fromTo('[data-hero-copy]', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: 'power3.out' });
+    gsap.fromTo('[data-hero-map]', { opacity: 0, y: 32, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 1, delay: 0.2, ease: 'power3.out' });
+  }
+  hero() { return this.state.hero || this.props.hero || 'B'; }
+  setHero(h) { this.setState({ hero: h }, () => { requestAnimationFrame(() => this.animateHero()); }); }
+  mountMap(el) {
+    if (!el || !window.MVMap || !window.MV_DATA) return;
+    const D = window.MV_DATA, a = D.areas[0];
+    window.MVMap.mount(el, { center: [a.lng, a.lat], zoom: 13, areas: [a], decls: D.decl.filter(d => d.area === 'a1'), interactive: false });
+  }
+  renderVals() {
+    const s = this.state, h = this.hero();
+    const heroOptions = ['A', 'B', 'C'].map(k => ({ label: k, pick: () => this.setHero(k), bg: k === h ? '#F0B35A' : 'transparent', fg: k === h ? '#1B211D' : '#fff' }));
+    const steps = [
+      { n: '1', title: 'Merkitse tontti kartalle', body: 'Hae osoitteella tai napauta karttaa. Voit siirtää merkkiä vapaasti.' },
+      { n: '2', title: 'Valitse säde', body: 'Kuinka läheltä haluat tietää: 250 metristä kahteen kilometriin.' },
+      { n: '3', title: 'Saat sähköpostin', body: 'Kun uusi metsänkäyttöilmoitus ilmestyy alueelle, kerromme siitä sähköpostilla.' }
+    ];
+    const faqRaw = [
+      { q: 'Mistä tiedot tulevat?', a: 'Suomen metsäkeskuksen avoimesta Metsänkäyttöilmoitukset-aineistosta. Haemme muutokset kaksi kertaa päivässä.' },
+      { q: 'Tarkoittaako ilmoitus, että metsä hakataan varmasti?', a: 'Ei. Metsänkäyttöilmoitus on aikomus, joka on voimassa kolme vuotta. Osa ilmoitetuista hakkuista jää tekemättä tai toteutuu vain osittain.' },
+      { q: 'Näenkö kuka metsän omistaa?', a: 'Et. Palvelu ei käsittele eikä näytä maanomistajien henkilötietoja, vain hakkuualueen sijainnin, tyypin ja ajankohdan.' },
+      { q: 'Kuinka nopeasti saan tiedon?', a: 'Yleensä saman päivän aikana siitä, kun ilmoitus julkaistaan avoimessa aineistossa. Tarkistus tehdään aamulla ja illalla.' },
+      { q: 'Voinko seurata useampaa paikkaa?', a: 'Kyllä. Ilmaisella tasolla voit luoda kaksi vahtialuetta, esimerkiksi kodin ja mökin.' },
+      { q: 'Miten poistan tilini?', a: 'Tilin asetuksista kohdasta Poista tili. Tiedot poistetaan välittömästi lukuun ottamatta anonymisoituja lokeja.' }
+    ];
+    const faqs = faqRaw.map((f, i) => { const open = s.openFaq === i; return { ...f, open, toggle: () => this.setState({ openFaq: open ? -1 : i }), maxH: open ? '240px' : '0px', opacity: open ? 1 : 0, iconTransform: open ? 'rotate(45deg)' : 'rotate(0deg)' }; });
+    const save = (analytics) => { try { localStorage.setItem('mv_consent', JSON.stringify({ necessary: true, analytics, at: new Date().toISOString() })); } catch (e) {} this.setState({ showBanner: false, showConsentModal: false, analytics }); };
+    return {
+      heroA: h === 'A', heroB: h === 'B', heroC: h === 'C', heroOptions, steps, faqs,
+      heroMapRef: el => this.mountMap(el),
+      showBanner: s.showBanner, showConsentModal: s.showConsentModal, analytics: s.analytics,
+      analyticsBg: s.analytics ? '#2B6247' : '#B7C4BC', analyticsKnob: s.analytics ? '21px' : '3px',
+      acceptAll: () => save(true), acceptNecessary: () => save(false), saveConsent: () => save(s.analytics),
+      openConsent: () => this.setState({ showConsentModal: true }), closeConsent: () => this.setState({ showConsentModal: false }),
+      toggleAnalytics: () => this.setState({ analytics: !s.analytics }), stop: e => e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

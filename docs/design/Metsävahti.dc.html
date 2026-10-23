@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#E6E2D8;color:#1B211D;font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2B6247;text-decoration:none}a:hover{color:#1E4A37;text-decoration:underline}
+*{box-sizing:border-box}button,select{font-family:inherit}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px">
+  <header style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#1E4A37"><span style="width:28px;height:28px;border-radius:8px;background:#1E4A37;display:inline-flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:#F0B35A;display:block"></span></span>Metsävahti · prototyyppi</span>
+    <nav style="display:flex;gap:6px;flex-wrap:wrap;font-size:14px;font-weight:600">
+      <a href="Landing.dc.html" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Etusivu (3 hero-versiota)</a>
+      <a href="Miten.dc.html" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Miten se toimii</a>
+      <a href="Hinnoittelu.dc.html" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Hinnoittelu</a>
+      <a href="Yhteystiedot.dc.html" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Yhteystiedot + Tietopyyntö</a>
+      <a href="Legal.dc.html#tietosuoja" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Lakisivut</a>
+      <a href="Email.dc.html" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">Sähköpostit (7)</a>
+      <a href="tokens.js" style="background:#fff;border:1px solid #DDE3DE;padding:8px 14px;border-radius:9999px;color:#1B211D" style-hover="border-color:#B7C4BC;text-decoration:none">tokens.js</a>
+    </nav>
+    <label style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#5C6B62">Näkymä
+      <select value="{{ route }}" onChange="{{ setRoute }}" style="padding:8px 12px;border:1px solid #B7C4BC;border-radius:10px;font-size:14px;background:#fff;min-width:220px">
+        <sc-for list="{{ routes }}" as="r" hint-placeholder-count="5"><option value="{{ r.value }}">{{ r.label }}</option></sc-for>
+      </select>
+    </label>
+  </header>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 820px;min-width:0;display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:12px;font-weight:600;color:#5C6B62;text-transform:uppercase;letter-spacing:.06em">Työpöytä · 1280</span>
+      <div style="border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,29,.08),0 24px 48px rgba(27,33,29,.14);background:#fff;border:1px solid #DDE3DE">
+        <div style="height:36px;background:#F7F5F0;border-bottom:1px solid #DDE3DE;display:flex;align-items:center;gap:6px;padding:0 12px"><span style="width:10px;height:10px;border-radius:50%;background:#DDE3DE"></span><span style="width:10px;height:10px;border-radius:50%;background:#DDE3DE"></span><span style="width:10px;height:10px;border-radius:50%;background:#DDE3DE"></span><span style="margin-left:12px;flex:1;height:20px;border-radius:6px;background:#fff;border:1px solid #DDE3DE;font-size:11px;color:#8A9E93;display:flex;align-items:center;padding:0 8px;font-family:ui-monospace,monospace">metsavahti.fi/{{ routePath }}</span></div>
+        <div style="height:820px"><dc-import name="App" viewport="desktop" route="{{ route }}" hint-size="100%,820px"></dc-import></div>
+      </div>
+    </div>
+    <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:12px;font-weight:600;color:#5C6B62;text-transform:uppercase;letter-spacing:.06em">Mobiili · 390</span>
+      <div style="width:414px;background:#1B211D;border-radius:44px;padding:12px;box-shadow:0 24px 48px rgba(27,33,29,.24)">
+        <div style="border-radius:34px;overflow:hidden;background:#F7F5F0;height:844px;position:relative">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:13px;font-weight:600;background:#F7F5F0"><span>9:41</span><span style="width:100px;height:26px;border-radius:14px;background:#1B211D;position:absolute;left:50%;top:9px;transform:translateX(-50%)"></span><span>●●● ▲</span></div>
+          <div style="height:800px"><dc-import name="App" viewport="mobile" route="{{ route }}" hint-size="100%,800px"></dc-import></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { route: 'vahtialueet' };
+  renderVals() {
+    const routes = [
+      ['kirjaudu', 'Kirjaudu'], ['rekisteroidy', 'Luo tili'], ['vahvista', 'Vahvista sähköposti'], ['vahvistettu', 'Sähköposti vahvistettu'], ['unohtunut', 'Unohtunut salasana'], ['uusi_salasana', 'Uusi salasana'], ['kirjauduttu_ulos', 'Kirjauduttu ulos'],
+      ['aloita', 'Aloita (onboarding)'], ['vahtialueet', 'Vahtialueet'], ['alue/a1', 'Vahtialue – Mökki, Rääkkylä'], ['alue_muokkaa/a1', 'Vahtialue – muokkaa'], ['ilmoitukset', 'Ilmoitukset'], ['ilmoitus/d1', 'Ilmoitus – detail'],
+      ['tili', 'Tili'], ['turvallisuus', 'Turvallisuus'], ['ilmoitusasetukset', 'Ilmoitusasetukset'], ['tietosuoja', 'Tietosuoja ja tiedot'], ['poista', 'Poista tili'],
+      ['404', '404'], ['500', '500'], ['huolto', 'Huolto'], ['rajoitus', '429 Liian monta pyyntöä'], ['vahvistus_vaaditaan', 'Vahvistus vaaditaan']
+    ].map(([value, label]) => ({ value, label }));
+    return { route: this.state.route, routePath: this.state.route.replace('_', '-'), routes, setRoute: e => this.setState({ route: e.target.value }) };
+  }
+}
+</script>
+</body>
+</html>

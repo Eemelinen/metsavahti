@@ -1,0 +1,147 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/*
+ * Metsävahti design tokens (docs/design/tokens.js, rules in docs/design/README.md).
+ * The default Tailwind palette is removed so that only these colours exist as utilities;
+ * `bg-gray-500` is an unknown class and fails lint. Values are mirrored in
+ * src/lib/design-tokens.ts for MapLibre and email code; a unit test keeps them in sync.
+ */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-forest-50: #e9f0eb;
+  --color-forest-100: #d3e1d8;
+  --color-forest-200: #a9c4b3;
+  --color-forest-300: #7ea58f;
+  --color-forest-500: #3b7a5a;
+  --color-forest-600: #2b6247;
+  --color-forest-700: #1e4a37;
+  --color-forest-800: #163828;
+  --color-forest-900: #0f2a1e;
+
+  --color-sage-300: #b7c4bc;
+  --color-sage-500: #8a9e93;
+  --color-sage-700: #5c6b62;
+
+  --color-amber-100: #fbebd0;
+  --color-amber-300: #f0b35a;
+  --color-amber-500: #d98a1e;
+  --color-amber-700: #9c6010;
+
+  --color-ember-100: #fbddd2;
+  --color-ember-500: #d9572b;
+  --color-ember-700: #a33e1a;
+
+  --color-ink: #1b211d;
+  --color-ink-muted: #5c6b62;
+  --color-ink-faint: #8a9e93;
+
+  --color-paper: #f7f5f0;
+  --color-paper-raised: #ffffff;
+  --color-paper-sunken: #efece5;
+
+  --color-line: #dde3de;
+  --color-line-strong: #b7c4bc;
+
+  /* Harvest types (hakkuutapa); always pair with a text label. */
+  --color-cut-harvennus: #f0b35a;
+  --color-cut-uudistus: #d9572b;
+  --color-cut-muu: #9aa39d;
+
+  --color-success: #2b6247;
+  --color-error: #b8321c;
+  --color-info: #2f5f8a;
+
+  /* Radii: rounded-lg is the design default (10px), rounded-xl the card radius (14px). */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --radius-4xl: 36px;
+
+  --shadow-card: 0 1px 2px rgba(27, 33, 29, 0.06), 0 4px 16px rgba(27, 33, 29, 0.06);
+  --shadow-pop: 0 8px 32px rgba(27, 33, 29, 0.16);
+
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-heading: var(--font-figtree), system-ui, sans-serif;
+
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 22px;
+  --text-xl--line-height: 30px;
+  --text-2xl: 28px;
+  --text-2xl--line-height: 34px;
+  --text-2xl--letter-spacing: -0.01em;
+  --text-3xl: 36px;
+  --text-3xl--line-height: 42px;
+  --text-3xl--letter-spacing: -0.015em;
+  --text-4xl: 48px;
+  --text-4xl--line-height: 54px;
+  --text-4xl--letter-spacing: -0.02em;
+
+  /* Named layout sizes instead of arbitrary values. */
+  --grid-template-columns-card-header: 1fr auto;
+  --grid-template-rows-card-header: auto auto;
+}
+
+/* shadcn semantic aliases, mapped onto the design tokens. */
+@theme inline {
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-paper-raised);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-paper-raised);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-forest-700);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-paper-sunken);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-paper-sunken);
+  --color-muted-foreground: var(--color-ink-muted);
+  --color-accent: var(--color-forest-50);
+  --color-accent-foreground: var(--color-forest-700);
+  --color-destructive: var(--color-error);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-strong);
+  --color-ring: var(--color-forest-600);
+  --color-chart-1: var(--color-forest-500);
+  --color-chart-2: var(--color-amber-300);
+  --color-chart-3: var(--color-ember-500);
+  --color-chart-4: var(--color-sage-500);
+  --color-chart-5: var(--color-forest-200);
+  --color-sidebar: var(--color-paper-raised);
+  --color-sidebar-foreground: var(--color-ink);
+  --color-sidebar-primary: var(--color-forest-700);
+  --color-sidebar-primary-foreground: var(--color-white);
+  --color-sidebar-accent: var(--color-forest-50);
+  --color-sidebar-accent-foreground: var(--color-forest-700);
+  --color-sidebar-border: var(--color-line);
+  --color-sidebar-ring: var(--color-forest-600);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-forest-600;
+  }
+}

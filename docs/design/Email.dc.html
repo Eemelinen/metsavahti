@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#E6E2D8;color:#1B211D;font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2B6247}a:hover{color:#1E4A37}
+button{font-family:Figtree,system-ui,sans-serif}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <div style="position:sticky;top:0;z-index:10;background:rgba(230,226,216,.92);backdrop-filter:blur(8px);border-bottom:1px solid #DDE3DE;padding:12px 16px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:Figtree,system-ui,sans-serif">
+    <a href="Metsävahti.dc.html" style="font-size:13px;font-weight:600;color:#5C6B62;text-decoration:none;margin-right:8px">← Prototyyppi</a>
+    <sc-for list="{{ kinds }}" as="k" hint-placeholder-count="7"><button onClick="{{ k.pick }}" aria-pressed="{{ k.on }}" style="border:1px solid;padding:7px 12px;border-radius:9999px;font-size:13px;font-weight:600;cursor:pointer;background:{{ k.bg }};color:{{ k.fg }};border-color:{{ k.border }}">{{ k.label }}</button></sc-for>
+  </div>
+  <div style="padding:24px 12px 48px;display:flex;justify-content:center">
+    <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;max-width:600px;border-collapse:collapse">
+      <tbody>
+        <tr><td style="padding:0 0 16px;font-size:13px;color:#5C6B62;text-align:center">{{ preheader }}</td></tr>
+        <tr><td style="background:#ffffff;border-radius:16px;border:1px solid #DDE3DE;overflow:hidden">
+          <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;border-collapse:collapse"><tbody>
+            <tr><td style="padding:20px 24px;border-bottom:1px solid #DDE3DE"><table role="presentation" cellPadding="0" cellSpacing="0"><tbody><tr><td style="width:28px;height:28px;border-radius:8px;background:#1E4A37;text-align:center;vertical-align:middle"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F0B35A"></span></td><td style="padding-left:10px;font-weight:700;font-size:18px;color:#1E4A37">Metsävahti</td></tr></tbody></table></td></tr>
+            <tr><td style="padding:24px 24px 8px">
+              <sc-if value="{{ badge }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase;background:{{ badgeBg }};color:{{ badgeFg }}">{{ badge }}</span></sc-if>
+              <h1 style="margin:14px 0 8px;font-size:24px;line-height:1.2;color:#1E4A37;letter-spacing:-0.01em">{{ heading }}</h1>
+              <p style="margin:0;font-size:16px;line-height:1.5;color:#5C6B62">{{ lead }}</p>
+            </td></tr>
+
+            <sc-if value="{{ isAlert }}" hint-placeholder-val="{{ true }}">
+            <tr><td style="padding:16px 24px">
+              <div style="height:220px;border-radius:12px;border:1px solid #DDE3DE;background:repeating-linear-gradient(135deg,#E9F0EB 0 10px,#DFE8E2 10px 20px);position:relative;overflow:hidden">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:12px;color:#5C6B62">staattinen karttakuva 552×220 (alt: kartta vahtialueesta ja hakkuualueesta)</div>
+                <div style="position:absolute;left:32%;top:24%;width:110px;height:70px;background:rgba(217,87,43,.6);border:2px solid #A33E1A;border-radius:8px"></div>
+                <div style="position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:2px dashed #2B6247;background:rgba(43,98,71,.10)"></div>
+              </div>
+            </td></tr>
+            <tr><td style="padding:0 24px 8px">
+              <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;border-collapse:collapse;font-size:15px"><tbody>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62;width:45%">Hakkuun tyyppi</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5;font-weight:700"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#D9572B;margin-right:8px;vertical-align:middle"></span>Uudistushakkuu</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62">Pinta-ala</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5;font-weight:700">3,4 ha</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62">Etäisyys</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5;font-weight:700">420 m vahtialueen keskipisteestä</td></tr>
+                <tr><td style="padding:10px 0;color:#5C6B62">Ilmoitus saapunut</td><td style="padding:10px 0;font-weight:700">5.9.2026</td></tr>
+              </tbody></table>
+            </td></tr>
+            </sc-if>
+
+            <sc-if value="{{ isDigest }}" hint-placeholder-val="{{ false }}">
+            <tr><td style="padding:8px 24px 8px">
+              <sc-for list="{{ digestGroups }}" as="g" hint-placeholder-count="2">
+                <div style="margin-bottom:14px">
+                  <div style="font-size:12px;font-weight:700;color:#8A9E93;text-transform:uppercase;letter-spacing:.06em;padding:8px 0">{{ g.area }} · {{ g.count }}</div>
+                  <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+                    <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;border-collapse:collapse;border:1px solid #DDE3DE;border-radius:10px;margin-bottom:8px"><tbody><tr>
+                      <td style="width:10px;background:{{ it.color }};border-radius:10px 0 0 10px"></td>
+                      <td style="padding:12px 14px;font-size:14px;line-height:1.45"><strong>{{ it.type }}</strong> · {{ it.ha }} ha<br><span style="color:#5C6B62">{{ it.dist }} keskipisteestä · saapunut {{ it.date }}</span></td>
+                      <td style="padding:12px 14px;text-align:right;white-space:nowrap"><a href="App.dc.html#ilmoitus/{{ it.id }}" style="font-size:13px;font-weight:700;color:#2B6247;text-decoration:none">Kartalla →</a></td>
+                    </tr></tbody></table>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </td></tr>
+            </sc-if>
+
+            <sc-if value="{{ isDelete }}" hint-placeholder-val="{{ false }}">
+            <tr><td style="padding:8px 24px">
+              <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;border-collapse:collapse;font-size:15px"><tbody>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62;width:45%">Poistettu</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5">Tili, 2 vahtialuetta, ilmoitushistoria</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62">Säilytetään</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5">Anonymisoidut tekniset lokit enintään 12 kk</td></tr>
+                <tr><td style="padding:10px 0;color:#5C6B62">Ajankohta</td><td style="padding:10px 0">6.9.2026 klo 14:32</td></tr>
+              </tbody></table>
+            </td></tr>
+            </sc-if>
+
+            <sc-if value="{{ isExport }}" hint-placeholder-val="{{ false }}">
+            <tr><td style="padding:8px 24px">
+              <table role="presentation" cellPadding="0" cellSpacing="0" style="width:100%;border-collapse:collapse;font-size:15px"><tbody>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62;width:45%">Sisältö</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5">tili.json, vahtialueet.geojson, ilmoitukset.json</td></tr>
+                <tr><td style="padding:10px 0;border-bottom:1px solid #EFECE5;color:#5C6B62">Koko</td><td style="padding:10px 0;border-bottom:1px solid #EFECE5">48 kt (zip)</td></tr>
+                <tr><td style="padding:10px 0;color:#5C6B62">Linkki vanhenee</td><td style="padding:10px 0;font-weight:700">7.9.2026 klo 14:32 (24 h)</td></tr>
+              </tbody></table>
+            </td></tr>
+            </sc-if>
+
+            <sc-if value="{{ cta }}" hint-placeholder-val="{{ true }}"><tr><td style="padding:16px 24px 8px"><a href="{{ ctaHref }}" style="display:block;background:#1E4A37;color:#ffffff;text-align:center;padding:16px;border-radius:10px;font-weight:700;font-size:16px;text-decoration:none">{{ cta }}</a></td></tr></sc-if>
+            <sc-if value="{{ linkFallback }}" hint-placeholder-val="{{ false }}"><tr><td style="padding:0 24px 8px;font-size:12px;line-height:1.5;color:#8A9E93;word-break:break-all">Jos painike ei toimi, kopioi osoite selaimeen:<br><span style="font-family:ui-monospace,monospace;color:#5C6B62">{{ linkFallback }}</span></td></tr></sc-if>
+            <tr><td style="padding:8px 24px 24px"><p style="margin:0;font-size:13px;line-height:1.5;color:#5C6B62;background:#F7F5F0;border-radius:8px;padding:12px 14px">{{ note }}</p></td></tr>
+          </tbody></table>
+        </td></tr>
+        <tr><td style="padding:20px 16px 0;font-size:12px;line-height:1.6;color:#8A9E93;text-align:center">
+          {{ footerWhy }}<br>
+          <sc-if value="{{ showPrefs }}" hint-placeholder-val="{{ true }}"><a href="App.dc.html#ilmoitusasetukset" style="color:#5C6B62">Ilmoitusasetukset</a> · <a href="App.dc.html#ilmoitusasetukset" style="color:#5C6B62">Lopeta tämän alueen ilmoitukset</a> · </sc-if><a href="Legal.dc.html#tietosuoja" style="color:#5C6B62">Tietosuojaseloste</a><br><br>
+          <sc-if value="{{ showAttribution }}" hint-placeholder-val="{{ true }}">Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa 09/2026. Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.<br></sc-if>Metsävahti Oy · Metsäkatu 1, 80100 Joensuu
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  state = { kind: 'alert' };
+  componentDidMount() { const h = location.hash.replace('#', ''); if (this.defs()[h]) this.setState({ kind: h }); }
+  defs() {
+    const app = 'https://app.metsavahti.fi';
+    return {
+      verify: { label: '1 Vahvista sähköposti', preheader: 'Vahvista sähköpostiosoitteesi, niin vahtialueet aukeavat', badge: 'Tervetuloa', badgeBg: '#E9F0EB', badgeFg: '#1E4A37', heading: 'Vahvista sähköpostiosoitteesi', lead: 'Kiitos, että loit tilin. Paina alla olevaa painiketta vahvistaaksesi, että osoite on sinun. Linkki on voimassa 24 tuntia.', cta: 'Vahvista sähköposti', ctaHref: 'App.dc.html#vahvistettu', linkFallback: app + '/vahvista?token=8f3a…c21e', note: 'Jos et luonut tiliä Metsävahtiin, voit jättää tämän viestin huomiotta. Tili poistetaan automaattisesti 7 päivän kuluessa, jos osoitetta ei vahvisteta.', footerWhy: 'Saat tämän viestin, koska tällä osoitteella luotiin tili Metsävahtiin.', showPrefs: false, showAttribution: false },
+      reset: { label: '2 Salasanan palautus', preheader: 'Aseta uusi salasana – linkki voimassa 1 tunnin', badge: 'Turvallisuus', badgeBg: '#EFECE5', badgeFg: '#5C6B62', heading: 'Salasanan palautus', lead: 'Saimme pyynnön vaihtaa tilisi salasana. Aseta uusi salasana painikkeesta. Linkki on voimassa tunnin ja toimii vain kerran.', cta: 'Aseta uusi salasana', ctaHref: 'App.dc.html#uusi_salasana', linkFallback: app + '/uusi-salasana?token=2b9d…77f0', note: 'Jos et pyytänyt salasanan vaihtoa, salasanasi ei ole vaihtunut eikä sinun tarvitse tehdä mitään. Halutessasi voit kirjata ulos muut laitteet tilin turvallisuusasetuksista.', footerWhy: 'Saat tämän viestin, koska salasanan palautusta pyydettiin tilillesi.', showPrefs: false, showAttribution: false },
+      alert: { label: '3 Uusi ilmoitus', preheader: 'Uusi metsänkäyttöilmoitus 420 m päässä vahtialueestasi Mökki, Rääkkylä', badge: 'Uusi ilmoitus', badgeBg: '#FBDDD2', badgeFg: '#A33E1A', heading: 'Uusi metsänkäyttöilmoitus vahtialueellasi Mökki, Rääkkylä', lead: 'Metsäkeskuksen aineistoon on lisätty hakkuuaikomus 420 metrin päähän vahtialueesi keskipisteestä.', cta: 'Näytä kartalla', ctaHref: 'App.dc.html#ilmoitus/d1', linkFallback: '', note: 'Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata. Hakkuu voi alkaa aikaisintaan 10 päivää ilmoituksesta, ja ilmoitus on voimassa kolme vuotta.', footerWhy: 'Saat tämän viestin, koska seuraat aluetta ”Mökki, Rääkkylä”.', showPrefs: true, showAttribution: true },
+      digest: { label: '4 Kooste', preheader: '3 uutta metsänkäyttöilmoitusta vahtialueillasi tällä viikolla', badge: 'Viikkokooste 31.8.–6.9.', badgeBg: '#FBEBD0', badgeFg: '#9C6010', heading: '3 uutta metsänkäyttöilmoitusta vahtialueillasi', lead: 'Kooste viikon aikana löytyneistä uusista ilmoituksista. Seuraava kooste tulee sunnuntaina klo 09.', cta: 'Avaa kaikki ilmoitukset', ctaHref: 'App.dc.html#ilmoitukset', linkFallback: '', note: 'Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata. Voit vaihtaa koosteen tahdin tai siirtyä välittömiin ilmoituksiin asetuksista.', footerWhy: 'Saat tämän viestin, koska olet valinnut viikoittaisen koosteen.', showPrefs: true, showAttribution: true },
+      export: { label: '5 Tietojen vienti', preheader: 'Tietosi ovat valmiit ladattavaksi – linkki voimassa 24 h', badge: 'Tietopyyntö', badgeBg: '#E9F0EB', badgeFg: '#1E4A37', heading: 'Tietojen vienti on valmis', lead: 'Pyytämäsi tietopaketti on koottu. Se sisältää tilitietosi, vahtialueet GeoJSON-muodossa ja ilmoitushistorian.', cta: 'Lataa tiedot (zip, 48 kt)', ctaHref: '#', linkFallback: app + '/vienti/9c1e…04ab', note: 'Linkki toimii vain kirjautuneena ja vanhenee 24 tunnin kuluttua. Jos et pyytänyt vientiä, vaihda salasanasi ja ota yhteyttä tietosuoja@metsavahti.fi.', footerWhy: 'Saat tämän viestin, koska pyysit tietojesi vientiä tilin asetuksista.', showPrefs: false, showAttribution: false },
+      deleted: { label: '6 Tili poistettu', preheader: 'Tilisi on poistettu – kiitos, että käytit Metsävahtia', badge: '', badgeBg: '', badgeFg: '', heading: 'Tilisi on poistettu', lead: 'Pyyntösi mukaisesti olemme poistaneet tilisi ja siihen liittyvät tiedot. Et saa enää ilmoituksia vahtialueiltasi.', cta: '', ctaHref: '', linkFallback: '', note: 'Jos et tehnyt tätä pyyntöä, ota heti yhteyttä osoitteeseen tietosuoja@metsavahti.fi. Voit luoda uuden tilin milloin tahansa; vanhoja vahtialueita ei kuitenkaan voi palauttaa.', footerWhy: 'Tämä on viimeinen viesti, jonka lähetämme tähän osoitteeseen.', showPrefs: false, showAttribution: false },
+      changeEmail: { label: '7 Sähköpostin vaihto', preheader: 'Vahvista uusi sähköpostiosoitteesi', badge: 'Turvallisuus', badgeBg: '#EFECE5', badgeFg: '#5C6B62', heading: 'Vahvista uusi sähköpostiosoite', lead: 'Tilisi sähköpostiosoitteeksi pyydettiin vaihtoa osoitteeseen anna.k@example.fi. Vahvista vaihto painikkeesta. Vanha osoite pysyy käytössä, kunnes vahvistus on tehty.', cta: 'Vahvista uusi osoite', ctaHref: 'App.dc.html#tili', linkFallback: app + '/vaihda-sahkoposti?token=e51c…9a2d', note: 'Jos et pyytänyt vaihtoa, jätä viesti huomiotta; osoite ei vaihdu. Lähetimme tiedon myös vanhaan osoitteeseen.', footerWhy: 'Saat tämän viestin, koska tilisi sähköpostiosoitteen vaihtoa pyydettiin.', showPrefs: false, showAttribution: false }
+    };
+  }
+  renderVals() {
+    const defs = this.defs(), k = this.state.kind, d = defs[k];
+    const digestGroups = [
+      { area: 'Mökki, Rääkkylä', count: '2 uutta', items: [{ id: 'd1', type: 'Uudistushakkuu', color: '#D9572B', ha: '3,4', dist: '420 m', date: '5.9.' }, { id: 'd2', type: 'Harvennushakkuu', color: '#F0B35A', ha: '6,1', dist: '760 m', date: '4.9.' }] },
+      { area: 'Kotitalo, Vihti', count: '1 uusi', items: [{ id: 'd6', type: 'Harvennushakkuu', color: '#F0B35A', ha: '1,7', dist: '310 m', date: '2.9.' }] }
+    ];
+    return {
+      kinds: Object.keys(defs).map(key => { const on = key === k; return { label: defs[key].label, on, pick: () => { this.setState({ kind: key }); try { history.replaceState(null, '', '#' + key); } catch (e) {} }, bg: on ? '#1E4A37' : '#fff', fg: on ? '#fff' : '#1B211D', border: on ? '#1E4A37' : '#DDE3DE' }; }),
+      ...d, badge: d.badge || false, cta: d.cta || false, linkFallback: d.linkFallback || false,
+      isAlert: k === 'alert', isDigest: k === 'digest', isDelete: k === 'deleted', isExport: k === 'export', digestGroups
+    };
+  }
+}
+</script>
+</body>
+</html>

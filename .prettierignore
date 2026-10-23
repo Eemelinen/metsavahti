@@ -1,0 +1,13 @@
+node_modules
+.next
+.next-e2e
+.next-check
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+src/payload-types.ts
+src/app/(payload)/admin/importMap.js
+src/payload/migrations/
+tests/fixtures
+docs/design/
