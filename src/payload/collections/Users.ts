@@ -93,6 +93,16 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
+      // Payload's own auth field (deep-merged with this entry: unique, lower-cased, validated).
+      // Only admins may set it directly; an account changes its address through the confirmed
+      // flow (MV-052, D-024), which writes with `overrideAccess`.
+      name: 'email',
+      type: 'email',
+      access: {
+        update: isAdminField,
+      },
+    },
+    {
       name: 'name',
       type: 'text',
       label: 'Nimi',

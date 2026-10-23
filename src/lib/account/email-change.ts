@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import type { Payload } from 'payload'
+import { type Payload, ValidationError } from 'payload'
 
 import { CHANGE_EMAIL_SUBJECT, renderChangeEmailConfirm } from '@/emails/ChangeEmailConfirm'
 import { EMAIL_CHANGE_NOTICE_SUBJECT, renderEmailChangeNotice } from '@/emails/EmailChangeNotice'
@@ -133,21 +133,31 @@ export async function applyEmailChange(
     await clearPendingEmail(payload, user.id)
     return { state: 'taken' }
   }
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: {
-      email: claims.email,
-      _verified: true,
-      _verificationToken: null,
-      pendingEmail: null,
-      pendingEmailTokenId: null,
-      resetPasswordToken: null,
-      resetPasswordExpiration: null,
-    },
-    depth: 0,
-    overrideAccess: true,
-  })
+  try {
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: {
+        email: claims.email,
+        _verified: true,
+        _verificationToken: null,
+        pendingEmail: null,
+        pendingEmailTokenId: null,
+        resetPasswordToken: null,
+        resetPasswordExpiration: null,
+      },
+      depth: 0,
+      overrideAccess: true,
+    })
+  } catch (error) {
+    // A registration of the same address between the check above and this write hits the
+    // unique index: the same answer as when the check catches it.
+    if (error instanceof ValidationError && error.data.errors.some((e) => e.path === 'email')) {
+      await clearPendingEmail(payload, user.id)
+      return { state: 'taken' }
+    }
+    throw error
+  }
   return { state: 'changed', email: claims.email }
 }
 

@@ -238,7 +238,7 @@ describe('email change flow (MV-052)', () => {
     })
   })
 
-  it('keeps the pending fields out of reach of the account itself', async () => {
+  it('keeps the address and the pending fields out of reach of the account itself', async () => {
     const payload = await getTestPayload()
     const user = await createTestUser(payload)
     await payload.update({
@@ -248,7 +248,16 @@ describe('email change flow (MV-052)', () => {
       overrideAccess: false,
       user,
     })
+    // Without the guard on `email`, the REST API would let a session skip the confirmation.
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: { email: 'ohitus@metsavahti.test' },
+      overrideAccess: false,
+      user,
+    })
     const after = await readUser(user.id)
+    expect(after.email).toBe(user.email)
     expect(after.pendingEmail ?? null).toBeNull()
     expect(after.pendingEmailTokenId ?? null).toBeNull()
   })
