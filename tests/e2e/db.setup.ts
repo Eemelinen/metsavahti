@@ -6,7 +6,7 @@ import {
   PLACEHOLDER_VERSION,
   richTextFromParagraphs,
 } from '@/lib/legal/documents'
-import { runMigrations, truncateAll } from '../helpers/db'
+import { insertDeclaration, runMigrations, truncateAll } from '../helpers/db'
 import { assertTestDatabaseUrl } from '../helpers/db-guard'
 import { createMailpitClient } from '../helpers/mailpit'
 import { E2E_USER, E2E_WATCH_AREA } from './fixtures'
@@ -14,8 +14,9 @@ import { E2E_USER, E2E_WATCH_AREA } from './fixtures'
 /**
  * Prepares the e2e database through the running app:
  *  1. guard against non-test databases, 2. migrate, 3. truncate,
- *  4. seed the first user (auto-verified admin), one watch area and the four placeholder
- *     legal documents (registration records their versions) via the REST API.
+ *  4. seed the first user (auto-verified admin), one watch area, one sent but unread alert
+ *     (the nav badge, MV-050; its declaration through SQL) and the four placeholder legal
+ *     documents (registration records their versions) via the REST API.
  * Runs once per `playwright test` invocation (project `db-setup`).
  */
 setup('migrate, reset and seed the e2e database', async ({ request }) => {
@@ -29,13 +30,28 @@ setup('migrate, reset and seed the e2e database', async ({ request }) => {
     data: { email: E2E_USER.email, password: E2E_USER.password, name: E2E_USER.name },
   })
   expect(first.ok(), await first.text()).toBeTruthy()
-  const { token } = (await first.json()) as { token: string }
+  const { token, user } = (await first.json()) as { token: string; user: { id: number } }
 
   const area = await request.post('/api/watch-areas', {
     headers: { authorization: `JWT ${token}` },
     data: { ...E2E_WATCH_AREA },
   })
   expect(area.ok(), await area.text()).toBeTruthy()
+  const { doc: watchArea } = (await area.json()) as { doc: { id: number } }
+
+  // Already emailed (`notifiedAt`), so the dashboard's pending count stays 0; `readAt` unset.
+  const alert = await request.post('/api/alerts', {
+    headers: { authorization: `JWT ${token}` },
+    data: {
+      user: user.id,
+      watchArea: watchArea.id,
+      declaration: await insertDeclaration(databaseUrl, 'e2e.forestusedeclaration.1'),
+      changeType: 'new',
+      notifiedAt: new Date().toISOString(),
+      snapshot: { cuttingTypeLabel: 'Avohakkuu', areaHa: 1.5, distanceM: 120, receivedAt: null },
+    },
+  })
+  expect(alert.ok(), await alert.text()).toBeTruthy()
 
   for (const slug of LEGAL_DOCUMENT_SLUGS) {
     const title = LEGAL_DOCUMENT_TITLES[slug]

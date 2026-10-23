@@ -36,3 +36,32 @@ export async function truncateAll(databaseUrl: string): Promise<void> {
     await client.end()
   }
 }
+
+/**
+ * Insert one declaration (a 100 m square near Jyväskylä, EPSG:3067) straight into
+ * `databaseUrl` and return its id. The REST API refuses declaration writes (only the
+ * pipeline creates them), so the e2e seed uses SQL for the alert it needs (MV-050 badge).
+ */
+export async function insertDeclaration(databaseUrl: string, sourceId: string): Promise<number> {
+  assertTestDatabaseUrl(databaseUrl)
+  const client = new Client({ connectionString: databaseUrl })
+  await client.connect()
+  try {
+    const { rows } = await client.query<{ id: number }>(
+      `INSERT INTO declarations (
+         source_id, declaration_number, cutting_type_code, area_ha, received_at, valid_until,
+         raw_attributes, geom_hash, attr_hash, first_seen_at, last_seen_at, geom
+       ) VALUES (
+         $1::text, '1-2026-1', 4, 1.5, now(), now() + interval '3 years', '{}'::jsonb,
+         'geom-' || $1::text, 'attr-' || $1::text, now(), now(),
+         ST_Multi(ST_GeomFromText(
+           'POLYGON((435000 6900000, 435100 6900000, 435100 6900100, 435000 6900100, 435000 6900000))',
+           3067))
+       ) RETURNING id`,
+      [sourceId],
+    )
+    return Number(rows[0]!.id)
+  } finally {
+    await client.end()
+  }
+}

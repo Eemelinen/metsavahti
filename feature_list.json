@@ -933,7 +933,7 @@
       "area": "account",
       "title": "App layout: sidebar / bottom tabs",
       "user_visible_behavior": "`(app)` layout with desktop sidebar (Vahtialueet, Ilmoitukset, Tili) and mobile bottom tab bar; account menu; unread alert badge (count from `alerts.readAt IS NULL`).",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-034", "F-046"],
       "ticket": "MV-050",
       "epic": "E04",
@@ -941,12 +941,22 @@
       "design": ["docs/design/App.dc.html#route=vahtialueet", "docs/design/Metsävahti.dc.html"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit tests/unit/account/app-layout-sidebar-bottom-tabs.test.ts (unit render at two viewports; E2E nav on Mobile Chrome.)",
+        "L1: pnpm test:unit tests/unit/account/app-layout-sidebar-bottom-tabs.test.tsx (unit render at two viewports; E2E nav on Mobile Chrome.)",
+        "L2: pnpm test:integration tests/integration/app-layout-sidebar-bottom-tabs.int.test.ts (unread badge counts the viewer's own alerts with readAt IS NULL, also for an admin.)",
         "L3: pnpm test:e2e tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts (unit render at two viewports; E2E nav on Mobile Chrome.)"
       ],
-      "evidence": [],
-      "attempts": 0,
-      "notes": "Tests (ticket): unit render at two viewports; E2E nav on Mobile Chrome."
+      "evidence": [
+        "2026-10-23 pnpm check → pass (working tree on e0243f7)",
+        "2026-10-23 pnpm test:unit tests/unit/account/app-layout-sidebar-bottom-tabs.test.tsx → pass (working tree on e0243f7)",
+        "2026-10-23 pnpm test:integration tests/integration/app-layout-sidebar-bottom-tabs.int.test.ts → pass (working tree on e0243f7, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts → pass (working tree on e0243f7, Docker available, CI=1: next start on the last build, retries 2)",
+        "2026-10-23 pnpm check → pass (working tree on 3efd184)",
+        "2026-10-23 pnpm test:unit tests/unit/account/app-layout-sidebar-bottom-tabs.test.tsx → pass (working tree on 3efd184)",
+        "2026-10-23 pnpm test:integration tests/integration/app-layout-sidebar-bottom-tabs.int.test.ts → pass (working tree on 3efd184, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts → pass (working tree on 3efd184, Docker available, CI unset: own next dev on this tree, retries 0, 11 passed)"
+      ],
+      "attempts": 1,
+      "notes": "Tests (ticket): unit render at two viewports; E2E nav on Mobile Chrome. Attempt 1 failed 2026-10-23: evaluator: Revise"
     },
     {
       "id": "F-051",

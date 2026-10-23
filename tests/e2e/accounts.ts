@@ -31,6 +31,18 @@ export async function waitForForm(page: Page): Promise<void> {
   await expect(page.locator('form[data-hydrated]')).toBeAttached()
 }
 
+/** "Kirjaudu ulos" from the app header's account menu (MV-050); lands on `/kirjauduttu-ulos`. */
+export async function logOut(page: Page): Promise<void> {
+  const item = page.getByRole('menuitem', { name: 'Kirjaudu ulos' })
+  // A click before hydration does not open the Radix menu; try again until it does.
+  await expect(async () => {
+    if (!(await item.isVisible())) await page.getByTestId('account-menu-trigger').click()
+    await expect(item).toBeVisible({ timeout: 2_000 })
+  }).toPass()
+  await item.click()
+  await expect(page).toHaveURL('/kirjauduttu-ulos')
+}
+
 /** `/rekisteroidy` → `/vahvista-sahkoposti?email=`; returns the (unverified) address. */
 export async function registerAccount(
   page: Page,

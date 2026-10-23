@@ -116,9 +116,12 @@ database or points at port 5432.
   `e2e/accounts.ts` waits for it before filling, because RHF resets the inputs on mount and a value typed
   before hydration is lost (webkit under load).
 - Project order: `db-setup` (guard → migrate → truncate → seed first user, a
-  watch area and the four placeholder legal documents through the REST API) → `auth-setup` (logs in once, stores cookies
+  watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
+  the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: landing page + attribution + axe, login and logout (`login-logout.spec.ts`, guest, an own
+- Specs: app shell (`app-layout-sidebar-bottom-tabs.spec.ts`: sidebar on desktop, bottom tabs on Mobile Chrome,
+  navigation between the three sections, the unread badge against the REST count, account menu, logout through
+  `logOut()` in `e2e/accounts.ts`, which every logout test uses), landing page + attribution + axe, login and logout (`login-logout.spec.ts`, guest, an own
   verified account per test through `e2e/accounts.ts`: `@smoke` `/kirjaudu` → `/dashboard` (1-day cookie) →
   `Kirjaudu ulos` → `/kirjauduttu-ulos` → the session is gone server-side; remember-me gives a 30-day cookie and
   `?next=` follows same-origin paths only; invalid, unverified (+ inline resend → second Mailpit link) and locked
