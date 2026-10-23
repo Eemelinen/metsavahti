@@ -97,39 +97,43 @@ Safeguards:
 
 ## Scripts
 
-| Script                                                               | What it does                                                                                            |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `pnpm dev` / `build` / `start`                                       | Next.js with Turbopack                                                                                  |
-| `pnpm db:up` / `db:down`                                             | start / stop `db`, `db_test`, `mailpit`                                                                 |
-| `pnpm db:migrate` / `db:migrate:create <name>` / `db:migrate:status` | Payload migrations (dev DB)                                                                             |
-| `pnpm db:seed`                                                       | admin user, sample watch area and the four placeholder legal documents in the dev DB (refuses test DBs) |
-| `pnpm db:reset`                                                      | drop volumes, recreate containers, migrate                                                              |
-| `pnpm test`                                                          | unit + integration                                                                                      |
-| `pnpm test:unit` / `test:watch`                                      | Vitest unit project (no DB, no network)                                                                 |
-| `pnpm test:integration`                                              | Vitest integration project (Testcontainers PostGIS + Mailpit)                                           |
-| `pnpm test:coverage`                                                 | both projects with v8 coverage (80 % line threshold on `src/lib/geo`, `src/lib/wfs`)                    |
-| `pnpm test:e2e` / `test:e2e:ui`                                      | Playwright against `next dev -p 3100` + `db_test` + WFS mock                                            |
-| `pnpm test:e2e:ci`                                                   | same, but builds first and runs `next start` (what CI does)                                             |
-| `pnpm test:live`                                                     | opt-in contract test against the real Metsäkeskus WFS                                                   |
-| `pnpm jobs:run`                                                      | run the sync workflow once against the dev DB                                                           |
-| `pnpm fixtures:record -- --bbox …`                                   | record a fresh WFS sample into `tests/fixtures/wfs`                                                     |
-| `pnpm lint` / `format` / `typecheck` / `knip`                        | quality gates (also run by Husky on commit and in CI)                                                   |
-| `pnpm check` / `check:full`                                          | L1 verification (lint, typecheck, knip, format:check, unit); `check:full` adds integration + build      |
-| `pnpm harness:check`                                                 | validate `feature_list.json` (WIP=1, evidence, layer labels)                                            |
-| `pnpm harness:feature` / `harness:verify` / `harness:clean-state`    | feature state transitions, the verification gate, the clock-out gate                                    |
-| `pnpm harness:loop` / `harness:report` / `harness:import-tickets`    | unattended feature loop, its run log, ticket → feature import                                           |
+| Script                                                               | What it does                                                                                                      |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev` / `build` / `start`                                       | Next.js with Turbopack                                                                                            |
+| `pnpm db:up` / `db:down`                                             | start / stop `db`, `db_test`, `mailpit`                                                                           |
+| `pnpm db:migrate` / `db:migrate:create <name>` / `db:migrate:status` | Payload migrations (dev DB)                                                                                       |
+| `pnpm db:seed`                                                       | admin user, sample watch area and the four placeholder legal documents in the dev DB (refuses test DBs)           |
+| `pnpm db:reset`                                                      | drop volumes, recreate containers, migrate                                                                        |
+| `pnpm test`                                                          | unit + integration                                                                                                |
+| `pnpm test:unit` / `test:watch`                                      | Vitest unit project (no DB, no network)                                                                           |
+| `pnpm test:integration`                                              | Vitest integration project (Testcontainers PostGIS + Mailpit)                                                     |
+| `pnpm test:coverage`                                                 | both projects with v8 coverage (80 % line threshold on `src/lib/geo`, `src/lib/wfs`)                              |
+| `pnpm test:e2e` / `test:e2e:ui`                                      | Playwright against `next dev -p 3100` + `db_test` + WFS mock                                                      |
+| `pnpm test:e2e:ci`                                                   | same, but builds first and runs `next start` (what CI does)                                                       |
+| `pnpm test:live`                                                     | opt-in contract test against the real Metsäkeskus WFS                                                             |
+| `pnpm jobs:run`                                                      | run the sync workflow once against the dev DB                                                                     |
+| `pnpm fixtures:record -- --bbox …`                                   | record a fresh WFS sample into `tests/fixtures/wfs`                                                               |
+| `pnpm lint` / `format` / `typecheck` / `knip`                        | quality gates (also run by Husky on commit and in CI)                                                             |
+| `pnpm check` / `check:full`                                          | L1 verification (lint, typecheck, knip, format:check, harness:check, unit); `check:full` adds integration + build |
+| `pnpm harness:check`                                                 | validate `feature_list.json` (WIP=1, evidence, layer labels)                                                      |
+| `pnpm harness:feature` / `harness:verify` / `harness:clean-state`    | feature state transitions, the verification gate, the clock-out gate                                              |
+| `pnpm harness:loop` / `harness:report` / `harness:import-tickets`    | unattended feature loop, its run log, ticket → feature import                                                     |
+| `pnpm harness:doctor`                                                | check the shared harness wiring (package version = plugin pin, config, required files)                            |
 
 ## Working with coding agents
 
-The repository carries its own agent harness (course:
+The repository uses the shared agent harness
+([Eemelinen/harness](https://github.com/Eemelinen/harness): the `@eemelinen/harness` package and
+its Claude Code plugin, configured in [harness.config.json](harness.config.json); course:
 [learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering)).
 [AGENTS.md](AGENTS.md) is the operating manual (clock-in, verification layers, constraints,
 definition of done, clock-out), [PROGRESS.md](PROGRESS.md) the session log,
 [feature_list.json](feature_list.json) the feature tracker (one active feature, evidence before
 `passing`) and `./init.sh` the standard startup path. Templates for handoffs, the clean-state
 checklist, the evaluator rubric and the quality snapshot live in [docs/harness/](docs/harness/).
-Claude Code users get permissions, hooks and the `/clock-in`, `/verify-feature` and
-`/clock-out` skills from `.claude/` (see [CLAUDE.md](CLAUDE.md)).
+Claude Code users get the hooks and the `/harness:clock-in`, `/harness:verify-feature` and
+`/harness:clock-out` skills from the harness plugin and the permissions from `.claude/` (see
+[CLAUDE.md](CLAUDE.md)).
 `pnpm harness:loop` runs the loop unattended (one worktree, one session and one PR per
 feature; see [docs/harness/README.md](docs/harness/README.md)). The product spec and its
 tickets live in [docs/product/](docs/product/), the designs in [docs/design/](docs/design/);

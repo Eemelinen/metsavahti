@@ -17,15 +17,17 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
 import {
-  FEATURE_LIST_PATH,
+  loadProject,
   readFeatureList,
   today,
   writeFeatureList,
   type Feature,
   type FeatureList,
-} from './validate-feature-list'
+} from '@eemelinen/harness'
 
-const ROOT = path.dirname(FEATURE_LIST_PATH)
+const project = loadProject(path.dirname(fileURLToPath(import.meta.url)))
+const ROOT = project.root
+const FEATURE_LIST_PATH = project.resolve(project.config.project.featureList)
 export const TICKETS_DIR = path.join(ROOT, 'docs/product/tickets')
 export const DESIGN_MAP_PATH = path.join(ROOT, 'docs/design/design-map.json')
 
@@ -359,7 +361,7 @@ function main(argv: string[]) {
     args: argv,
     options: { write: { type: 'boolean', default: false } },
   })
-  const existing = retireLegacy(readFeatureList())
+  const existing = retireLegacy(readFeatureList(FEATURE_LIST_PATH, project.config.features))
   const tickets = readTickets()
   const designMap = JSON.parse(readFileSync(DESIGN_MAP_PATH, 'utf8')) as Record<string, string[]>
   const scaffoldEvidence =
@@ -391,7 +393,11 @@ function main(argv: string[]) {
     console.log('dry run; pass --write to update feature_list.json')
     return
   }
-  writeFeatureList(merged)
+  writeFeatureList(merged, {
+    file: FEATURE_LIST_PATH,
+    features: project.config.features,
+    cwd: ROOT,
+  })
   console.log('feature_list.json written')
 }
 
