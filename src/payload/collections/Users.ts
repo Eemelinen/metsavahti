@@ -2,22 +2,11 @@ import type { CollectionConfig } from 'payload'
 
 import { RESET_PASSWORD_SUBJECT, renderResetPassword } from '@/emails/ResetPassword'
 import { VERIFY_EMAIL_SUBJECT, renderVerifyEmail } from '@/emails/VerifyEmail'
+import { DEFAULT_TIMEZONE, isValidTimeZone } from '@/lib/account/timezone'
 import { env } from '@/lib/env'
 import { isAdmin, isAdminField, isAdminOrSelf, isAdminUser } from '@/payload/access'
 
-export const DEFAULT_TIMEZONE = 'Europe/Helsinki'
 export const DEFAULT_DAILY_HOUR = 9
-
-/** IANA zone check through `Intl`; Node ships the full tz database. */
-export function isValidTimeZone(value: unknown): value is string {
-  if (typeof value !== 'string' || value.length === 0) return false
-  try {
-    new Intl.DateTimeFormat('fi-FI', { timeZone: value })
-    return true
-  } catch {
-    return false
-  }
-}
 
 /**
  * Auth collection (`01 §3.1`, ticket MV-031). Anyone can sign up; email verification is

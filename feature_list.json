@@ -964,7 +964,7 @@
       "area": "account",
       "title": "Profile and security pages /tili, /tili/turvallisuus",
       "user_visible_behavior": "`/tili`: name, locale, timezone edits (Server Action `updateProfile`); email shows current + \"Vaihda\" starting change flow (MV-052). `/tili/turvallisuus`: change password (current required; invalidates other sessions), sessions list (device/UA, created, last seen, current flag), \"Kirjaa ulos muista laitteista\".",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-044", "F-046", "F-050"],
       "ticket": "MV-051",
       "epic": "E04",

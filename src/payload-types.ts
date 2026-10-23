@@ -80,6 +80,7 @@ export interface Config {
     'job-runs': JobRun;
     'legal-documents': LegalDocument;
     'rate-limit-buckets': RateLimitBucket;
+    'user-sessions': UserSession;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -101,6 +102,7 @@ export interface Config {
     'job-runs': JobRunsSelect<false> | JobRunsSelect<true>;
     'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     'rate-limit-buckets': RateLimitBucketsSelect<false> | RateLimitBucketsSelect<true>;
+    'user-sessions': UserSessionsSelect<false> | UserSessionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -503,6 +505,19 @@ export interface RateLimitBucket {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-sessions".
+ */
+export interface UserSession {
+  id: number;
+  user?: (number | null) | User;
+  sid: string;
+  userAgent?: string | null;
+  lastSeenAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -669,6 +684,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'rate-limit-buckets';
         value: number | RateLimitBucket;
+      } | null)
+    | ({
+        relationTo: 'user-sessions';
+        value: number | UserSession;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -933,6 +952,18 @@ export interface RateLimitBucketsSelect<T extends boolean = true> {
   key?: T;
   hits?: T;
   expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-sessions_select".
+ */
+export interface UserSessionsSelect<T extends boolean = true> {
+  user?: T;
+  sid?: T;
+  userAgent?: T;
+  lastSeenAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

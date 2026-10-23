@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import config from '@payload-config'
+import { currentSessionId, recordSessionSeen } from '@/lib/account/sessions'
 import { DEFAULT_AFTER_LOGIN } from '@/lib/auth/login-schema'
 import { pageDecision } from '@/lib/auth/page-access'
 import { type SessionState, resolveSession } from '@/lib/auth/session'
@@ -16,10 +17,25 @@ import type { User } from '@/payload-types'
  * database, so every `(app)` page and every action that touches user data calls one of them.
  */
 
-/** The request's session, resolved once per render (React `cache`). */
+/**
+ * The request's session, resolved once per render (React `cache`). A verified session is also
+ * noted as seen for the device list on `/tili/turvallisuus` (MV-051).
+ */
 const currentSession = cache(async (): Promise<SessionState> => {
   const payload = await getPayload({ config })
-  return resolveSession(payload, await headers())
+  const requestHeaders = await headers()
+  const session = await resolveSession(payload, requestHeaders)
+  if (session.status === 'user') {
+    const sid = currentSessionId(payload, requestHeaders, session.user)
+    if (sid) {
+      await recordSessionSeen(payload, {
+        user: session.user,
+        sid,
+        userAgent: requestHeaders.get('user-agent'),
+      })
+    }
+  }
+  return session
 })
 
 /** The verified user behind the request, or `null` (guest, unverified, revoked, forged). */

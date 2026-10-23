@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import type { User } from '@/payload-types'
-import { DEFAULT_DAILY_HOUR, DEFAULT_TIMEZONE, isValidTimeZone } from '@/payload/collections/Users'
+import { DEFAULT_TIMEZONE, isValidTimeZone } from '@/lib/account/timezone'
+import { DEFAULT_DAILY_HOUR } from '@/payload/collections/Users'
 import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payload'
 
 /** MV-031: `users` per `01 §3.1` — self-only access, admin-only fields, defaults, auth options. */

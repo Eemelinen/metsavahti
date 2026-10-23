@@ -66,7 +66,7 @@ test.describe('app layout (logged in)', () => {
 
     await visible.getByRole('link', { name: 'Tili' }).click()
     await expect(page).toHaveURL('/tili')
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tili')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tili ja asetukset')
     await expect(current).toHaveText('Tili')
 
     await visible.getByRole('link', { name: 'Vahtialueet' }).click()
