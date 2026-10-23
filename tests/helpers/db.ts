@@ -8,7 +8,7 @@ export function runMigrations(databaseUrl: string): void {
   assertTestDatabaseUrl(databaseUrl)
   // On Windows `pnpm` is a `.cmd` shim that execFileSync cannot run (and that fails with
   // "The batch file cannot be found" through a shell); run pnpm's own entry through node,
-  // as scripts/harness-loop.ts does.
+  // as the harness CLI (@eemelinen/harness) does.
   const pnpmEntry = process.env.npm_execpath
   const [cmd, prefix]: [string, string[]] =
     process.platform === 'win32' && pnpmEntry ? [process.execPath, [pnpmEntry]] : ['pnpm', []]
