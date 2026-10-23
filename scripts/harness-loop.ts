@@ -95,11 +95,23 @@ interface Options {
 const log = (line: string) =>
   console.log(`[harness ${new Date().toISOString().slice(11, 19)}] ${line}`)
 
+/**
+ * On Windows `pnpm` is a `.cmd` shim that spawnSync cannot run without a shell, and a shell
+ * would mangle arguments with spaces (`--reason`); run pnpm's own entry point through node.
+ */
+function resolveCommand(cmd: string, args: string[]): [string, string[]] {
+  const pnpmEntry = process.env.npm_execpath
+  if (process.platform === 'win32' && cmd === 'pnpm' && pnpmEntry)
+    return [process.execPath, [pnpmEntry, ...args]]
+  return [cmd, args]
+}
+
 function sh(
-  cmd: string,
-  args: string[],
+  command: string,
+  commandArgs: string[],
   opts: { cwd?: string; quiet?: boolean; env?: Record<string, string | undefined> } = {},
 ) {
+  const [cmd, args] = resolveCommand(command, commandArgs)
   const res: SpawnSyncReturns<string> = spawnSync(cmd, args, {
     cwd: opts.cwd ?? ROOT,
     encoding: 'utf8',

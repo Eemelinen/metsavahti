@@ -106,7 +106,12 @@ stateDiagram-v2
 
 **Prerequisites (once):** Docker Desktop running, `gh` installed and logged in
 (`brew install gh && gh auth login`), `main` clean and in sync with `origin/main`, Playwright
-browsers installed (`pnpm exec playwright install chromium webkit`).
+browsers installed (`pnpm exec playwright install chromium webkit`). On Windows: `winget install
+--id GitHub.cli`, the native `claude.exe` installer (`irm https://claude.ai/install.ps1 | iex`, then
+add `%USERPROFILE%\.local\bin` to `Path`), and run the driver from Git Bash; it runs `pnpm` through
+node there because the `pnpm.cmd` shim cannot be spawned without a shell. Desktop notifications are
+macOS-only. With `merge: "auto"`, `main` needs branch protection with required CI checks, or GitHub
+merges the PR before CI runs.
 
 **Commands**
 
