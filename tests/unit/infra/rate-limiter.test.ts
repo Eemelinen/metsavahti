@@ -82,6 +82,21 @@ describe('rate limiter', () => {
   it('refuses a limit below one', () => {
     expect(() => createRateLimiter({ name: 'x', limit: 0, windowMs: 1 })).toThrow(/limit/)
   })
+
+  it('reads a limit function on each check, not at creation', async () => {
+    let limit = Number.NaN
+    const limiter = createRateLimiter({
+      name: 'lazy',
+      limit: () => limit,
+      windowMs: 60_000,
+      now: () => 0,
+      store: memoryRateLimitStore(),
+    })
+    await expect(limiter.check('k')).rejects.toThrow(/limit/)
+    limit = 1
+    await expect(limiter.check('k')).resolves.toMatchObject({ allowed: true })
+    await expect(limiter.check('k')).resolves.toMatchObject({ allowed: false })
+  })
 })
 
 describe('rateLimitKey', () => {

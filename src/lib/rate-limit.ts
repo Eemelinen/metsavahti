@@ -158,8 +158,12 @@ export function setDefaultRateLimitStore(store: RateLimitStore): void {
 export type RateLimiterOptions = {
   /** Namespace of this limiter's keys; two limiters with different windows never share one. */
   name: string
-  /** Requests allowed per key within `windowMs`. */
-  limit: number
+  /**
+   * Requests allowed per key within `windowMs`. A function is read on every check, so a limit
+   * from `env` is never evaluated at import time (`next build` runs with `SKIP_ENV_VALIDATION`,
+   * where `env` applies no defaults).
+   */
+  limit: number | (() => number)
   windowMs: number
   /** Injected in tests. */
   now?: () => number
@@ -193,11 +197,16 @@ export function createRateLimiter({
   now = Date.now,
   store,
 }: RateLimiterOptions): RateLimiter {
-  if (!Number.isInteger(limit) || limit < 1) throw new Error(`${name}: limit must be ≥ 1`)
+  const validLimit = (value: number) => {
+    if (!Number.isInteger(value) || value < 1) throw new Error(`${name}: limit must be ≥ 1`)
+    return value
+  }
+  if (typeof limit === 'number') validLimit(limit)
+  const currentLimit = typeof limit === 'number' ? () => limit : () => validLimit(limit())
   const resolve = () => store ?? defaultStore
 
   async function check(key: string): Promise<RateLimitDecision> {
-    return resolve().hit(bucketKey(name, key), { limit, windowMs, at: now() })
+    return resolve().hit(bucketKey(name, key), { limit: currentLimit(), windowMs, at: now() })
   }
 
   return {
@@ -248,11 +257,12 @@ export async function limitApiRequest(limiter: RateLimiter, key: string): Promis
 
 /**
  * Limiter for the auth Server Actions (`01 §8`: registration 5/h/IP). The window is one hour;
- * the count comes from `AUTH_RATE_LIMIT_PER_HOUR` (default 5, which the test suites keep).
+ * the count comes from `AUTH_RATE_LIMIT_PER_HOUR` (default 5, which the test suites keep),
+ * read per check so importing this module never touches `env`.
  * Keys are `rateLimitKey(<action>, { ip })`, so each action has its own budget.
  */
 export const authRateLimiter = createRateLimiter({
   name: 'auth',
-  limit: env.AUTH_RATE_LIMIT_PER_HOUR,
+  limit: () => env.AUTH_RATE_LIMIT_PER_HOUR,
   windowMs: 60 * 60 * 1000,
 })
