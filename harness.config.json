@@ -50,7 +50,7 @@
     "Bash(docker info*)"
   ],
   "worktreeRoot": "../metsavahti-worktrees",
-  "merge": "wait",
+  "merge": "auto",
   "traceDir": ".harness/traces",
   "runsLog": ".harness/runs.jsonl"
 }

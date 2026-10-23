@@ -116,7 +116,7 @@ browsers installed (`pnpm exec playwright install chromium webkit`).
 | `pnpm harness:loop --once`                | One feature end to end, then stops. Use this for the first runs.                                            |
 | `pnpm harness:loop --feature F-020`       | This feature only (it must be ready and unattended-capable).                                                |
 | `pnpm harness:loop`                       | Loop until nothing is ready, a stop condition hits, or Ctrl-C (finishes the current session first).         |
-| `--auto-merge`                            | `gh pr merge --auto --squash --delete-branch` instead of waiting for you.                                   |
+| `--auto-merge`                            | `gh pr merge --auto --squash --delete-branch` for this run (already the default: `merge: "auto"`).          |
 | `--no-wait`                               | Do not wait for the merge; continue with features that do not depend on the open PR.                        |
 | `pnpm harness:report`                     | Table of past runs from `.harness/runs.jsonl` (feature, attempt, outcome, verdict, turns, cost, PR).        |
 | `pnpm harness:feature list`               | Queue overview with `[ready]` / `[ready, human-only]` markers.                                              |
@@ -150,8 +150,9 @@ evaluator is capped at 60 turns / 4 USD.
 - **Not a sandbox.** Sessions run on the host with the classifier and the deny list as the boundary;
   `bypassPermissions` is deliberately not used (D-008). Put the driver in a container before raising caps
   or loosening the allowlist.
-- **State files on branches.** Every PR touches `feature_list.json` and `PROGRESS.md`; the default
-  `merge: "wait"` policy avoids conflicts by finishing one PR before the next dependent feature starts.
+- **State files on branches.** Every PR touches `feature_list.json` and `PROGRESS.md`; the driver
+  avoids conflicts by waiting for each PR to merge (`merge: "auto"`: GitHub merges once CI passes;
+  `merge: "wait"`: a human merges) before the next dependent feature starts.
 - **Phase 3 (graph stage, lecture 14).** Parallel workers on features with disjoint `area` and satisfied
   `depends_on`, one worktree each with parametrised ports and `NEXT_DIST_DIR`, an `owner` field on
   `in_progress` features and a per-worker WIP=1. The swarm schedule in
