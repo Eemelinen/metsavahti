@@ -286,7 +286,11 @@ export function writeFeatureList(list: FeatureList, options: WriteOptions = {}):
   validateFeatureList(normalized)
   writeFileSync(file, `${JSON.stringify(normalized, null, 2)}\n`)
   if (options.format ?? true) {
-    spawnSync('pnpm', ['exec', 'prettier', '--write', '--log-level', 'warn', file], {
+    // On Windows `pnpm` is a `.cmd` shim spawnSync cannot run; use pnpm's entry through node.
+    const pnpmEntry = process.env.npm_execpath
+    const [cmd, prefix]: [string, string[]] =
+      process.platform === 'win32' && pnpmEntry ? [process.execPath, [pnpmEntry]] : ['pnpm', []]
+    spawnSync(cmd, [...prefix, 'exec', 'prettier', '--write', '--log-level', 'warn', file], {
       cwd: path.dirname(FEATURE_LIST_PATH),
       stdio: 'inherit',
     })

@@ -28,6 +28,10 @@ export const env = createEnv({
     LOG_LEVEL: z.enum(logLevels).default('info'),
     /** `1` exposes `/virhe`, a route that throws so the e2e suite can test `error.tsx`. */
     ENABLE_ERROR_TEST_ROUTE: z.enum(['0', '1']).default('0'),
+    /** `1` sends every request to `/huolto` (pages) or answers 503 (`/api/*`), except `/api/health`. */
+    MAINTENANCE_MODE: z.enum(['0', '1']).default('0'),
+    /** Shown on `/huolto` as "Palaamme noin klo …" (e.g. `07.00`); without it the page says "pian". */
+    MAINTENANCE_RETURN_TIME: z.string().min(1).max(40).optional(),
     /** Auth Server Actions (registration) allowed per IP per hour (`01 §8`; ticket MV-042 says 5). */
     AUTH_RATE_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(5),
     /** Local directory for the `exports` upload collection (relative to the working directory). */

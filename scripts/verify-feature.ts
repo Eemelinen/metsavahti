@@ -10,7 +10,9 @@
  * trailing parenthesised description. `manual:` entries fail closed unless `--allow-manual`
  * is given, in which case they are recorded as waived by the current user; `--manual-observed
  * "<what you saw>"` records the observation instead. Evidence names `commit <sha>` when the tree
- * is clean and `working tree on <sha>` when it is not, so the hash is never misleading.
+ * is clean and `working tree on <sha>` when it is not, so the hash is never misleading. With
+ * `CI` set, L3 evidence says so: Playwright then serves the last `pnpm build` through
+ * `next start` and retries a failing test up to twice (`playwright.config.ts`).
  */
 import { spawnSync } from 'node:child_process'
 import path from 'node:path'
@@ -67,6 +69,8 @@ export interface VerifyOptions {
   run?: (command: string) => number
   /** Reports whether Docker is available (needed for L2/L3); injected by tests. */
   dockerAvailable?: () => boolean
+  /** Whether `CI` is set (changes how L3 runs); injected by tests. */
+  ci?: boolean
   commit?: string
   date?: string
   user?: string
@@ -114,6 +118,7 @@ export function verifyFeature(feature: Feature, options: VerifyOptions = {}): Ve
   const commit = options.commit ?? headCommit()
   const dirty = options.treeDirty ?? treeIsDirty()
   const where = dirty ? `working tree on ${commit}` : `commit ${commit}`
+  const ci = options.ci ?? Boolean(process.env.CI)
   const allowManual = options.allowManual || Boolean(options.manualObserved)
   const user = options.user ?? process.env.USER ?? 'unknown'
   const steps = feature.verification.map(parseStep)
@@ -181,7 +186,8 @@ export function verifyFeature(feature: Feature, options: VerifyOptions = {}): Ve
     result.status = 'pass'
     log(`[${step.layer}] pass (${seconds}s)`)
     const docker = step.layer === 'L1' ? '' : ', Docker available'
-    evidence.push(`${date} ${step.command} → pass (${where}${docker})`)
+    const mode = step.layer === 'L3' && ci ? ', CI=1: next start on the last build, retries 2' : ''
+    evidence.push(`${date} ${step.command} → pass (${where}${docker}${mode})`)
   }
 
   if (options.dryRun) {

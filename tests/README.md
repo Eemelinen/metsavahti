@@ -33,7 +33,11 @@ database or points at port 5432.
   forgot / reset password (`auth/forgot-reset-password.test.ts`: the two schemas, the `ResetPassword`
   template, the `requestPasswordReset` action with the helper spied: same answer for a registered and an
   unknown address, unusable address refused, 5/h/IP; the `resetPassword` action: field errors, weak,
-  `invalid`, redirect to `/kirjaudu?reset=1`),
+  `invalid`, redirect to `/kirjaudu?reset=1`), route protection (`auth/route-protection.test.ts`: the route
+  table, the CSP directives and nonce, `handleRequest()` for public / user / guest-only / admin paths with a
+  valid, forged and expired token and in maintenance mode, `pageDecision()`, `assertOwner()`, and the guards
+  with a faked Payload: `actionResult()` maps a bare `requireUser()` to `unauthorized` and `assertOwner` to
+  `forbidden`, pages are redirected to the login or the interstitial),
 
 ## Integration — `pnpm test:integration`
 
@@ -85,6 +89,10 @@ database or points at port 5432.
   unknown address and a repeat within 60 s send nothing; `resetUserPassword` changes the password, the
   session from before the reset is refused by `payload.auth()`, the old password by `loginUser()`, the
   lockout is cleared, the token works once; expired, made-up and weak are refused without a change),
+  route protection (`route-protection.int.test.ts`: the proxy's key equals `payload.secret`; route × auth
+  state (guest, forged, revoked, unverified, verified) through `handleRequest()` and then the page's
+  `pageDecision()` on the real session → 200 or which layer redirects where; `assertOwner` on a real watch
+  area throws `Forbidden` for another user),
   the full `sync-declarations` pipeline (new → idempotent → changed
   geometry with a `declaration-revisions` row and an in-place `watch-area-declarations` update,
   emails asserted through the Mailpit API), and the cron endpoint.
@@ -122,7 +130,12 @@ database or points at port 5432.
 vahtialue` points at `/aloita` → login succeeds → the same link is `used`; an admin backdates
   `verificationSentAt` 25 h so the link is `expired` and its resend button issues a working one;
   `/vahvista` without or with an unknown token; an admin resets `_verified` on a logged-in account and
-  `/dashboard` redirects to `/vahvista-sahkoposti?email=…&required=1` with the `VAHVISTUS` interstitial; axe on every state), dashboard
+  `/dashboard` redirects to `/vahvista-sahkoposti?email=…&required=1` with the `VAHVISTUS` interstitial; axe on every state), the
+  consolidated auth suite (`auth.spec.ts`, Chromium + Mobile Chrome only: `@smoke` register → verify → `/dashboard`
+  via `/kirjaudu?next=` → the guest-only pages send the signed-in user on (a safe `?next=` too) → logout → reset →
+  login; guests are sent from every app route with the full return address; an unverified session goes to the
+  interstitial and may still open `/kirjaudu`; the security headers and a fresh nonce per request; no CSP violation
+  on `/` and on the map page; axe on every auth page and state), dashboard
   redirect (`/kirjaudu?next=%2Fdashboard`)/map/pending-alert count, marketing layout + system pages (header/footer, 404 status,
   `/huolto`, `/liikaa-pyyntoja`, the error boundary through `/virhe`, axe), health and
   jobs API (runs the sync against the mock). `/virhe` throws only because `.env.test` sets

@@ -47,7 +47,9 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
       dependencies: ['auth-setup'],
-      testIgnore: /.*\.setup\.ts/,
+      // The consolidated auth suite runs on Chromium + Mobile Chrome (MV-046); the per-ticket
+      // auth specs keep covering webkit.
+      testIgnore: [/.*\.setup\.ts/, /auth\.spec\.ts/],
     },
     {
       name: 'mobile-chrome',

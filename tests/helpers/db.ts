@@ -6,7 +6,13 @@ import { assertTestDatabaseUrl } from './db-guard'
 /** Run Payload migrations against `databaseUrl` using the CLI (same path as prod/CI). */
 export function runMigrations(databaseUrl: string): void {
   assertTestDatabaseUrl(databaseUrl)
-  execFileSync('pnpm', ['exec', 'payload', 'migrate'], {
+  // On Windows `pnpm` is a `.cmd` shim that execFileSync cannot run (and that fails with
+  // "The batch file cannot be found" through a shell); run pnpm's own entry through node,
+  // as scripts/harness-loop.ts does.
+  const pnpmEntry = process.env.npm_execpath
+  const [cmd, prefix]: [string, string[]] =
+    process.platform === 'win32' && pnpmEntry ? [process.execPath, [pnpmEntry]] : ['pnpm', []]
+  execFileSync(cmd, [...prefix, 'exec', 'payload', 'migrate'], {
     env: { ...process.env, DATABASE_URL: databaseUrl, NODE_OPTIONS: '--no-deprecation' },
     stdio: 'inherit',
   })

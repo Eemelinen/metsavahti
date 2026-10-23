@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 
 import type { Payload } from 'payload'
 
@@ -87,4 +87,48 @@ export async function findUnverifiedSessionUser(
   const session = user.sessions?.find((s) => s.id === claims.sid)
   if (!session || Date.parse(session.expiresAt) <= now) return null
   return user
+}
+
+/**
+ * The key Payload signs its tokens with: `payload.secret` is the first 32 hex characters of
+ * SHA-256 over `PAYLOAD_SECRET`. `src/proxy.ts` cannot boot Payload, so it derives the key
+ * itself; the integration suite checks the two agree.
+ */
+export function payloadSecretKey(secret: string): string {
+  return createHash('sha256').update(secret).digest('hex').slice(0, 32)
+}
+
+/**
+ * Whether the request carries a signed, unexpired `users` session token: the proxy's
+ * optimistic check (no database). A `true` here may still be a revoked session or an
+ * unverified account; the page's `requireUser()` makes the real decision.
+ */
+export function hasSessionToken(
+  headers: Headers,
+  secretKey: string,
+  now = Date.now(),
+  cookiePrefix = 'payload',
+): boolean {
+  const token = sessionTokenFromCookies(headers, cookiePrefix)
+  if (!token) return false
+  return readSessionToken(token, secretKey, now)?.collection === 'users'
+}
+
+export type SessionState =
+  { status: 'guest' } | { status: 'user'; user: User } | { status: 'unverified'; user: User }
+
+/**
+ * Who is behind the request: a verified account with a live session (`payload.auth()`), an
+ * unverified one (`findUnverifiedSessionUser()`) or nobody. A revoked, expired or forged
+ * cookie is a guest.
+ */
+export async function resolveSession(
+  payload: Payload,
+  headers: Headers,
+  now = Date.now(),
+): Promise<SessionState> {
+  const { user } = await payload.auth({ headers })
+  if (user && user.collection === 'users') return { status: 'user', user: user as User }
+  const unverified = await findUnverifiedSessionUser(payload, headers, now)
+  return unverified ? { status: 'unverified', user: unverified } : { status: 'guest' }
 }

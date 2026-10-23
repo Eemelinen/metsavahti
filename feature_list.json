@@ -1,6 +1,6 @@
 {
   "project": "metsavahti",
-  "last_updated": "2026-09-20",
+  "last_updated": "2026-10-23",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -867,7 +867,7 @@
       "area": "auth",
       "title": "Route protection middleware and session helpers",
       "user_visible_behavior": "`src/middleware.ts`: guards for `(app)` routes, guest-only for auth routes, maintenance mode, security headers (CSP nonce, HSTS, frame-ancestors none). `getSessionUser()` (server), `requireUser()`, `assertOwner(user, doc)`, `AppError` mapping for Server Actions (`actionResult<T>()` wrapper returning `{ ok, data | error }`). Consolidated auth E2E suite.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-010", "F-011", "F-044"],
       "ticket": "MV-046",
       "epic": "E03",
@@ -882,9 +882,22 @@
         "L2: pnpm test:integration -- tests/integration/route-protection.int.test.ts (unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no v…)",
         "L3: pnpm test:e2e -- tests/e2e/auth.spec.ts (unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no v…)"
       ],
-      "evidence": [],
-      "attempts": 0,
-      "notes": "Tests (ticket): unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no violations on `/` and `/vahtialueet` (console check); consolidated `tests/e2e/auth.spec.ts` covering all E03 flows (register, verify, login/logout, reset, route protection) on Chromium + Mobile Chrome with axe on all auth pages. Status (ticket): absorbs MV-047 and MV-049 (merged 2026-09-20, ledger P11)."
+      "evidence": [
+        "2026-10-23 pnpm check → pass (working tree on 652b1a6)",
+        "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 652b1a6)",
+        "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 652b1a6, Docker available)",
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 652b1a6, Docker available, CI=1: next start on a .env.test production build, retries 2, whole suite)",
+        "2026-10-23 pnpm check → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 86d4e71, Docker available)",
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 86d4e71, Docker available, CI=1: next start on the last build, retries 2)",
+        "2026-10-23 pnpm check → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:unit -- tests/unit/auth/route-protection.test.ts → pass (working tree on 86d4e71)",
+        "2026-10-23 pnpm test:integration -- tests/integration/route-protection.int.test.ts → pass (working tree on 86d4e71, Docker available)",
+        "2026-10-23 pnpm test:e2e -- tests/e2e/auth.spec.ts → pass (working tree on 86d4e71, Docker available, CI=1: next start on the last build, retries 2)"
+      ],
+      "attempts": 1,
+      "notes": "Tests (ticket): unit for wrapper; integration: matrix of route × auth state → expected status/redirect, `assertOwner` throws `Forbidden`; E2E: CSP has no violations on `/` and `/vahtialueet` (console check); consolidated `tests/e2e/auth.spec.ts` covering all E03 flows (register, verify, login/logout, reset, route protection) on Chromium + Mobile Chrome with axe on all auth pages. Status (ticket): absorbs MV-047 and MV-049 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-23: evaluator: Revise. Attempt 2: the `-- <file>` filter in the L2/L3 commands is not applied, so both run the whole suite; L3 ran as CI runs it (CI=1 after a .env.test build); two consecutive gate runs, see PROGRESS session 029"
     },
     {
       "id": "F-048",
