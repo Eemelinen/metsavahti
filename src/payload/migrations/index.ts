@@ -7,6 +7,7 @@ import * as migration_20260920_153151_logs_consents_exports_job_runs from './202
 import * as migration_20260920_162232_legal_documents from './20260920_162232_legal_documents';
 import * as migration_20260920_180549_users_verification_sent_at from './20260920_180549_users_verification_sent_at';
 import * as migration_20261023_121838_rate_limit_buckets from './20261023_121838_rate_limit_buckets';
+import * as migration_20261023_214734_user_sessions from './20261023_214734_user_sessions';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261023_121838_rate_limit_buckets.up,
     down: migration_20261023_121838_rate_limit_buckets.down,
-    name: '20261023_121838_rate_limit_buckets'
+    name: '20261023_121838_rate_limit_buckets',
+  },
+  {
+    up: migration_20261023_214734_user_sessions.up,
+    down: migration_20261023_214734_user_sessions.down,
+    name: '20261023_214734_user_sessions'
   },
 ];

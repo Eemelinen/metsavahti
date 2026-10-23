@@ -21,6 +21,7 @@ import {
   NotificationLog,
   RateLimitBuckets,
   Users,
+  UserSessions,
   WatchAreaDeclarations,
   WatchAreas,
 } from '@/payload/collections'
@@ -101,6 +102,7 @@ export default buildConfig({
     JobRuns,
     LegalDocuments,
     RateLimitBuckets,
+    UserSessions,
   ],
   // One editor for every richText field (legal_documents.body); admin UI + JSON storage.
   editor: lexicalEditor(),

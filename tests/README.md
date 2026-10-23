@@ -33,6 +33,8 @@ database or points at port 5432.
   limit; `readSessionToken` against tokens signed with Payload's `jwtSign`, the cookie parser and
   `findUnverifiedSessionUser` with `findByID` stubbed; `email-verification-pages.resend-button.test.tsx`:
   the button's countdown under fake timers and how a short server refusal becomes the countdown),
+  profile and security pages (`account/profile-security.test.ts`: `describeUserAgent` labels, the profile and
+  password-change schemas with their Finnish messages, the time-zone options, `formatSessionTime`),
   forgot / reset password (`auth/forgot-reset-password.test.ts`: the two schemas, the `ResetPassword`
   template, the `requestPasswordReset` action with the helper spied: same answer for a registered and an
   unknown address, unusable address refused, the sixth call in an hour from one address redirects to
@@ -88,6 +90,13 @@ database or points at port 5432.
   Mailpit works and the old one does not, unknown/verified addresses send nothing; the session guard
   names a logged-in account whose `_verified` was reset while `payload.auth()` already returns no
   user; a `down` → `up` round-trip of the MV-043 migration),
+  profile and security pages (`profile-security.int.test.ts`: `updateUserProfile` changes only the signed-in
+  user's row and `users` access refuses another account; `user-sessions` is admin-only and one account's list
+  never touches another's rows; `changeUserPassword` refuses a wrong current and a weak new password without a
+  change, then ends every other session (their tokens fail `payload.auth()`) and keeps the asking one, the old
+  password stops working; `verifyPassword` agrees with Payload's hashes; the sixth attempt in 15 min is
+  `limited`; `recordSessionSeen` writes the browser once and `lastSeenAt` at most every 5 min;
+  `listUserSessions` / `endOtherSessions` and the pruning of ended sessions; `currentSessionId`),
   forgot / reset password (`forgot-reset-password.int.test.ts`: `requestPasswordReset` writes a 40-hex
   token with a one-hour expiry and the Mailpit message carries the `/uusi-salasana?token=` link, an
   unknown address and a repeat within 60 s send nothing; `resetUserPassword` changes the password, the
@@ -121,7 +130,11 @@ database or points at port 5432.
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
 - Specs: app shell (`app-layout-sidebar-bottom-tabs.spec.ts`: sidebar on desktop, bottom tabs on Mobile Chrome,
   navigation between the three sections, the unread badge against the REST count, account menu, logout through
-  `logOut()` in `e2e/accounts.ts`, which every logout test uses), landing page + attribution + axe, login and logout (`login-logout.spec.ts`, guest, an own
+  `logOut()` in `e2e/accounts.ts`, which every logout test uses), profile and security pages
+  (`profile-security.spec.ts`, guest, own account per test, `test.slow()`: `/tili` saves name and time zone and
+  the header initials follow, axe; `/tili/turvallisuus` with a second Windows-Chrome context lists two sessions,
+  refuses a wrong current password, changes it, the other context is sent to `/kirjaudu?next=`, the old
+  password is refused and the new one works; "Kirjaa ulos muista laitteista" ends only the other session), landing page + attribution + axe, login and logout (`login-logout.spec.ts`, guest, an own
   verified account per test through `e2e/accounts.ts`: `@smoke` `/kirjaudu` → `/dashboard` (1-day cookie) →
   `Kirjaudu ulos` → `/kirjauduttu-ulos` → the session is gone server-side; remember-me gives a 30-day cookie and
   `?next=` follows same-origin paths only; invalid, unverified (+ inline resend → second Mailpit link) and locked

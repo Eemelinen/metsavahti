@@ -1,20 +1,28 @@
 import type { Metadata } from 'next'
 
 import { fi } from '@/i18n/fi'
+import { DEFAULT_TIMEZONE, timezoneOptions } from '@/lib/account/timezone'
 import { requireUser } from '@/lib/auth/guards'
+
+import { ProfileForm } from './profile-form'
 
 export const metadata: Metadata = { title: fi.app.nav.account }
 
 /**
- * Stand-in for `/tili` so the app navigation has a target (MV-050); MV-051 replaces it
- * with the real page (00-deviations R20).
+ * `/tili` (App artboard `tili`, `03-pages.md`, E04 MV-051): the signed-in user's profile —
+ * address (changed through MV-052's flow), name, language, time zone.
  */
 export default async function TiliPage() {
-  await requireUser({ next: '/tili' })
+  const user = await requireUser({ next: '/tili' })
   return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{fi.app.nav.account}</h1>
-      <p className="text-ink-muted">{fi.app.comingSoon}</p>
-    </div>
+    <ProfileForm
+      defaults={{
+        name: user.name ?? '',
+        locale: user.locale ?? 'fi',
+        timezone: user.timezone ?? DEFAULT_TIMEZONE,
+      }}
+      email={user.email}
+      timezones={timezoneOptions(user.timezone)}
+    />
   )
 }
