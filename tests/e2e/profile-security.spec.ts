@@ -1,8 +1,9 @@
-import type { Browser, Page } from '@playwright/test'
+import type { Browser } from '@playwright/test'
 
 import {
   ACCOUNT_PASSWORD,
   createVerifiedAccount,
+  logIn,
   logOut,
   useOwnAddress,
   waitForForm,
@@ -14,16 +15,6 @@ const NEW_PASSWORD = 'tunturi-koivu-puro-2027'
 /** The "other device" of these tests: a Windows Chrome, whatever browser the project runs. */
 const OTHER_DEVICE_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
-
-/** Log in through the form straight to `landing` (an account page, not the map-heavy dashboard). */
-async function logIn(page: Page, email: string, password: string, landing = '/tili') {
-  await page.goto(`/kirjaudu?next=${encodeURIComponent(landing)}`)
-  await waitForForm(page)
-  await page.getByLabel('Sähköposti').fill(email)
-  await page.getByLabel('Salasana', { exact: true }).fill(password)
-  await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
-  await expect(page).toHaveURL(landing)
-}
 
 /** A second, signed-in browser context for `email`: the account's "other device". */
 async function otherDevice(browser: Browser, email: string) {
@@ -57,8 +48,7 @@ test.describe('profile and security pages', () => {
     const tabs = page.getByRole('navigation', { name: 'Tilin osiot' })
     await expect(tabs.locator('a[aria-current="page"]')).toHaveText('Tili')
     await expect(page.getByLabel('Sähköposti')).toHaveValue(email)
-    await expect(page.getByLabel('Sähköposti')).not.toBeEditable()
-    await expect(page.getByRole('button', { name: 'Vaihda' })).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Vaihda' })).toBeEnabled()
     await expect(page.getByTestId('attribution')).toBeVisible()
     await expectNoA11yViolations(page)
 

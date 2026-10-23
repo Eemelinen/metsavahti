@@ -992,7 +992,7 @@
       "area": "account",
       "title": "Email change flow",
       "user_visible_behavior": "`pendingEmail` + signed token (`jose`, 1 h); `ChangeEmailConfirm` email to new address; notice to old; `/vaihda-sahkoposti/vahvista?token=` applies change and re-marks verified.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-040", "F-051"],
       "ticket": "MV-052",
       "epic": "E04",
@@ -1003,7 +1003,14 @@
         "L2: pnpm test:integration tests/integration/email-change-flow.int.test.ts (integration: token reuse rejected; E2E via Mailpit.)",
         "L3: pnpm test:e2e tests/e2e/email-change-flow.spec.ts (integration: token reuse rejected; E2E via Mailpit.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-23 pnpm check → pass (working tree on 5659f3a)",
+        "2026-10-23 pnpm test:integration tests/integration/email-change-flow.int.test.ts → pass (working tree on 5659f3a, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/email-change-flow.spec.ts → pass (working tree on 5659f3a, Docker available)",
+        "2026-10-23 pnpm check → pass (commit 4939160)",
+        "2026-10-23 pnpm test:integration tests/integration/email-change-flow.int.test.ts → pass (commit 4939160, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/email-change-flow.spec.ts → pass (commit 4939160, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: token reuse rejected; E2E via Mailpit."
     },

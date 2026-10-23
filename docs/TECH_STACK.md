@@ -16,13 +16,13 @@
 > Planned by the product spec ([product/](./product/)) but not installed yet — add the row's
 > reason here when the owning ticket lands:
 >
-> | Planned                                                   | Owning ticket                | Notes                                                                                        |
-> | --------------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------- |
-> | Geocoder (MML) behind `Geocoder` interface                | MV-062                       | Needs `MML_API_KEY`; mock in tests.                                                          |
-> | `MAP_TILE_URL` + MML taustakartta                         | MV-060, F-017                | OSM raster until the key exists.                                                             |
-> | Resend bounce webhook                                     | MV-123                       | `POST /api/webhooks/resend`.                                                                 |
-> | Consent-gated analytics (Plausible/Umami)                 | MV-126                       | Optional.                                                                                    |
-> | `fast-xml-parser`, `jose`, `@resvg/resvg-js`, `@lhci/cli` | first ticket that needs each | 00-deviations S14; `zxcvbn` and `@testing-library/react` + `user-event` arrived with MV-041. |
+> | Planned                                                   | Owning ticket                | Notes                                                                                                                                                |
+> | --------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+> | Geocoder (MML) behind `Geocoder` interface                | MV-062                       | Needs `MML_API_KEY`; mock in tests.                                                                                                                  |
+> | `MAP_TILE_URL` + MML taustakartta                         | MV-060, F-017                | OSM raster until the key exists.                                                                                                                     |
+> | Resend bounce webhook                                     | MV-123                       | `POST /api/webhooks/resend`.                                                                                                                         |
+> | Consent-gated analytics (Plausible/Umami)                 | MV-126                       | Optional.                                                                                                                                            |
+> | `fast-xml-parser`, `jose`, `@resvg/resvg-js`, `@lhci/cli` | first ticket that needs each | 00-deviations S14; `zxcvbn` and `@testing-library/react` + `user-event` arrived with MV-041, `jose` (signed links, `src/lib/tokens.ts`) with MV-052. |
 >
 > The original spec follows unchanged. Ongoing decisions live in [DECISIONS.md](./DECISIONS.md);
 > the deviations between the product spec and this repository are listed in
@@ -120,7 +120,7 @@ Data source: Suomen metsäkeskus open data, WFS 2.0.0 at `https://avoin.metsakes
 ## 5. Local development
 
 - `docker-compose.yml`: `db` (postgis/postgis:16-3.4, port 5432), `db_test` (same image, port 5433), `mailpit` (ports 1025/8025).
-- `.env.example` with: `DATABASE_URL`, `PAYLOAD_SECRET`, `NEXT_PUBLIC_SERVER_URL`, `WFS_BASE_URL`, `CRON_SECRET`, `RESEND_API_KEY`, `SMTP_HOST/PORT` (dev), `MML_API_KEY`, `SENTRY_DSN`, `AUTH_RATE_LIMIT_PER_HOUR` (auth Server Actions per IP per hour, default 5, kept in `.env.test`; e2e tests set their own `x-forwarded-for`), `ENABLE_ERROR_TEST_ROUTE` (test hook: `1` enables the throwing `/virhe` route, set in `.env.test` only).
+- `.env.example` with: `DATABASE_URL`, `PAYLOAD_SECRET`, `TOKEN_SECRET` (optional, signed links), `NEXT_PUBLIC_SERVER_URL`, `WFS_BASE_URL`, `CRON_SECRET`, `RESEND_API_KEY`, `SMTP_HOST/PORT` (dev), `MML_API_KEY`, `SENTRY_DSN`, `AUTH_RATE_LIMIT_PER_HOUR` (auth Server Actions per IP per hour, default 5, kept in `.env.test`; e2e tests set their own `x-forwarded-for`), `ENABLE_ERROR_TEST_ROUTE` (test hook: `1` enables the throwing `/virhe` route, set in `.env.test` only).
 - Scripts:
   - `dev`, `build`, `start`
   - `db:up`, `db:migrate`, `db:seed`, `db:reset`

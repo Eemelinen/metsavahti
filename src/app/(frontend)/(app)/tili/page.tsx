@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: fi.app.nav.account }
 
 /**
  * `/tili` (App artboard `tili`, `03-pages.md`, E04 MV-051): the signed-in user's profile —
- * address (changed through MV-052's flow), name, language, time zone.
+ * address (with "Vaihda", MV-052's change flow), name, language, time zone.
  */
 export default async function TiliPage() {
   const user = await requireUser({ next: '/tili' })
@@ -22,6 +22,7 @@ export default async function TiliPage() {
         timezone: user.timezone ?? DEFAULT_TIMEZONE,
       }}
       email={user.email}
+      pendingEmail={user.pendingEmail ?? null}
       timezones={timezoneOptions(user.timezone)}
     />
   )

@@ -93,6 +93,16 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
+      // Payload's own auth field (deep-merged with this entry: unique, lower-cased, validated).
+      // Only admins may set it directly; an account changes its address through the confirmed
+      // flow (MV-052, D-024), which writes with `overrideAccess`.
+      name: 'email',
+      type: 'email',
+      access: {
+        update: isAdminField,
+      },
+    },
+    {
       name: 'name',
       type: 'text',
       label: 'Nimi',
@@ -199,6 +209,33 @@ export const Users: CollectionConfig = {
         position: 'sidebar',
         readOnly: true,
         description: 'Viimeisin vahvistuslinkki; linkki on voimassa 24 tuntia lähetyksestä.',
+      },
+    },
+    {
+      // Email change (MV-052): the requested new address waits here until the link sent to it
+      // is opened; `email` stays the login address until then. Only the server writes it.
+      name: 'pendingEmail',
+      type: 'email',
+      label: 'Odottava sähköpostiosoite',
+      access: {
+        create: isAdminField,
+        update: isAdminField,
+      },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'Vaihdetaan tilin osoitteeksi, kun käyttäjä avaa uuteen osoitteeseen lähetetyn linkin.',
+      },
+    },
+    {
+      // `jti` of the newest email-change link: only that link applies the change, and only once.
+      name: 'pendingEmailTokenId',
+      type: 'text',
+      hidden: true,
+      access: {
+        create: isAdminField,
+        update: isAdminField,
       },
     },
     {
