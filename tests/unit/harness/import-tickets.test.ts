@@ -14,10 +14,13 @@ import {
   ticketToFeature,
 } from '../../../scripts/import-tickets'
 import {
+  loadProject,
   validateFeatureList,
   type Feature,
   type FeatureList,
-} from '../../../scripts/validate-feature-list'
+} from '@eemelinen/harness'
+
+const { features } = loadProject().config
 
 const sample = `# E03 — Authentication (MV-040…MV-049)
 
@@ -151,7 +154,7 @@ describe('mergeFeatures', () => {
     expect(byId('F-062').attempts).toBe(1)
     expect(byId('F-070').title).toBe('fresh')
     expect(byId('F-070').attempts).toBe(1)
-    expect(() => validateFeatureList(merged)).not.toThrow()
+    expect(() => validateFeatureList(merged, features)).not.toThrow()
   })
 })
 

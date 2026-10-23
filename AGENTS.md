@@ -23,7 +23,7 @@ Before touching code:
 6. If the baseline is red, fix that first. Never stack feature work on a broken start.
 7. `pnpm harness:feature activate F-NNN` (WIP=1, dependency check) and work only on it.
 
-Claude Code: `/clock-in` runs these steps; the SessionStart hook prints the state summary.
+Claude Code: `/harness:clock-in` runs these steps; the SessionStart hook prints the state summary.
 
 ## Verification layers
 
@@ -36,8 +36,8 @@ Claude Code: `/clock-in` runs these steps; the SessionStart hook prints the stat
 - Layers run in order. Do not proceed to layer N+1 while layer N fails, and do not skip a layer a feature lists.
 - L3 is required when a change crosses component boundaries (frontend + Payload/API/jobs).
 - The repository is in a consistent state when `pnpm check` exits 0. `pnpm check:full` adds L2 and a build.
-- `pnpm harness:check` validates `feature_list.json`; it also runs from `pnpm test:unit` and lint-staged.
-- `pnpm harness:verify F-NNN` runs a feature's layers in order and records evidence; `manual:` steps fail closed. `scripts/clean-state-check.sh` is the machine-checkable clock-out gate.
+- `pnpm harness:check` validates `feature_list.json`; it also runs from `pnpm check` and lint-staged.
+- `pnpm harness:verify F-NNN` runs a feature's layers in order and records evidence; `manual:` steps fail closed. `pnpm harness:clean-state` is the machine-checkable clock-out gate.
 - Details per suite: [tests/README.md](tests/README.md).
 
 ## Constraints
@@ -81,16 +81,16 @@ A feature is done only when all of these are true:
 
 ## Clock-out (session end)
 
-1. `scripts/clean-state-check.sh --allow-state-dirty`, then the judgement items of [docs/harness/clean-state-checklist.md](docs/harness/clean-state-checklist.md).
+1. `pnpm harness:clean-state --allow-state-dirty`, then the judgement items of [docs/harness/clean-state-checklist.md](docs/harness/clean-state-checklist.md).
 2. Update `PROGRESS.md`; `feature_list.json` is already updated by `pnpm harness:verify` (or `pnpm harness:feature block`); `pnpm harness:check`.
 3. `pnpm check` (plus the feature's L2/L3).
-4. Optional: score the diff with [docs/harness/evaluator-rubric.md](docs/harness/evaluator-rubric.md) (Claude Code: `evaluator` subagent). Revise before committing if any category is below 2.
+4. Optional: score the diff with [docs/harness/evaluator-rubric.md](docs/harness/evaluator-rubric.md) (Claude Code: the `harness:evaluator` agent). Revise before committing if any category is below 2.
 5. Commit; for long sessions also fill [docs/harness/session-handoff.md](docs/harness/session-handoff.md).
 6. Leave a clean restart path: the next session must be able to run `./init.sh` immediately.
 
 Cleanup is dual-mode: immediate at every clock-out, plus a periodic (monthly) sweep that runs `pnpm knip`, prunes stale docs and regrades [docs/harness/quality-document.md](docs/harness/quality-document.md).
 
-Claude Code: `/clock-out` walks these steps; `/verify-feature F-NNN` runs a feature's layers and records evidence.
+Claude Code: `/harness:clock-out` walks these steps; `/harness:verify-feature F-NNN` runs a feature's layers and records evidence.
 
 ## Driver-run sessions
 
@@ -102,7 +102,7 @@ Claude Code: `/clock-out` walks these steps; `/verify-feature F-NNN` runs a feat
 - State: [PROGRESS.md](PROGRESS.md) · [feature_list.json](feature_list.json) · [docs/DECISIONS.md](docs/DECISIONS.md) · [docs/harness/](docs/harness/) (README, prompts, handoff, checklist, rubric, quality document).
 - Product: [docs/product/](docs/product/) (spec, tickets, [deviations ledger](docs/product/00-deviations.md)) · [docs/design/](docs/design/) (artboards, tokens, design map).
 - Project: [README.md](README.md) · [docs/TECH_STACK.md](docs/TECH_STACK.md) · [src/ARCHITECTURE.md](src/ARCHITECTURE.md) · [tests/README.md](tests/README.md).
-- Tools: Claude Code permissions, hooks, skills and the evaluator subagent are described in [CLAUDE.md](CLAUDE.md) and live in `.claude/`.
+- Tools: the harness CLI and the Claude Code plugin (skills, hooks, evaluator agent) come from the shared harness (`@eemelinen/harness`, configured in [harness.config.json](harness.config.json)); permissions live in `.claude/settings.json`. Both are described in [CLAUDE.md](CLAUDE.md).
 
 ## Framework notes
 
