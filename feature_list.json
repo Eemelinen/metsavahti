@@ -1034,7 +1034,10 @@
       "evidence": [
         "2026-10-23 pnpm check → pass (commit b5aba36)",
         "2026-10-23 pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts → pass (commit b5aba36, Docker available)",
-        "2026-10-23 pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts → pass (commit b5aba36, Docker available)"
+        "2026-10-23 pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts → pass (commit b5aba36, Docker available)",
+        "2026-10-23 pnpm check → pass (commit b2e71aa)",
+        "2026-10-23 pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts → pass (commit b2e71aa, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts → pass (commit b2e71aa, Docker available)"
       ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit."
