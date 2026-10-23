@@ -1,4 +1,10 @@
-import type { Payload } from 'payload'
+import {
+  type Payload,
+  commitTransaction,
+  createLocalReq,
+  initTransaction,
+  killTransaction,
+} from 'payload'
 
 import { type AlertEmailDeclaration, renderAlertEmail } from '@/emails/AlertEmail'
 import { fi } from '@/i18n/fi'
@@ -137,8 +143,10 @@ export type ConsentContext = {
  * The "Palvelun uutiset" switch (`01 §8`: withdrawal as easy as giving): sets
  * `users.marketingConsent` (the collection hook dates `marketingConsentAt`) and appends a
  * `marketing` consent event with `granted` at the current privacy-policy version, as
- * registration does. Nothing is written when the value does not change, so the trail holds
- * decisions, not clicks.
+ * registration does. Both writes share one transaction, so the flag never changes without its
+ * event. The field is admin-only (`Users`), so this server path writes it with `overrideAccess`
+ * for the session's own id. Nothing is written when the value does not change, so the trail
+ * holds decisions, not clicks.
  */
 export async function setMarketingConsent(
   payload: Payload,
@@ -151,26 +159,35 @@ export async function setMarketingConsent(
   if (!privacy) {
     throw new Error('The privacy policy is not published; run pnpm db:seed first')
   }
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: { marketingConsent: granted },
-    depth: 0,
-    overrideAccess: false,
-    user,
-  })
-  await payload.create({
-    collection: 'consent-events',
-    data: {
-      user: user.id,
-      kind: 'marketing',
-      version: privacy.version,
-      granted,
-      ip: context.ip,
-      userAgent: context.userAgent,
-    },
-    overrideAccess: true,
-  })
+  const req = await createLocalReq({}, payload)
+  await initTransaction(req)
+  try {
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: { marketingConsent: granted },
+      depth: 0,
+      overrideAccess: true,
+      req,
+    })
+    await payload.create({
+      collection: 'consent-events',
+      data: {
+        user: user.id,
+        kind: 'marketing',
+        version: privacy.version,
+        granted,
+        ip: context.ip,
+        userAgent: context.userAgent,
+      },
+      overrideAccess: true,
+      req,
+    })
+    await commitTransaction(req)
+  } catch (error) {
+    await killTransaction(req)
+    throw error
+  }
   return { changed: true }
 }
 
@@ -205,6 +222,8 @@ export async function sendTestAlertEmail(
   user: Pick<User, 'id' | 'email'>,
   now: Date = new Date(),
 ): Promise<TestEmailOutcome> {
+  // The slot is spent before the send, so a failed delivery also counts: the limit guards the
+  // mailbox, and a retry within the hour is still possible twice.
   const limit = await testEmailLimiter.check(String(user.id))
   if (!limit.allowed) return { status: 'limited', retryAfterSeconds: limit.retryAfterSeconds }
   const { html, text } = await renderAlertEmail({

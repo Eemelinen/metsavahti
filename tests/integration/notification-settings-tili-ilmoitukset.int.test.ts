@@ -97,6 +97,33 @@ describe('notification settings /tili/ilmoitukset (MV-054)', () => {
     expect(await marketingEvents(user.id)).toHaveLength(2)
   })
 
+  it('an account cannot set its own marketing consent past the consent trail', async () => {
+    const payload = await getTestPayload()
+    const user = await createTestUser(payload)
+    // What `PATCH /api/users/:id` or `POST /api/users` would do with the session's own access.
+    const patched = await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: { marketingConsent: true },
+      user,
+      overrideAccess: false,
+    })
+    expect(patched.marketingConsent).toBe(false)
+    expect(patched.marketingConsentAt ?? null).toBeNull()
+    const created = await payload.create({
+      collection: 'users',
+      data: {
+        email: `self-consent-${Date.now()}@metsavahti.test`,
+        password: 'Test-password-123',
+        role: 'user',
+        marketingConsent: true,
+      },
+      overrideAccess: false,
+    })
+    expect(created.marketingConsent).toBe(false)
+    expect(await marketingEvents(user.id)).toHaveLength(0)
+  })
+
   it('saves the global switch and the mode without resetting the other', async () => {
     const payload = await getTestPayload()
     const user = await createTestUser(payload)

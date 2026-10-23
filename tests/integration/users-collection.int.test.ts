@@ -136,12 +136,13 @@ describe('users collection', () => {
   it('marketingConsentAt follows marketingConsent and cannot be set directly', async () => {
     const payload = await getTestPayload()
     const before = Date.now()
+    // `marketingConsent` is written by the server with its consent event (MV-054), so these
+    // writes go through `overrideAccess`; the derived date is still never settable.
     const granted = await payload.update({
       collection: 'users',
       id: alice.id,
       data: { marketingConsent: true, marketingConsentAt: '2000-01-01T00:00:00.000Z' },
-      user: alice,
-      overrideAccess: false,
+      overrideAccess: true,
     })
     expect(granted.marketingConsent).toBe(true)
     expect(Date.parse(granted.marketingConsentAt!)).toBeGreaterThanOrEqual(before - 1000)
@@ -159,8 +160,7 @@ describe('users collection', () => {
       collection: 'users',
       id: alice.id,
       data: { marketingConsent: false },
-      user: alice,
-      overrideAccess: false,
+      overrideAccess: true,
     })
     expect(withdrawn.marketingConsentAt ?? null).toBeNull()
   })

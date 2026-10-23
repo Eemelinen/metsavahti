@@ -11,7 +11,8 @@ export const DEFAULT_DAILY_HOUR = 9
 /**
  * Auth collection (`01 §3.1`, ticket MV-031). Anyone can sign up; email verification is
  * required before login; users read and update only themselves, admins everything.
- * `role`, `plan` and `deletedAt` are admin-only fields; `marketingConsentAt` is derived.
+ * `role`, `plan`, `deletedAt` and `marketingConsent` are admin-only fields (the server writes the
+ * consent together with its event); `marketingConsentAt` is derived.
  * `locale` is stored for MV-041+ (the UI is Finnish-only today); `notificationPrefs.mode`
  * follows `01 §4.3` (every run, daily digest, weekly digest); plan limits arrive with
  * `src/config/plans.ts` in MV-032 (ledger S15).
@@ -142,10 +143,17 @@ export const Users: CollectionConfig = {
         isValidTimeZone(value) || 'Tuntematon aikavyöhyke (IANA-nimi, esim. Europe/Helsinki)',
     },
     {
+      // Every change must leave a `consent-events` row (`01 §3.7`), so only the server writes
+      // it: registration and `/tili/ilmoitukset` (`setMarketingConsent`, MV-054) append the
+      // event in the same step and write with `overrideAccess`.
       name: 'marketingConsent',
       type: 'checkbox',
       defaultValue: false,
       label: 'Markkinointilupa',
+      access: {
+        create: isAdminField,
+        update: isAdminField,
+      },
     },
     {
       name: 'marketingConsentAt',
