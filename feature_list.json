@@ -905,7 +905,7 @@
       "area": "auth",
       "title": "Rate limiter",
       "user_visible_behavior": "`src/lib/rate-limit.ts` Postgres-backed sliding window (`rate_limit_buckets` table, migration `0004`) with keys per IP/user/route; helper for Server Actions and Route Handlers; 429 → `/liikaa-pyyntoja` for form posts, JSON 429 for API.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-030"],
       "ticket": "MV-048",
       "epic": "E03",
@@ -913,11 +913,19 @@
       "design": ["docs/design/App.dc.html#route=rajoitus"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration tests/integration/rate-limiter.int.test.ts (integration: 6th request within window rejected.)"
+        "L2: pnpm test:integration tests/integration/rate-limiter.int.test.ts (integration: 6th request within window rejected.)",
+        "L3: pnpm test:e2e tests/e2e/registration.spec.ts tests/e2e/forgot-reset-password.spec.ts tests/e2e/email-verification-pages.spec.ts (the auth forms count in Postgres; the sixth registration post lands on /liikaa-pyyntoja; added in session 031 because the store change crosses frontend + database)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-23 pnpm check → pass (working tree on 8151929)",
+        "2026-10-23 pnpm test:integration tests/integration/rate-limiter.int.test.ts → pass (working tree on 8151929, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/registration.spec.ts tests/e2e/forgot-reset-password.spec.ts tests/e2e/email-verification-pages.spec.ts → pass (working tree on 8151929, Docker available, CI=1: next start on the last build, retries 2)",
+        "2026-10-23 pnpm check → pass (working tree on 8151929)",
+        "2026-10-23 pnpm test:integration tests/integration/rate-limiter.int.test.ts → pass (working tree on 8151929, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/registration.spec.ts tests/e2e/forgot-reset-password.spec.ts tests/e2e/email-verification-pages.spec.ts → pass (working tree on 8151929, Docker available, CI=1: next start on the last build, retries 2)"
+      ],
       "attempts": 0,
-      "notes": "Was F-010 (Postgres-based limiter preferred over Upstash to avoid a new external service). Tests (ticket): integration: 6th request within window rejected."
+      "notes": "Was F-010 (Postgres-based limiter preferred over Upstash to avoid a new external service). Tests (ticket): integration: 6th request within window rejected. Session 031: two gate runs; the first three evidence lines predate the HMAC keys / time-based sweep (evaluator finding), the last three cover the committed code. Run 2 L3: 2 chromium tests passed only on retry (host stall, PROGRESS session 031)."
     },
     {
       "id": "F-050",

@@ -19,6 +19,7 @@ import {
   JobRuns,
   LegalDocuments,
   NotificationLog,
+  RateLimitBuckets,
   Users,
   WatchAreaDeclarations,
   WatchAreas,
@@ -99,6 +100,7 @@ export default buildConfig({
     Exports,
     JobRuns,
     LegalDocuments,
+    RateLimitBuckets,
   ],
   // One editor for every richText field (legal_documents.body); admin UI + JSON storage.
   editor: lexicalEditor(),

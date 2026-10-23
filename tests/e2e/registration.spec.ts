@@ -113,7 +113,7 @@ test.describe('registration', () => {
     expect(await messagesFor()).toHaveLength(1)
   })
 
-  test('refuses the sixth submission from one address within an hour', async ({
+  test('sends the sixth submission from one address within an hour to /liikaa-pyyntoja', async ({
     page,
     browserName,
   }) => {
@@ -130,9 +130,8 @@ test.describe('registration', () => {
       await expect(tooWeak).toBeVisible()
     }
     await submit(page)
-    await expect(page.getByRole('alert').filter({ hasText: 'Liikaa pyyntöjä' })).toBeVisible()
-    await expect(tooWeak).toBeHidden()
-    await expect(page).toHaveURL(/\/rekisteroidy$/)
+    await expect(page).toHaveURL(/\/liikaa-pyyntoja$/)
+    await expect(page.getByRole('heading', { name: 'Liian monta pyyntöä' })).toBeVisible()
     await expectNoA11yViolations(page)
   })
 })

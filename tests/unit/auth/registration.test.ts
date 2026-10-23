@@ -8,9 +8,8 @@ import { fi } from '@/i18n/fi'
 import { registerUser, validateRegistration, verifyEmailPath } from '@/lib/auth/registration'
 import { passwordUserInputs, registrationFormSchema } from '@/lib/auth/registration-schema'
 import { env } from '@/lib/env'
-import { RateLimited, publicMessages } from '@/lib/errors'
 import { clientIp } from '@/lib/privacy/ip'
-import { authRateLimiter, createRateLimiter } from '@/lib/rate-limit'
+import { TOO_MANY_REQUESTS_PATH, authRateLimiter } from '@/lib/rate-limit'
 
 // The `register` action is exercised without a request context: `headers()` is stubbed per
 // test, Payload is never booted and `registerUser` is a spy; `redirect()` is the real one
@@ -121,45 +120,6 @@ describe('validateRegistration', () => {
   })
 })
 
-describe('rate limiter', () => {
-  it('allows `limit` requests per window and then denies with a retry hint', () => {
-    let now = 1_000_000
-    const limiter = createRateLimiter({ limit: 5, windowMs: 60_000, now: () => now })
-    for (let i = 1; i <= 5; i += 1) {
-      expect(limiter.check('ip:1')).toEqual({
-        allowed: true,
-        remaining: 5 - i,
-        retryAfterSeconds: 0,
-      })
-    }
-    now += 10_000
-    expect(limiter.check('ip:1')).toEqual({ allowed: false, remaining: 0, retryAfterSeconds: 50 })
-    // Another key is independent.
-    expect(limiter.check('ip:2').allowed).toBe(true)
-    // The window slides: the five requests share a timestamp and leave together after 60 s.
-    now += 50_000
-    expect(limiter.check('ip:1')).toMatchObject({ allowed: true, remaining: 4 })
-  })
-
-  it('assert() throws RateLimited with the retry-after seconds', () => {
-    const limiter = createRateLimiter({ limit: 1, windowMs: 30_000, now: () => 0 })
-    limiter.assert('k')
-    expect(() => limiter.assert('k')).toThrow(RateLimited)
-    const thrown = (() => {
-      try {
-        limiter.assert('k')
-        return null
-      } catch (error) {
-        return error as RateLimited
-      }
-    })()
-    expect(thrown?.retryAfterSeconds).toBe(30)
-    expect(thrown?.toActionError()).toMatchObject({ code: 'rate_limited', retryAfterSeconds: 30 })
-    limiter.reset()
-    expect(() => limiter.assert('k')).not.toThrow()
-  })
-})
-
 describe('register action', () => {
   const VERIFY_PATH = '/vahvista-sahkoposti?email=anna.k%40example.fi'
 
@@ -169,26 +129,21 @@ describe('register action', () => {
     )
   }
 
-  beforeEach(() => {
-    authRateLimiter.reset()
+  beforeEach(async () => {
+    await authRateLimiter.reset()
     vi.mocked(registerUser).mockReset()
     requestFrom('203.0.113.9')
   })
 
-  it('refuses the sixth call from one address within the hour (5/h/IP) and keeps other addresses open', async () => {
+  it('sends the sixth call from one address within the hour (5/h/IP) to /liikaa-pyyntoja and keeps other addresses open', async () => {
     // `.env.test` runs the suite at the production default so every layer observes the real limit.
     expect(env.AUTH_RATE_LIMIT_PER_HOUR).toBe(5)
     for (let i = 0; i < 5; i += 1) {
       // Invalid input still counts: the limit is applied before validation.
       await expect(register({})).resolves.toMatchObject({ ok: false, fieldErrors: {} })
     }
-    await expect(register(valid)).resolves.toEqual({
-      ok: false,
-      error: {
-        code: 'rate_limited',
-        message: publicMessages.rate_limited,
-        retryAfterSeconds: 3600,
-      },
+    await expect(register(valid)).rejects.toMatchObject({
+      digest: expect.stringContaining(`;${TOO_MANY_REQUESTS_PATH};`),
     })
     expect(registerUser).not.toHaveBeenCalled()
 

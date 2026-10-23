@@ -21,7 +21,7 @@ import {
   resetPasswordFormSchema,
 } from '@/lib/auth/password-reset-schema'
 import { publicMessages } from '@/lib/errors'
-import { authRateLimiter } from '@/lib/rate-limit'
+import { TOO_MANY_REQUESTS_PATH, authRateLimiter } from '@/lib/rate-limit'
 
 // Both actions run without a request context: `headers()` is stubbed, Payload is never
 // booted and the two library helpers are spies (their real bodies are covered by the
@@ -108,8 +108,8 @@ describe('reset password email', () => {
 })
 
 describe('requestPasswordReset action', () => {
-  beforeEach(() => {
-    authRateLimiter.reset()
+  beforeEach(async () => {
+    await authRateLimiter.reset()
     vi.mocked(sendResetEmail).mockReset()
     vi.mocked(sendResetEmail).mockResolvedValue({ status: 'sent' })
     requestFrom('203.0.113.9')
@@ -139,19 +139,14 @@ describe('requestPasswordReset action', () => {
     expect(sendResetEmail).not.toHaveBeenCalled()
   })
 
-  it('refuses the sixth call from one address within the hour (5/h/IP) and keeps other addresses open', async () => {
+  it('sends the sixth call from one address within the hour (5/h/IP) to /liikaa-pyyntoja and keeps other addresses open', async () => {
     for (let i = 0; i < 5; i += 1) {
       await expect(requestPasswordReset({ email: 'anna.k@example.fi' })).resolves.toMatchObject({
         ok: true,
       })
     }
-    await expect(requestPasswordReset({ email: 'anna.k@example.fi' })).resolves.toEqual({
-      ok: false,
-      error: {
-        code: 'rate_limited',
-        message: publicMessages.rate_limited,
-        retryAfterSeconds: 3600,
-      },
+    await expect(requestPasswordReset({ email: 'anna.k@example.fi' })).rejects.toMatchObject({
+      digest: expect.stringContaining(`;${TOO_MANY_REQUESTS_PATH};`),
     })
     expect(sendResetEmail).toHaveBeenCalledTimes(5)
     requestFrom('203.0.113.10')

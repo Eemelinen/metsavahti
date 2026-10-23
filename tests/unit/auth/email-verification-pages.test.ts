@@ -69,9 +69,9 @@ describe('resendVerification action', () => {
     vi.mocked(headers).mockResolvedValue(new Headers({ 'x-forwarded-for': ip }) as never)
   }
 
-  beforeEach(() => {
-    authRateLimiter.reset()
-    resendCooldownLimiter.reset()
+  beforeEach(async () => {
+    await authRateLimiter.reset()
+    await resendCooldownLimiter.reset()
     vi.mocked(resendVerificationEmail).mockClear()
     requestFrom('203.0.113.9')
   })

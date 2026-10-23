@@ -9,7 +9,7 @@ import { requestPasswordReset as sendResetEmail } from '@/lib/auth/password-rese
 import { forgotPasswordSchema } from '@/lib/auth/password-reset-schema'
 import { type ActionResult, actionResult } from '@/lib/errors'
 import { clientIp } from '@/lib/privacy/ip'
-import { authRateLimiter } from '@/lib/rate-limit'
+import { authRateLimiter, limitFormPost, rateLimitKey } from '@/lib/rate-limit'
 
 export type RequestPasswordResetResult = ActionResult<{
   /** Always `true`: the page shows the same confirmation whether or not the address exists. */
@@ -18,15 +18,14 @@ export type RequestPasswordResetResult = ActionResult<{
 
 /**
  * Server Action `requestPasswordReset` (E03 MV-045, `03-pages.md` `/unohtunut-salasana`):
- * every call counts against the per-IP auth limit (5/h, D-015), an unusable address is
- * the only visible refusal, and then the answer is the neutral confirmation whatever
- * happened: a registered address gets the `ResetPassword` email, an unknown one nothing,
+ * every call counts against the per-IP auth limit (5/h; over it: redirect to
+ * `/liikaa-pyyntoja`, MV-048), an unusable address is the only visible refusal, and then
+ * the answer is the neutral confirmation whatever happened: a registered address gets the `ResetPassword` email, an unknown one nothing,
  * one asked again within 60 s nothing either. The page never reveals who has an account.
  */
 export async function requestPasswordReset(input: unknown): Promise<RequestPasswordResetResult> {
   const ip = clientIp(await headers())
-  const limited = await actionResult(() => authRateLimiter.assert(`forgot:${ip ?? 'unknown'}`))
-  if (!limited.ok) return limited
+  await limitFormPost(authRateLimiter, rateLimitKey('forgot', { ip }))
 
   const parsed = forgotPasswordSchema.safeParse(input)
   if (!parsed.success) {

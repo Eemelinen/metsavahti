@@ -18,7 +18,6 @@
 >
 > | Planned                                                   | Owning ticket                | Notes                                                                                        |
 > | --------------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------- |
-> | Postgres rate limiter (`rate_limit_buckets`)              | MV-048                       | No Upstash (00-deviations S4).                                                               |
 > | Geocoder (MML) behind `Geocoder` interface                | MV-062                       | Needs `MML_API_KEY`; mock in tests.                                                          |
 > | `MAP_TILE_URL` + MML taustakartta                         | MV-060, F-017                | OSM raster until the key exists.                                                             |
 > | Resend bounce webhook                                     | MV-123                       | `POST /api/webhooks/resend`.                                                                 |
@@ -63,7 +62,7 @@ Data source: Suomen metsäkeskus open data, WFS 2.0.0 at `https://avoin.metsakes
 | Password strength (MV-041)        | `zxcvbn` 4 behind `src/lib/auth/password-strength.ts`                                                                           | Score ≥ 3 and ≥ 10 characters (E03); the client loads it lazily from `PasswordInput`                                                                                 |
 | Logging                           | pino + pino-pretty (dev)                                                                                                        | Structured logs with job run ids                                                                                                                                     |
 | Error tracking                    | Sentry (`@sentry/nextjs`)                                                                                                       |                                                                                                                                                                      |
-| Rate limiting                     | `@upstash/ratelimit` or simple Postgres-based limiter                                                                           | Protect public geocoding/search endpoints                                                                                                                            |
+| Rate limiting                     | Postgres sliding window in `src/lib/rate-limit.ts` (`rate_limit_buckets`, MV-048)                                               | Auth forms, later geocode/preview/contact (D-021); no Upstash                                                                                                        |
 | Geocoding (address → coordinates) | MML Geocoding API (free, API key) or Digitransit/Pelias                                                                         | Abstract behind `Geocoder` interface                                                                                                                                 |
 
 ## 2. Code quality tooling

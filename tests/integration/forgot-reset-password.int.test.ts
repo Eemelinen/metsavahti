@@ -27,7 +27,7 @@ async function readUser(id: number) {
 /** Ask for a reset and return the token Payload stored for the account. */
 async function requestToken(email: string, id: number): Promise<string> {
   const payload = await getTestPayload()
-  resetCooldownLimiter.reset()
+  await resetCooldownLimiter.reset()
   await expect(requestPasswordReset(payload, email)).resolves.toEqual({ status: 'sent' })
   const token = (await readUser(id)).resetPasswordToken
   expect(token).toBeTruthy()
@@ -54,7 +54,7 @@ describe('forgot / reset password (MV-045)', () => {
   it('sends the ResetPassword email with a one-hour token to a registered address and nothing to an unknown one', async () => {
     const payload = await getTestPayload()
     const user = await createTestUser(payload)
-    resetCooldownLimiter.reset()
+    await resetCooldownLimiter.reset()
     const before = (await mailpit.listMessages()).length
 
     await expect(requestPasswordReset(payload, 'nobody@metsavahti.test')).resolves.toEqual({

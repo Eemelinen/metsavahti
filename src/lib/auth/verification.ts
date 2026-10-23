@@ -17,6 +17,7 @@ export const VERIFICATION_LINK_TTL_MS = 24 * 60 * 60 * 1000
  * still counts every call on top of this.
  */
 export const resendCooldownLimiter = createRateLimiter({
+  name: 'resend-email',
   limit: 1,
   windowMs: RESEND_COOLDOWN_SECONDS * 1000,
 })
