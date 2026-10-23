@@ -341,7 +341,7 @@
       "depends_on": ["F-060"],
       "verification": [
         "L1: pnpm check",
-        "L3: pnpm test:e2e -- tests/e2e/dashboard.spec.ts (tile requests go to the MML endpoint; stubbed in E2E)"
+        "L3: pnpm test:e2e tests/e2e/dashboard.spec.ts (tile requests go to the MML endpoint; stubbed in E2E)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -382,7 +382,7 @@
       "spec": "docs/product/tickets/E01-wfs-geo.md#mv-021-discover-and-pin-wfs-layer-contract-and-record-fixtures",
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/wfs/wfs-layer-contract.test.ts (unit: schema parses recorded fixtures.)",
+        "L1: pnpm test:unit tests/unit/wfs/wfs-layer-contract.test.ts (unit: schema parses recorded fixtures.)",
         "manual: recorded fixtures reviewed (network access to the live WFS was needed)"
       ],
       "evidence": [],
@@ -402,7 +402,7 @@
       "spec": "docs/product/tickets/E01-wfs-geo.md#mv-023-wfs-client",
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/wfs/wfs-client.test.ts (unit with MSW: paging, retry on 502, timeout, GML fallback path.)"
+        "L1: pnpm test:unit tests/unit/wfs/wfs-client.test.ts (unit with MSW: paging, retry on 502, timeout, GML fallback path.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -421,7 +421,7 @@
       "spec": "docs/product/tickets/E01-wfs-geo.md#mv-024-normalisation-cutting-type-codes-and-finnish-labels",
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/wfs/normalisation.test.ts (unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label.)"
+        "L1: pnpm test:unit tests/unit/wfs/normalisation.test.ts (unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -683,7 +683,7 @@
       "spec": "docs/product/tickets/E02-data-model.md#mv-037-spatial-query-module",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/spatial-query-module.int.test.ts (integration with factories: inside/outside/borderline fixtures → expected matches; distance for outside-but-intersecting polygon = 0; idemp…)"
+        "L2: pnpm test:integration tests/integration/spatial-query-module.int.test.ts (integration with factories: inside/outside/borderline fixtures → expected matches; distance for outside-but-intersecting polygon = 0; idemp…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -913,7 +913,7 @@
       "design": ["docs/design/App.dc.html#route=rajoitus"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/rate-limiter.int.test.ts (integration: 6th request within window rejected.)"
+        "L2: pnpm test:integration tests/integration/rate-limiter.int.test.ts (integration: 6th request within window rejected.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -933,8 +933,8 @@
       "design": ["docs/design/App.dc.html#route=vahtialueet", "docs/design/Metsävahti.dc.html"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/account/app-layout-sidebar-bottom-tabs.test.ts (unit render at two viewports; E2E nav on Mobile Chrome.)",
-        "L3: pnpm test:e2e -- tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts (unit render at two viewports; E2E nav on Mobile Chrome.)"
+        "L1: pnpm test:unit tests/unit/account/app-layout-sidebar-bottom-tabs.test.ts (unit render at two viewports; E2E nav on Mobile Chrome.)",
+        "L3: pnpm test:e2e tests/e2e/app-layout-sidebar-bottom-tabs.spec.ts (unit render at two viewports; E2E nav on Mobile Chrome.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -957,8 +957,8 @@
       ],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/profile-security.int.test.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)",
-        "L3: pnpm test:e2e -- tests/e2e/profile-security.spec.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)"
+        "L2: pnpm test:integration tests/integration/profile-security.int.test.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)",
+        "L3: pnpm test:e2e tests/e2e/profile-security.spec.ts (integration owner-only; integration: other session invalid after password change; E2E edit name + change password.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -978,8 +978,8 @@
       "design": ["docs/design/Email.dc.html#template=7"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/email-change-flow.int.test.ts (integration: token reuse rejected; E2E via Mailpit.)",
-        "L3: pnpm test:e2e -- tests/e2e/email-change-flow.spec.ts (integration: token reuse rejected; E2E via Mailpit.)"
+        "L2: pnpm test:integration tests/integration/email-change-flow.int.test.ts (integration: token reuse rejected; E2E via Mailpit.)",
+        "L3: pnpm test:e2e tests/e2e/email-change-flow.spec.ts (integration: token reuse rejected; E2E via Mailpit.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -999,8 +999,8 @@
       "design": ["docs/design/App.dc.html#route=ilmoitusasetukset"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/notification-settings-tili-ilmoitukset.int.test.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)",
-        "L3: pnpm test:e2e -- tests/e2e/notification-settings-tili-ilmoitukset.spec.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)"
+        "L2: pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)",
+        "L3: pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1020,8 +1020,8 @@
       "design": ["docs/design/App.dc.html#route=alue", "docs/design/App.dc.html#route=aloita"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/watch-areas/mapview-component.test.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)",
-        "L3: pnpm test:e2e -- tests/e2e/mapview-component.spec.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)"
+        "L1: pnpm test:unit tests/unit/watch-areas/mapview-component.test.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)",
+        "L3: pnpm test:e2e tests/e2e/mapview-component.spec.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1041,7 +1041,7 @@
       "design": ["docs/design/App.dc.html#route=alue"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/watch-areas/declaration-popover.test.ts (unit.)"
+        "L1: pnpm test:unit tests/unit/watch-areas/declaration-popover.test.ts (unit.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1061,9 +1061,9 @@
       "design": ["docs/design/App.dc.html#route=aloita"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/watch-areas/geocoding-proxy.test.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)",
-        "L2: pnpm test:integration -- tests/integration/geocoding-proxy.int.test.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)",
-        "L3: pnpm test:e2e -- tests/e2e/geocoding-proxy.spec.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)"
+        "L1: pnpm test:unit tests/unit/watch-areas/geocoding-proxy.test.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)",
+        "L2: pnpm test:integration tests/integration/geocoding-proxy.int.test.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)",
+        "L3: pnpm test:e2e tests/e2e/geocoding-proxy.spec.ts (unit with MSW; integration rate limit; E2E with mocked geocoder `GEOCODER=mock` returns fixtures.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1082,7 +1082,7 @@
       "spec": "docs/product/tickets/E05-watch-areas.md#mv-063-preview-endpoint",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/preview-endpoint.int.test.ts (integration: cold bbox triggers exactly one mocked WFS call; warm bbox none.)"
+        "L2: pnpm test:integration tests/integration/preview-endpoint.int.test.ts (integration: cold bbox triggers exactly one mocked WFS call; warm bbox none.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1101,7 +1101,7 @@
       "spec": "docs/product/tickets/E05-watch-areas.md#mv-064-watch-area-server-actions",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/watch-area-server-actions.int.test.ts (integration: ownership, limits, cascade.)"
+        "L2: pnpm test:integration tests/integration/watch-area-server-actions.int.test.ts (integration: ownership, limits, cascade.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1121,8 +1121,8 @@
       "design": ["docs/design/App.dc.html#route=aloita"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/watch-areas/onboarding-wizard-aloita.test.ts (unit reducer; E2E `@smoke`: create first watch area with mocked geocoder + WFS mock.)",
-        "L3: pnpm test:e2e -- tests/e2e/onboarding-wizard-aloita.spec.ts (unit reducer; E2E `@smoke`: create first watch area with mocked geocoder + WFS mock.)"
+        "L1: pnpm test:unit tests/unit/watch-areas/onboarding-wizard-aloita.test.ts (unit reducer; E2E `@smoke`: create first watch area with mocked geocoder + WFS mock.)",
+        "L3: pnpm test:e2e tests/e2e/onboarding-wizard-aloita.spec.ts (unit reducer; E2E `@smoke`: create first watch area with mocked geocoder + WFS mock.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1142,8 +1142,8 @@
       "design": ["docs/design/App.dc.html#route=vahtialueet"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/dashboard-vahtialueet.int.test.ts (integration: other users' areas not listed; E2E `@smoke`.)",
-        "L3: pnpm test:e2e -- tests/e2e/dashboard-vahtialueet.spec.ts (integration: other users' areas not listed; E2E `@smoke`.)"
+        "L2: pnpm test:integration tests/integration/dashboard-vahtialueet.int.test.ts (integration: other users' areas not listed; E2E `@smoke`.)",
+        "L3: pnpm test:e2e tests/e2e/dashboard-vahtialueet.spec.ts (integration: other users' areas not listed; E2E `@smoke`.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1163,8 +1163,8 @@
       "design": ["docs/design/App.dc.html#route=alue"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/watch-area-detail-vahtialueat-id-and-dec.int.test.ts (integration endpoint 403 for non-owner; E2E filter + delete.)",
-        "L3: pnpm test:e2e -- tests/e2e/watch-area-detail-vahtialueat-id-and-dec.spec.ts (integration endpoint 403 for non-owner; E2E filter + delete.)"
+        "L2: pnpm test:integration tests/integration/watch-area-detail-vahtialueat-id-and-dec.int.test.ts (integration endpoint 403 for non-owner; E2E filter + delete.)",
+        "L3: pnpm test:e2e tests/e2e/watch-area-detail-vahtialueat-id-and-dec.spec.ts (integration endpoint 403 for non-owner; E2E filter + delete.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1184,7 +1184,7 @@
       "design": ["docs/design/App.dc.html#route=alue_muokkaa"],
       "verification": [
         "L1: pnpm check",
-        "L3: pnpm test:e2e -- tests/e2e/watch-areas.spec.ts (E2E edit radius → detail shows new radius; E2E full journey + axe + keyboard-only path.)"
+        "L3: pnpm test:e2e tests/e2e/watch-areas.spec.ts (E2E edit radius → detail shows new radius; E2E full journey + axe + keyboard-only path.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1203,7 +1203,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-070-jobs-infrastructure-and-cleanup-task",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/jobs-infrastructure.int.test.ts (integration: unauthenticated 401; run creates `job_runs` row; cleanup removes expired declarations and keeps referenced ones.)"
+        "L2: pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts (integration: unauthenticated 401; run creates `job_runs` row; cleanup removes expired declarations and keeps referenced ones.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1222,7 +1222,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-071-fetch-declarations-task",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/fetch-declarations-task.int.test.ts (integration with MSW WFS fixtures: inserts; changed-geometry fixture → revision row; missing 3× → removed; one failing bbox → others succee…)"
+        "L2: pnpm test:integration tests/integration/fetch-declarations-task.int.test.ts (integration with MSW WFS fixtures: inserts; changed-geometry fixture → revision row; missing 3× → removed; one failing bbox → others succee…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1241,7 +1241,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-072-match-watch-areas-task",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/match-watch-areas-task.int.test.ts (integration: inside → 1 alert; borderline → 1; outside → 0; re-run → 0 new alerts; geometry change → `geometry_changed` alert once; area ed…)"
+        "L2: pnpm test:integration tests/integration/match-watch-areas-task.int.test.ts (integration: inside → 1 alert; borderline → 1; outside → 0; re-run → 0 new alerts; geometry change → `geometry_changed` alert once; area ed…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1261,8 +1261,8 @@
       "design": ["docs/design/Email.dc.html#template=3", "docs/design/Email.dc.html#template=4"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/pipeline/alert-emails.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)",
-        "L2: pnpm test:integration -- tests/integration/alert-emails.int.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)"
+        "L1: pnpm test:unit tests/unit/pipeline/alert-emails.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)",
+        "L2: pnpm test:integration tests/integration/alert-emails.int.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1281,7 +1281,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-074-send-notifications-task",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/send-notifications-task.int.test.ts (integration: immediate → 1 email per area per run Mailpit assert; daily mode → nothing on 21:30 run, one digest on 09:30 run; disabled area…)"
+        "L2: pnpm test:integration tests/integration/send-notifications-task.int.test.ts (integration: immediate → 1 email per area per run Mailpit assert; daily mode → nothing on 21:30 run, one digest on 09:30 run; disabled area…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1300,7 +1300,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-075-pipeline-orchestration-task-and-health-status",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/pipeline.int.test.ts (integration end-to-end with fixtures: area + fake WFS → email in Mailpit; second run → no email; concurrent trigger → second returns 409; h…)"
+        "L2: pnpm test:integration tests/integration/pipeline.int.test.ts (integration end-to-end with fixtures: area + fake WFS → email in Mailpit; second run → no email; concurrent trigger → second returns 409; h…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1319,7 +1319,7 @@
       "spec": "docs/product/tickets/E06-pipeline.md#mv-077-static-map-image-endpoint-flagged",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/static-map-image-endpoint-flagged.int.test.ts (integration: returns PNG, 403 for non-owner, token OK.)"
+        "L2: pnpm test:integration tests/integration/static-map-image-endpoint-flagged.int.test.ts (integration: returns PNG, 403 for non-owner, token OK.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1358,9 +1358,9 @@
       "design": ["docs/design/App.dc.html#route=ilmoitukset"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/alerts/alert-feed.test.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)",
-        "L2: pnpm test:integration -- tests/integration/alert-feed.int.test.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)",
-        "L3: pnpm test:e2e -- tests/e2e/alert-feed.spec.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)"
+        "L1: pnpm test:unit tests/unit/alerts/alert-feed.test.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)",
+        "L2: pnpm test:integration tests/integration/alert-feed.int.test.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)",
+        "L3: pnpm test:e2e tests/e2e/alert-feed.spec.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1380,7 +1380,7 @@
       "design": ["docs/design/App.dc.html#route=ilmoitus"],
       "verification": [
         "L1: pnpm check",
-        "L3: pnpm test:e2e -- tests/e2e/alert-loop.spec.ts (E2E detail page; E2E full loop `@smoke`.)"
+        "L3: pnpm test:e2e tests/e2e/alert-loop.spec.ts (E2E detail page; E2E full loop `@smoke`.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1400,7 +1400,7 @@
       "design": ["docs/design/App.dc.html#route=vahtialueet"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/dashboard-badges.int.test.ts (integration counts; integration tag invalidation called.)"
+        "L2: pnpm test:integration tests/integration/dashboard-badges.int.test.ts (integration counts; integration tag invalidation called.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1420,7 +1420,7 @@
       "design": ["docs/design/App.dc.html#route=vahtialueet"],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/reacceptance-banner.int.test.ts (integration: new version → banner data; accept writes event.)"
+        "L2: pnpm test:integration tests/integration/reacceptance-banner.int.test.ts (integration: new version → banner data; accept writes event.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1440,9 +1440,9 @@
       "design": ["docs/design/Landing.dc.html#consent", "docs/design/Legal.dc.html#evasteet"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/gdpr/cookie-consent-banner-and-modal.test.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)",
-        "L2: pnpm test:integration -- tests/integration/cookie-consent-banner-and-modal.int.test.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)",
-        "L3: pnpm test:e2e -- tests/e2e/cookie-consent-banner-and-modal.spec.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)"
+        "L1: pnpm test:unit tests/unit/gdpr/cookie-consent-banner-and-modal.test.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)",
+        "L2: pnpm test:integration tests/integration/cookie-consent-banner-and-modal.int.test.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)",
+        "L3: pnpm test:e2e tests/e2e/cookie-consent-banner-and-modal.spec.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1467,7 +1467,7 @@
       ],
       "verification": [
         "L1: pnpm check",
-        "L3: pnpm test:e2e -- tests/e2e/legaldocument-renderer-and-pages.spec.ts (E2E render + TOC anchors + axe.)"
+        "L3: pnpm test:e2e tests/e2e/legaldocument-renderer-and-pages.spec.ts (E2E render + TOC anchors + axe.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1510,8 +1510,8 @@
       ],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/data-export.int.test.ts (integration: zip contains 5 files, geojson valid WGS84; expired token 410; E2E: page renders consent history; request → Mailpit link → 200.)",
-        "L3: pnpm test:e2e -- tests/e2e/data-export.spec.ts (integration: zip contains 5 files, geojson valid WGS84; expired token 410; E2E: page renders consent history; request → Mailpit link → 200.)"
+        "L2: pnpm test:integration tests/integration/data-export.int.test.ts (integration: zip contains 5 files, geojson valid WGS84; expired token 410; E2E: page renders consent history; request → Mailpit link → 200.)",
+        "L3: pnpm test:e2e tests/e2e/data-export.spec.ts (integration: zip contains 5 files, geojson valid WGS84; expired token 410; E2E: page renders consent history; request → Mailpit link → 200.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1531,9 +1531,9 @@
       "design": ["docs/design/App.dc.html#route=poista", "docs/design/Email.dc.html#template=6"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/gdpr/account-deletion.test.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)",
-        "L2: pnpm test:integration -- tests/integration/account-deletion.int.test.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)",
-        "L3: pnpm test:e2e -- tests/e2e/account-deletion.spec.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)"
+        "L1: pnpm test:unit tests/unit/gdpr/account-deletion.test.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)",
+        "L2: pnpm test:integration tests/integration/account-deletion.int.test.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)",
+        "L3: pnpm test:e2e tests/e2e/account-deletion.spec.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1556,8 +1556,8 @@
       ],
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/public-forms.int.test.ts (integration: both data-request emails, contact email; E2E both forms.)",
-        "L3: pnpm test:e2e -- tests/e2e/public-forms.spec.ts (integration: both data-request emails, contact email; E2E both forms.)"
+        "L2: pnpm test:integration tests/integration/public-forms.int.test.ts (integration: both data-request emails, contact email; E2E both forms.)",
+        "L3: pnpm test:e2e tests/e2e/public-forms.spec.ts (integration: both data-request emails, contact email; E2E both forms.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1595,7 +1595,7 @@
       "spec": "docs/product/tickets/E08-gdpr-legal.md#mv-098-admin-gdpr-tooling",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/admin-gdpr-tooling.int.test.ts (integration admin-only.)"
+        "L2: pnpm test:integration tests/integration/admin-gdpr-tooling.int.test.ts (integration admin-only.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1634,8 +1634,8 @@
       "design": ["docs/design/Landing.dc.html#hero=B", "docs/design/Landing.dc.html#faq"],
       "verification": [
         "L1: pnpm check",
-        "L1: pnpm test:unit -- tests/unit/marketing/landing-page.test.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)",
-        "L3: pnpm test:e2e -- tests/e2e/landing-page.spec.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)"
+        "L1: pnpm test:unit tests/unit/marketing/landing-page.test.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)",
+        "L3: pnpm test:e2e tests/e2e/landing-page.spec.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1659,7 +1659,7 @@
       ],
       "verification": [
         "L1: pnpm check",
-        "L3: pnpm test:e2e -- tests/e2e/marketing.spec.ts (E2E + `@visual` snapshots.)"
+        "L3: pnpm test:e2e tests/e2e/marketing.spec.ts (E2E + `@visual` snapshots.)"
       ],
       "evidence": [],
       "attempts": 0,
@@ -1854,7 +1854,7 @@
       "spec": "docs/product/tickets/E09-E12-marketing-a11y-ops-launch.md#mv-122-cron-scheduling",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/cron-scheduling.int.test.ts (integration: secret required.)",
+        "L2: pnpm test:integration tests/integration/cron-scheduling.int.test.ts (integration: secret required.)",
         "manual: `vercel.json` crons 09:30 & 21:30 Europe/Helsinki convert to UTC with DST note hitting `/api/jobs/run` with `CRON_SECRET`; weekly cleanup; fallback instructions for external cron…"
       ],
       "evidence": [],
@@ -1874,7 +1874,7 @@
       "spec": "docs/product/tickets/E09-E12-marketing-a11y-ops-launch.md#mv-123-resend-production-email",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration -- tests/integration/resend-production-email.int.test.ts (integration webhook signature check.)",
+        "L2: pnpm test:integration tests/integration/resend-production-email.int.test.ts (integration webhook signature check.)",
         "manual: Domain verification, DKIM/SPF/DMARC records doc, sandbox for preview, bounce/complaint webhook `POST /api/webhooks/resend` disabling notifications on hard bounce logged."
       ],
       "evidence": [],

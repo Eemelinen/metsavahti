@@ -201,13 +201,13 @@ export function deriveVerification(ticket: Ticket): string[] {
   const slug = slugify(ticket.title) || ticket.id.toLowerCase()
   const area = EPIC_AREA[ticket.epic] ?? 'misc'
   if (/\bunit\b/i.test(tests))
-    steps.push(`L1: pnpm test:unit -- tests/unit/${area}/${slug}.test.ts (${summarize(tests)})`)
+    steps.push(`L1: pnpm test:unit tests/unit/${area}/${slug}.test.ts (${summarize(tests)})`)
   if (/\bintegration\b/i.test(tests))
     steps.push(
-      `L2: pnpm test:integration -- tests/integration/${slug}.int.test.ts (${summarize(tests)})`,
+      `L2: pnpm test:integration tests/integration/${slug}.int.test.ts (${summarize(tests)})`,
     )
   if (/\be2e\b/i.test(tests))
-    steps.push(`L3: pnpm test:e2e -- tests/e2e/${slug}.spec.ts (${summarize(tests)})`)
+    steps.push(`L3: pnpm test:e2e tests/e2e/${slug}.spec.ts (${summarize(tests)})`)
   if (ticket.id === 'MV-029')
     steps.push('manual: RUN_LIVE=1 pnpm test:live passes against the real Metsäkeskus WFS')
   if (ticket.id === 'MV-021')
