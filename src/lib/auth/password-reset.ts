@@ -18,6 +18,7 @@ import type { User } from '@/payload-types'
  * nothing about the address.
  */
 export const resetCooldownLimiter = createRateLimiter({
+  name: 'reset-email',
   limit: 1,
   windowMs: RESEND_COOLDOWN_SECONDS * 1000,
 })
@@ -40,7 +41,7 @@ export async function requestPasswordReset(
   payload: Payload,
   email: string,
 ): Promise<ResetRequestOutcome> {
-  if (!resetCooldownLimiter.check(`reset-email:${email}`).allowed) return { status: 'skipped' }
+  if (!(await resetCooldownLimiter.check(email)).allowed) return { status: 'skipped' }
   const token = await payload.forgotPassword({
     collection: 'users',
     data: { email },

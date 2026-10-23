@@ -13,21 +13,20 @@ import {
 } from '@/lib/auth/registration'
 import { actionResult } from '@/lib/errors'
 import { clientIp } from '@/lib/privacy/ip'
-import { authRateLimiter } from '@/lib/rate-limit'
+import { authRateLimiter, limitFormPost, rateLimitKey } from '@/lib/rate-limit'
 
 /**
  * Server Action `register` (E03 MV-042, `03-pages.md` `/rekisteroidy`). Every call counts
- * against the per-IP limit, then the input is validated on the server regardless of what
- * the form already checked. A duplicate address gets the same redirect as a new account so
- * the form never reveals who has one.
+ * against the per-IP limit (over it: redirect to `/liikaa-pyyntoja`, MV-048), then the input
+ * is validated on the server regardless of what the form already checked. A duplicate
+ * address gets the same redirect as a new account so the form never reveals who has one.
  */
 export async function register(input: unknown): Promise<RegisterActionResult> {
   const requestHeaders = await headers()
   const ip = clientIp(requestHeaders)
   const userAgent = requestHeaders.get('user-agent')
 
-  const limited = await actionResult(() => authRateLimiter.assert(`register:${ip ?? 'unknown'}`))
-  if (!limited.ok) return limited
+  await limitFormPost(authRateLimiter, rateLimitKey('register', { ip }))
 
   const validation = validateRegistration(input)
   if (!validation.success) return { ok: false, fieldErrors: validation.fieldErrors }

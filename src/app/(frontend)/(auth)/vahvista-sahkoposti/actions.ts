@@ -9,7 +9,7 @@ import { RESEND_COOLDOWN_SECONDS, resendVerificationSchema } from '@/lib/auth/ve
 import { fi } from '@/i18n/fi'
 import { type ActionResult, actionResult } from '@/lib/errors'
 import { clientIp } from '@/lib/privacy/ip'
-import { authRateLimiter } from '@/lib/rate-limit'
+import { authRateLimiter, rateLimitKey } from '@/lib/rate-limit'
 
 export type ResendVerificationResult = ActionResult<{
   /** How long the button stays disabled (seconds). */
@@ -25,7 +25,7 @@ export type ResendVerificationResult = ActionResult<{
  */
 export async function resendVerification(input: unknown): Promise<ResendVerificationResult> {
   const ip = clientIp(await headers())
-  const limited = await actionResult(() => authRateLimiter.assert(`resend:${ip ?? 'unknown'}`))
+  const limited = await actionResult(() => authRateLimiter.assert(rateLimitKey('resend', { ip })))
   if (!limited.ok) return limited
 
   const parsed = resendVerificationSchema.safeParse(input)
@@ -36,7 +36,7 @@ export async function resendVerification(input: unknown): Promise<ResendVerifica
   const { email } = parsed.data
 
   return actionResult(async () => {
-    resendCooldownLimiter.assert(`resend-email:${email}`)
+    await resendCooldownLimiter.assert(email)
     const payload = await getPayload({ config })
     await resendVerificationEmail(payload, email)
     return { cooldownSeconds: RESEND_COOLDOWN_SECONDS }

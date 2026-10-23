@@ -19,11 +19,14 @@ database or points at port 5432.
   template, adapter selection by env), the auth layout and form components (`PasswordInput`
   toggle + zxcvbn meter, `FormError`, `FormSuccess`, `scorePassword` thresholds), registration
   (`auth/registration.test.ts`: form schema per field, `validateRegistration` with the zxcvbn
-  requirement and the email local part as a penalised input, the sliding-window rate limiter,
+  requirement and the email local part as a penalised input,
   the `register` action itself with `headers()` stubbed and `registerUser` spied: the sixth
-  call from one address is `rate_limited` while another address passes, a duplicate address
+  call from one address redirects to `/liikaa-pyyntoja` while another address passes, a duplicate address
   redirects exactly like a new account, a weak password is refused on the server; `clientIp`,
-  the `VerifyEmail` template), the DB guard.
+  the `VerifyEmail` template), the DB guard, the rate limiter (`infra/rate-limiter.test.ts`: the
+  sliding window and its retry hint, `assert` / `reset`, name namespaces, `rateLimitKey`,
+  `limitFormPost` → `/liikaa-pyyntoja`, `limitApiRequest` → JSON 429 with `Retry-After`; every unit
+  test counts in `memoryRateLimitStore()`, set in `tests/unit/setup.ts`).
   email verification (`auth/email-verification-pages.test.ts`: the 24 h expiry boundary, the
   `resendVerification` action with `resendVerificationEmail` spied: one send per address per 60 s
   with the remaining seconds, neutral for unknown addresses, every call counted against the IP
@@ -32,7 +35,8 @@ database or points at port 5432.
   the button's countdown under fake timers and how a short server refusal becomes the countdown),
   forgot / reset password (`auth/forgot-reset-password.test.ts`: the two schemas, the `ResetPassword`
   template, the `requestPasswordReset` action with the helper spied: same answer for a registered and an
-  unknown address, unusable address refused, 5/h/IP; the `resetPassword` action: field errors, weak,
+  unknown address, unusable address refused, the sixth call in an hour from one address redirects to
+  `/liikaa-pyyntoja`; the `resetPassword` action: field errors, weak,
   `invalid`, redirect to `/kirjaudu?reset=1`), route protection (`auth/route-protection.test.ts`: the route
   table, the CSP directives and nonce, `handleRequest()` for public / user / guest-only / admin paths with a
   valid, forged and expired token and in maintenance mode, `pageDecision()`, `assertOwner()`, and the guards
@@ -92,7 +96,11 @@ database or points at port 5432.
   route protection (`route-protection.int.test.ts`: the proxy's key equals `payload.secret`; route × auth
   state (guest, forged, revoked, unverified, verified) through `handleRequest()` and then the page's
   `pageDecision()` on the real session → 200 or which layer redirects where; `assertOwner` on a real watch
-  area throws `Forbidden` for another user),
+  area throws `Forbidden` for another user), rate limiter (`rate-limiter.int.test.ts`: the sixth request
+  within the window is refused and the `rate_limit_buckets` row holds five hits, other addresses and
+  routes have their own budget, two limiter instances share one count and twelve concurrent requests
+  let exactly five through, the window slides, `limitApiRequest` answers 429, the sixth
+  `requestPasswordReset` post redirects to `/liikaa-pyyntoja`, migration round-trip),
   the full `sync-declarations` pipeline (new → idempotent → changed
   geometry with a `declaration-revisions` row and an in-place `watch-area-declarations` update,
   emails asserted through the Mailpit API), and the cron endpoint.
@@ -124,7 +132,7 @@ database or points at port 5432.
   runs as a guest with its own `x-forwarded-for` per test: inline validation + meter + axe; `@smoke`
   register → `/vahvista-sahkoposti?email=` → verify email in Mailpit → the same address again
   gets the same redirect and no second email → login still refused while unverified; five
-  weak-password submissions from one address, the sixth shows `Liikaa pyyntöjä`), email verification
+  weak-password submissions from one address, the sixth lands on `/liikaa-pyyntoja`), email verification
   (`email-verification-pages.spec.ts`, guest, own address per test: `@smoke` register → resend with the
   cooldown → the newest Mailpit link verifies and the older one is `invalid` → `Luo ensimmäinen
 vahtialue` points at `/aloita` → login succeeds → the same link is `used`; an admin backdates

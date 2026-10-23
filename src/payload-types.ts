@@ -79,6 +79,7 @@ export interface Config {
     exports: Export;
     'job-runs': JobRun;
     'legal-documents': LegalDocument;
+    'rate-limit-buckets': RateLimitBucket;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -99,6 +100,7 @@ export interface Config {
     exports: ExportsSelect<false> | ExportsSelect<true>;
     'job-runs': JobRunsSelect<false> | JobRunsSelect<true>;
     'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
+    'rate-limit-buckets': RateLimitBucketsSelect<false> | RateLimitBucketsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -481,6 +483,26 @@ export interface LegalDocument {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limit-buckets".
+ */
+export interface RateLimitBucket {
+  id: number;
+  key: string;
+  hits:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -643,6 +665,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'legal-documents';
         value: number | LegalDocument;
+      } | null)
+    | ({
+        relationTo: 'rate-limit-buckets';
+        value: number | RateLimitBucket;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -896,6 +922,17 @@ export interface LegalDocumentsSelect<T extends boolean = true> {
   requiresReacceptance?: T;
   changeSummary?: T;
   body?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limit-buckets_select".
+ */
+export interface RateLimitBucketsSelect<T extends boolean = true> {
+  key?: T;
+  hits?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
