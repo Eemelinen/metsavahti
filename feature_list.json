@@ -1462,7 +1462,7 @@
       "area": "alerts",
       "title": "Alert feed /ilmoitukset, mark read and change-type semantics",
       "user_visible_behavior": "Paginated (50, cursor) newest-first, grouped by date headers (Europe/Helsinki), `AlertItem` (area name, cutting chip, area ha, distance, change type label, \"Näytä kartalla\"), filter by watch area, unread styling, empty state. Server Actions `markAlertRead`, `markAllAlertsRead`; badge in nav updates. Labels/explanations for `new`, `geometry_changed`, `attributes_changed`, `removed` in `fi.ts`; icons; `removed` hidden unless flag.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-050", "F-072"],
       "ticket": "MV-080",
       "epic": "E07",
@@ -1474,7 +1474,12 @@
         "L2: pnpm test:integration tests/integration/alert-feed.int.test.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)",
         "L3: pnpm test:e2e tests/e2e/alert-feed.spec.ts (unit change-type labels; integration owner-only feed and actions; E2E `@smoke` after pipeline run, badge count after mark read.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on d514378)",
+        "2026-10-24 pnpm test:unit tests/unit/alerts/alert-feed.test.ts → pass (working tree on d514378)",
+        "2026-10-24 pnpm test:integration tests/integration/alert-feed.int.test.ts → pass (working tree on d514378, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/alert-feed.spec.ts → pass (working tree on d514378, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Was F-006 (alert list; now its own page). Tests (ticket): unit change-type labels; integration owner-only (feed and actions); E2E `@smoke` after pipeline run, badge count after mark read. Status (ticket): absorbs MV-081 and MV-084 (merged 2026-09-20, ledger P11)."
     },

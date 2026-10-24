@@ -362,7 +362,48 @@ export const fi = {
       settings: 'Asetukset',
       logout: 'Kirjaudu ulos',
     },
-    comingSoon: 'Tämä sivu on vielä rakenteilla.',
+  },
+  alerts: {
+    /** What each `alerts.changeType` means, for the feed (MV-080); the emails keep their own. */
+    changeType: {
+      new: {
+        label: 'Uusi ilmoitus',
+        explanation: 'Metsäkeskuksen aineistoon on lisätty uusi hakkuuaikomus vahtialueellesi.',
+      },
+      geometry_changed: {
+        label: 'Rajaus muuttunut',
+        explanation: 'Hakkuualueen rajaus on muuttunut Metsäkeskuksen aineistossa.',
+      },
+      attributes_changed: {
+        label: 'Tiedot muuttuneet',
+        explanation:
+          'Ilmoituksen tiedot, esimerkiksi hakkuutapa tai pinta-ala, ovat muuttuneet Metsäkeskuksen aineistossa.',
+      },
+      removed: {
+        label: 'Poistunut aineistosta',
+        explanation:
+          'Ilmoitus ei ole enää Metsäkeskuksen aineistossa. Se on voitu perua tai korvata uudella ilmoituksella.',
+      },
+    },
+    feed: {
+      title: 'Ilmoitukset',
+      markAllRead: 'Merkitse kaikki luetuiksi',
+      markedAllRead: 'Kaikki ilmoitukset merkitty luetuiksi.',
+      failed: 'Muutoksen tallennus epäonnistui. Yritä uudelleen.',
+      filter: 'Vahtialue',
+      allAreas: 'Kaikki vahtialueet',
+      emptyTitle: 'Ei uusia ilmoituksia — hyvä merkki.',
+      emptyBody: 'Tarkistamme Metsäkeskuksen aineiston kahdesti päivässä, klo 9.30 ja 21.30.',
+      emptyArea: 'Tällä vahtialueella ei ole vielä ilmoituksia.',
+      unread: 'Lukematon',
+      meta: (area: string, ha: string, distance: string, time: string) =>
+        `${area} · ${ha} · ${distance} · klo ${time}`,
+      showOnMap: 'Näytä kartalla',
+      showOnMapLabel: (type: string, area: string) => `Näytä kartalla: ${type}, ${area}`,
+      pages: 'Ilmoituslistan sivut',
+      older: 'Näytä vanhemmat ilmoitukset',
+      newest: 'Uusimpiin ilmoituksiin',
+    },
   },
   watchAreas: {
     errors: {

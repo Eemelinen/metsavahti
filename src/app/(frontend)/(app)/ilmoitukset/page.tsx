@@ -1,20 +1,31 @@
 import type { Metadata } from 'next'
+import { getPayload } from 'payload'
 
+import config from '@payload-config'
 import { fi } from '@/i18n/fi'
+import { loadAlertFeed } from '@/lib/alerts/feed'
+import { parseAlertFeedQuery } from '@/lib/alerts/feed-query'
 import { requireUser } from '@/lib/auth/guards'
 
-export const metadata: Metadata = { title: fi.app.nav.alerts }
+import { AlertFeed } from './alert-feed'
+
+export const metadata: Metadata = { title: fi.alerts.feed.title }
+export const dynamic = 'force-dynamic'
 
 /**
- * Stand-in for `/ilmoitukset` so the app navigation has a target (MV-050); MV-080 replaces it
- * with the real page (00-deviations R20).
+ * `/ilmoitukset` (E07 MV-080, App artboard `ilmoitukset`): the account's alerts across all
+ * watch areas, newest first, 50 per page (`?ennen=` cursor), grouped by the Finnish day, with
+ * the watch-area filter (`?alue=`), unread styling, "Merkitse kaikki luetuiksi" and the empty
+ * state. `removed` alerts show only while `ALERT_ON_REMOVED=1`. A bad `?alue=` or `?ennen=`
+ * is ignored, so the page falls back to the first page of every area.
  */
-export default async function IlmoituksetPage() {
-  await requireUser({ next: '/ilmoitukset' })
-  return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-semibold">{fi.app.nav.alerts}</h1>
-      <p className="text-ink-muted">{fi.app.comingSoon}</p>
-    </div>
-  )
+export default async function IlmoituksetPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const user = await requireUser({ next: '/ilmoitukset' })
+  const query = parseAlertFeedQuery(await searchParams)
+  const feed = await loadAlertFeed(await getPayload({ config }), user, query)
+  return <AlertFeed feed={feed} paged={query.cursor !== null} />
 }
