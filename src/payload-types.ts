@@ -127,6 +127,7 @@ export interface Config {
       'send-alerts': TaskSendAlerts;
       cleanup: TaskCleanup;
       export: TaskExport;
+      'delete-account': TaskDeleteAccount;
       inline: {
         input: unknown;
         output: unknown;
@@ -396,6 +397,10 @@ export interface ConsentEvent {
   granted: boolean;
   ip?: string | null;
   userAgent?: string | null;
+  /**
+   * Poistetun tilin osoitteen SHA-256 (pienin kirjaimin): todiste suostumuksesta ilman osoitetta.
+   */
+  emailHash?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -596,7 +601,14 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export';
+        taskSlug:
+          | 'inline'
+          | 'fetch-declarations'
+          | 'match-watch-areas'
+          | 'send-alerts'
+          | 'cleanup'
+          | 'export'
+          | 'delete-account';
         taskID: string;
         input?:
           | {
@@ -630,7 +642,9 @@ export interface PayloadJob {
       }[]
     | null;
   workflowSlug?: 'sync-declarations' | null;
-  taskSlug?: ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export') | null;
+  taskSlug?:
+    | ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export' | 'delete-account')
+    | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -895,6 +909,7 @@ export interface ConsentEventsSelect<T extends boolean = true> {
   granted?: T;
   ip?: T;
   userAgent?: T;
+  emailHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1126,6 +1141,26 @@ export interface TaskExport {
     files: number;
     bytes: number;
     emailsSent: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskDelete-account".
+ */
+export interface TaskDeleteAccount {
+  input: {
+    userId: number;
+  };
+  output: {
+    emailsSent: number;
+    alerts: number;
+    watchAreaDeclarations: number;
+    watchAreas: number;
+    notifications: number;
+    consentEvents: number;
+    dataExports: number;
+    sessions: number;
+    users: number;
   };
 }
 /**

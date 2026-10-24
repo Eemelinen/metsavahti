@@ -52,7 +52,10 @@ database or points at port 5432.
   a pending / ready request past `expiresAt` counts as expired, `account.json` without credentials, the GeoJSON
   shape, the zip round trip, `ExportReady` with link, contents, size, expiry and attribution; `….ui.test.tsx`
   (jsdom): `ExportSection` posts JSON and shows "Valmistellaan…", the route's refusal, the ready link without a
-  button, the next-allowed note and the failed state),
+  button, the next-allowed note and the failed state), account deletion (`gdpr/account-deletion.test.ts`: the
+  form rule wants `POISTA` in upper case (spaces forgiven) and a password, both errors at once; `hashEmail()` is
+  the SHA-256 of the trimmed, lower-cased address; `Poista tili` is the last account tab; `AccountDeleted` lists
+  what was deleted and kept, the time and the attribution, has no settings link, words the area count),
   legal pages (`legal/legaldocument-renderer.test.tsx`: `splitLegalSections()` slugs, suffixes and reserved
   ids; `LegalDocument` markup: date in Finnish time, version, numbered sections whose ids match the TOC links,
   lists and links, extra sections first, no TOC without sections; the `config/cookies.ts` lifetimes),
@@ -133,7 +136,14 @@ database or points at port 5432.
   `job-runs` rows; an expired token or request is 410, a forged, missing or foreign token 403; a second
   request the same day is refused, a failed export (SMTP down) keeps no file and can be retried, a failed log write
   after the send keeps the export ready, the route takes JSON only (415), a lapsed pending request allows a
-  new one the next day; every test makes its own export).
+  new one the next day; every test makes its own export), and account deletion
+  (`account-deletion.int.test.ts`: an account with a row in every collection that refers to `users` (found
+  from the live config) — a wrong password changes nothing; the right one stamps `deletedAt`, ends every
+  session and refuses a login; the `delete-account` job leaves no row for the user anywhere except the consent
+  events (user null, `emailHash`), deletes the notification-log rows sent to the address, sends
+  `AccountDeleted` (Mailpit) logged without user or address, records its counters in `job-runs` and leaves a
+  second account untouched; a run interrupted after the email finishes on retry without a second email; a
+  user who did not ask is refused; 5 password attempts per 15 min; the route takes JSON only (415)).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 
@@ -154,7 +164,10 @@ database or points at port 5432.
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
   the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents, each with a lead and the `E2E_LEGAL_SECTIONS` of `fixtures.ts`, through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: privacy page and data export (`data-export.spec.ts`: a new account's `/tili/tietosuoja` shows the
+- Specs: account deletion (`account-deletion.spec.ts`: a new account's `/tili/poista` shows the explanation
+  and passes axe; the button stays disabled for `poista` or without a password, a wrong password shows the field
+  error, the right one lands on `/tili-poistettu` (axe), the Mailpit email arrives, `/tili` then redirects to
+  the login and the same credentials are refused), privacy page and data export (`data-export.spec.ts`: a new account's `/tili/tietosuoja` shows the
   terms and privacy consents, the policy and supervisory-authority links, opens the cookie modal, passes axe;
   "Lataa tietoni" → "Valmistellaan…" → the Mailpit link answers 200 with a zip, a forged token 403, and after a
   reload the ready state with its own download link), legal pages (`legaldocument-renderer-and-pages.spec.ts`: the four routes show the seeded document's

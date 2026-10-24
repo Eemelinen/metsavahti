@@ -1589,7 +1589,7 @@
       "area": "gdpr",
       "title": "Delete account page /tili/poista and account deletion",
       "user_visible_behavior": "`/tili/poista`: explanation from `retention.ts`, `POISTA` + password confirmation form; `/tili-poistettu` public page. `POST /api/account/delete` (password re-check) → `delete-account` job per `01 §4.6`; `AccountDeleted` email sent first; consent events anonymised (user null, email sha256); session revoked; redirect `/tili-poistettu`.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-050", "F-070"],
       "ticket": "MV-094",
       "epic": "E08",

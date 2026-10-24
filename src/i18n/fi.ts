@@ -188,6 +188,7 @@ export const fi = {
       security: 'Turvallisuus',
       notifications: 'Ilmoitusasetukset',
       privacy: 'Tietosuoja ja tiedot',
+      deleteAccount: 'Poista tili',
     },
     profile: {
       email: 'Sähköposti',
@@ -319,6 +320,37 @@ export const fi = {
         authority: 'Tietosuojavaltuutetun toimisto ↗',
       },
     },
+    deleteAccount: {
+      title: 'Poista tili',
+      body: 'Poistamme tilisi, kaikki vahtialueet ja ilmoitushistorian välittömästi. Toimintoa ei voi perua.',
+      deletedTitle: 'Poistetaan',
+      deleted: [
+        'Tilitiedot, salasana ja kaikki kirjautumiset',
+        'Vahtialueet, niiden hälytykset ja ilmoitushistoria',
+        'Sinulle lähetettyjen sähköpostien loki ja tietojen vientitiedostot',
+      ],
+      keptTitle: 'Säilytetään',
+      keptConsents:
+        'Suostumusmerkinnät (käyttöehdot, tietosuojaseloste, markkinointi, evästeet) todisteena annetuista ja perutuista suostumuksista. Tilisi irrotetaan niistä, ja osoitteesta jää vain tiiviste, josta osoitetta ei voi lukea.',
+      keptJobRuns: (days: number) =>
+        `Taustatehtävien ajolokit, joissa on vain laskurit eikä tietojasi, poistetaan ${days} päivän kuluttua.`,
+      confirmBefore: 'Kirjoita',
+      confirmWord: 'POISTA',
+      confirmAfter: 'vahvistukseksi',
+      password: 'Salasana',
+      submit: 'Poista tili pysyvästi',
+      errors: {
+        confirmMismatch: 'Kirjoita POISTA isoin kirjaimin.',
+        passwordMissing: 'Anna salasanasi.',
+        passwordWrong: 'Salasana on väärin.',
+        failed: 'Pyyntö epäonnistui. Yritä uudelleen.',
+      },
+      done: {
+        title: 'Tilisi on poistettu',
+        body: 'Kiitos, että käytit Metsävahtia. Lähetimme vahvistuksen sähköpostiin.',
+        home: 'Etusivulle',
+      },
+    },
   },
   emails: {
     testAlert: {
@@ -380,6 +412,22 @@ export const fi = {
       expiresAt: (when: string) => `${when} (24 h)`,
       note: 'Kuka tahansa linkin saanut voi ladata tietosi sen voimassaoloaikana, joten älä jaa sitä. Jos et pyytänyt vientiä, vaihda salasanasi tilin turvallisuusasetuksista.',
       footerWhy: 'Saat tämän viestin, koska pyysit tietojesi vientiä tilin asetuksista.',
+    },
+    accountDeleted: {
+      subject: 'Tilisi on poistettu',
+      preview: 'Tilisi on poistettu – kiitos, että käytit Metsävahtia',
+      heading: 'Tilisi on poistettu',
+      lead: 'Pyyntösi mukaisesti olemme poistaneet tilisi ja siihen liittyvät tiedot. Et saa enää ilmoituksia vahtialueiltasi.',
+      deleted: 'Poistettu',
+      deletedValue: (watchAreas: number) =>
+        watchAreas === 0
+          ? 'Tili ja ilmoitushistoria'
+          : `Tili, ${watchAreas} ${watchAreas === 1 ? 'vahtialue' : 'vahtialuetta'}, ilmoitushistoria`,
+      kept: 'Säilytetään',
+      keptValue: 'Suostumusmerkinnät ilman tiliä ja osoitetta',
+      at: 'Ajankohta',
+      note: 'Jos et tehnyt tätä pyyntöä, ota heti yhteyttä tietosuojaselosteessa mainittuun osoitteeseen. Voit luoda uuden tilin milloin tahansa; vanhoja vahtialueita ei kuitenkaan voi palauttaa.',
+      footerWhy: 'Tämä on viimeinen viesti, jonka lähetämme tähän osoitteeseen.',
     },
   },
   forms: {

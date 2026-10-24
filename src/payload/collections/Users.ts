@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { AuthenticationError, type CollectionConfig } from 'payload'
 
 import { RESET_PASSWORD_SUBJECT, renderResetPassword } from '@/emails/ResetPassword'
 import { VERIFY_EMAIL_SUBJECT, renderVerifyEmail } from '@/emails/VerifyEmail'
@@ -89,6 +89,15 @@ export const Users: CollectionConfig = {
         const previous = operation === 'create' ? false : Boolean(originalDoc?.marketingConsent)
         if (Boolean(consent) === previous) return rest
         return { ...rest, marketingConsentAt: consent ? new Date().toISOString() : null }
+      },
+    ],
+    beforeLogin: [
+      // An account being deleted (`deletedAt`, MV-094) never gets a new session, even with the
+      // right password, in the moment before the `delete-account` job removes the row. The
+      // error is the wrong-credentials one, so it reveals nothing.
+      ({ user }) => {
+        if (user.deletedAt) throw new AuthenticationError()
+        return user
       },
     ],
   },

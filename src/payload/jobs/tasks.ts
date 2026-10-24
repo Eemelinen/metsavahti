@@ -3,6 +3,7 @@ import type { TaskConfig } from 'payload'
 import { retention } from '@/config/retention'
 import { cleanup } from '@/lib/jobs/cleanup'
 import { createJobContext } from '@/lib/jobs/context'
+import { runAccountDeletion } from '@/lib/jobs/delete-account'
 import { runDataExport } from '@/lib/jobs/export'
 import { fetchDeclarations } from '@/lib/jobs/fetch-declarations'
 import { withJobRun } from '@/lib/jobs/job-runs'
@@ -78,10 +79,40 @@ export const exportTask: TaskConfig<'export'> = {
   },
 }
 
+/**
+ * One account deletion (`01 §4.6`, MV-094), queued by `POST /api/account/delete` once the
+ * password checked out. Retried: the steps are idempotent and the email is sent once per job,
+ * so a retry finishes a deletion that a database error interrupted.
+ */
+export const deleteAccountTask: TaskConfig<'delete-account'> = {
+  slug: 'delete-account',
+  retries: 3,
+  inputSchema: [{ name: 'userId', type: 'number', required: true }],
+  outputSchema: [
+    count('emailsSent'),
+    count('alerts'),
+    count('watchAreaDeclarations'),
+    count('watchAreas'),
+    count('notifications'),
+    count('consentEvents'),
+    count('dataExports'),
+    count('sessions'),
+    count('users'),
+  ],
+  handler: async ({ input, job, req }) => {
+    const ctx = createJobContext(req.payload, job.id)
+    const output = await withJobRun(ctx, 'delete-account', () =>
+      runAccountDeletion(ctx, input.userId),
+    )
+    return { output }
+  },
+}
+
 export const tasks = [
   fetchDeclarationsTask,
   matchWatchAreasTask,
   sendAlertsTask,
   cleanupTask,
   exportTask,
+  deleteAccountTask,
 ]
