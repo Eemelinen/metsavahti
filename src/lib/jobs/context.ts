@@ -2,7 +2,7 @@ import type { Payload } from 'payload'
 
 import { env } from '@/lib/env'
 import { type Logger, logger as rootLogger } from '@/lib/logger'
-import { type WfsClient, createWfsClient } from '@/lib/wfs/client'
+import { MetsakeskusWfsClient, type WfsClient } from '@/lib/wfs/client'
 
 export type JobContext = {
   payload: Payload
@@ -18,7 +18,7 @@ export function createJobContext(payload: Payload, jobRunId: string | number): J
     payload,
     runId: String(jobRunId),
     logger: rootLogger.child({ jobRunId: String(jobRunId) }),
-    wfs: createWfsClient({ baseUrl: env.WFS_BASE_URL, layer: env.WFS_LAYER }),
+    wfs: new MetsakeskusWfsClient({ baseUrl: env.WFS_BASE_URL, layer: env.WFS_LAYER }),
     now: () => new Date(),
   }
 }

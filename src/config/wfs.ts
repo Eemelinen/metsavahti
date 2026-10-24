@@ -25,4 +25,9 @@ export const wfs = {
    * measure real request counts.
    */
   maxBboxSizeM: 100_000,
+  /**
+   * Features per `GetFeature` page (`count`). A full page of 1 000 measured ~1.3 s and
+   * ~2.9 MB on 2026-10-24 (D-012); the server's `CountDefault` caps it at 10 000.
+   */
+  pageSize: 1_000,
 } as const

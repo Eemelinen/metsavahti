@@ -198,7 +198,7 @@ src/
   content/faq.ts          the landing-page FAQ (accordion + FAQPage structured data)
   lib/legal/legal-sections.ts  splits a document body into h2 sections for the TOC
   config/cookies.ts       the cookies the service sets (the /evasteet table)
-  lib/wfs                 client.ts, schemas.ts, parse.ts, hakkuutapa.ts
+  lib/wfs                 client.ts (WfsClient, MetsakeskusWfsClient), gml.ts, schemas.ts, parse.ts, hakkuutapa.ts
   lib/jobs                fetch-declarations, match-watch-areas, send-alerts, cleanup, withJobRun
   emails                  React Email templates: EmailLayout (shared frame), AlertEmail, renderEmail()
   lib/notifications       provider.ts (which email adapter is active)
