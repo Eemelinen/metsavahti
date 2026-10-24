@@ -1,6 +1,6 @@
 {
   "project": "metsavahti",
-  "last_updated": "2026-10-23",
+  "last_updated": "2026-10-24",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1130,7 +1130,7 @@
       "area": "watch-areas",
       "title": "Watch-area Server Actions",
       "user_visible_behavior": "`createWatchArea`, `updateWatchArea`, `deleteWatchArea`, `toggleWatchAreaNotifications`; Zod schemas; plan-limit error mapped to UI; `update` nulls `lastCheckedAt`; delete cascades join rows/alerts (DB FK `ON DELETE CASCADE` via migration `0006`).",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-032", "F-046"],
       "ticket": "MV-064",
       "epic": "E05",
@@ -1139,7 +1139,12 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/watch-area-server-actions.int.test.ts (integration: ownership, limits, cascade.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (commit a2dfc8e)",
+        "2026-10-24 pnpm test:integration tests/integration/watch-area-server-actions.int.test.ts → pass (commit a2dfc8e, Docker available)",
+        "2026-10-24 pnpm check → pass (working tree on ae62815)",
+        "2026-10-24 pnpm test:integration tests/integration/watch-area-server-actions.int.test.ts → pass (working tree on ae62815, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Was F-004 (create a watch area from the dashboard). Tests (ticket): integration: ownership, limits, cascade."
     },

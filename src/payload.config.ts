@@ -29,6 +29,7 @@ import { canRunJobs } from '@/payload/jobs/access'
 import { tasks } from '@/payload/jobs/tasks'
 import { workflows } from '@/payload/jobs/workflows'
 import { migrations } from '@/payload/migrations'
+import { cascadeDeletes } from '@/payload/schema/foreign-keys'
 import { addPostgisColumns } from '@/payload/schema/postgis'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -117,6 +118,7 @@ export default buildConfig({
     push: false,
     migrationDir: path.resolve(dirname, 'payload/migrations'),
     prodMigrations: migrations,
+    beforeSchemaInit: [cascadeDeletes],
     afterSchemaInit: [addPostgisColumns],
   }),
   email: emailAdapter(),

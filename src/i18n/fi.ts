@@ -148,6 +148,17 @@ export const fi = {
     },
     comingSoon: 'Tämä sivu on vielä rakenteilla.',
   },
+  watchAreas: {
+    errors: {
+      nameMissing: 'Anna alueelle nimi.',
+      nameTooLong: 'Nimi voi olla enintään 100 merkkiä.',
+      centerOutside: 'Valitse keskipiste Suomesta.',
+      radiusInvalid: (min: number, max: number) => `Säteen pitää olla ${min}–${max} m.`,
+      addressTooLong: 'Osoite voi olla enintään 200 merkkiä.',
+      planLimit: (max: number) =>
+        `Tilaukseesi kuuluu enintään ${max} vahtialuetta. Poista jokin alue ennen uuden lisäämistä.`,
+    },
+  },
   account: {
     title: 'Tili ja asetukset',
     tabs: {

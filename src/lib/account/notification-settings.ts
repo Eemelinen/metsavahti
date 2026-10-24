@@ -10,7 +10,6 @@ import { type AlertEmailDeclaration, renderAlertEmail } from '@/emails/AlertEmai
 import { fi } from '@/i18n/fi'
 import type { NotificationMode, NotificationPrefsInput } from '@/lib/account/account-schema'
 import { metsakeskusAttribution } from '@/lib/attribution'
-import { assertOwner } from '@/lib/auth/page-access'
 import { env } from '@/lib/env'
 import { findLatestLegalDocument } from '@/lib/legal/documents'
 import { createRateLimiter } from '@/lib/rate-limit'
@@ -102,35 +101,6 @@ export async function updateNotificationPrefs(
     user,
   })
   return notificationSettingsOf(saved)
-}
-
-/**
- * One watch area's own switch (`watch-areas.notificationsEnabled`). The area is read as the user
- * and its owner checked again (`assertOwner`), so an id from the browser can only ever change
- * one of the account's own areas; someone else's is `Forbidden` (or `NotFound` from Payload).
- */
-export async function setWatchAreaNotifications(
-  payload: Payload,
-  user: User,
-  id: number,
-  enabled: boolean,
-): Promise<void> {
-  const area = await payload.findByID({
-    collection: 'watch-areas',
-    id,
-    depth: 0,
-    overrideAccess: false,
-    user,
-  })
-  assertOwner(user, area)
-  await payload.update({
-    collection: 'watch-areas',
-    id,
-    data: { notificationsEnabled: enabled },
-    depth: 0,
-    overrideAccess: false,
-    user,
-  })
 }
 
 export type ConsentContext = {
