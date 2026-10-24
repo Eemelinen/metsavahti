@@ -1248,7 +1248,9 @@
       ],
       "evidence": [
         "2026-10-24 pnpm check → pass (working tree on 4603457)",
-        "2026-10-24 pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts → pass (working tree on 4603457, Docker available)"
+        "2026-10-24 pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts → pass (working tree on 4603457, Docker available)",
+        "2026-10-24 pnpm check → pass (commit 31c6a43)",
+        "2026-10-24 pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts → pass (commit 31c6a43, Docker available)"
       ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: unauthenticated 401; run creates `job_runs` row; cleanup removes expired declarations and keeps referenced ones. Status (ticket): absorbs MV-076 (merged 2026-09-20, ledger P11)."
