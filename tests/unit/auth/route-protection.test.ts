@@ -86,7 +86,12 @@ describe('route table (03-pages.md Auth column)', () => {
 
 describe('content security policy', () => {
   it('allows scripts only by nonce, forbids framing and objects', () => {
-    const csp = contentSecurityPolicy({ nonce: 'abc', dev: false, https: false })
+    const csp = contentSecurityPolicy({
+      nonce: 'abc',
+      dev: false,
+      https: false,
+      mapOrigins: ['https://tile.openstreetmap.org', 'https://avoin.metsakeskus.fi'],
+    })
     const directives = Object.fromEntries(
       csp.split('; ').map((d) => {
         const [name, ...values] = d.split(' ')
@@ -99,6 +104,8 @@ describe('content security policy', () => {
     expect(directives['default-src']).toEqual(["'self'"])
     expect(directives['img-src']).toContain('https://tile.openstreetmap.org')
     expect(directives['connect-src']).toContain('https://tile.openstreetmap.org')
+    expect(directives['img-src']).toContain('https://avoin.metsakeskus.fi')
+    expect(directives['connect-src']).toContain('https://avoin.metsakeskus.fi')
     expect(csp).not.toContain('unsafe-eval')
     expect(csp).not.toContain('upgrade-insecure-requests')
   })

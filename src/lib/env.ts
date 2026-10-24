@@ -40,6 +40,13 @@ export const env = createEnv({
     MAINTENANCE_MODE: z.enum(['0', '1']).default('0'),
     /** Shown on `/huolto` as "Palaamme noin klo …" (e.g. `07.00`); without it the page says "pian". */
     MAINTENANCE_RETURN_TIME: z.string().min(1).max(40).optional(),
+    /** Base map raster tiles (`MapView`, MV-060): an XYZ template with `{z}`, `{x}` and `{y}`. */
+    MAP_TILE_URL: z
+      .string()
+      .regex(/^https?:\/\/[^/]+\/.*\{z\}.*\{x\}.*\{y\}/, 'an http(s) XYZ template with {z}/{x}/{y}')
+      .default('https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+    /** Attribution the map shows for `MAP_TILE_URL`'s tiles (the tile provider's licence term). */
+    MAP_TILE_ATTRIBUTION: z.string().min(1).default('© OpenStreetMap contributors'),
     /** `1` serves `GET /api/alerts/[id]/map-image.png` (MV-077); `0` answers 404 there. */
     ENABLE_MAP_IMAGES: z.enum(['0', '1']).default('0'),
     /** `1` serves `/hinnoittelu` and shows it in the header and sitemap (MV-101); `0` answers 404. */

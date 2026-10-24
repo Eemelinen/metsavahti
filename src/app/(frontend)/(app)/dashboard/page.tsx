@@ -1,13 +1,21 @@
+import type { FeatureCollection, Polygon } from 'geojson'
 import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
-import { WatchAreaMapClient } from '@/components/map/map-client'
+import { MapView } from '@/components/map/map-view'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireUser } from '@/lib/auth/guards'
+import { previewCircle } from '@/lib/geo/buffer'
+import type { LonLat } from '@/lib/geo/crs'
+import { mapSources } from '@/lib/map-sources'
 
 export const metadata: Metadata = { title: 'Vahtialueet' }
 export const dynamic = 'force-dynamic'
+
+/** Whole Finland, for an account without watch areas. */
+const FINLAND_CENTER: LonLat = [25.7, 62.9]
+const FINLAND_ZOOM = 4.5
 
 export default async function DashboardPage() {
   const payload = await getPayload({ config })
@@ -29,12 +37,14 @@ export default async function DashboardPage() {
     }),
   ])
 
-  const mapAreas = areas.map((a) => ({
-    id: a.id,
-    name: a.name,
-    center: a.center as [number, number],
-    radiusM: a.radiusM,
-  }))
+  const areaCircles: FeatureCollection<Polygon> = {
+    type: 'FeatureCollection',
+    features: areas.map((a) => ({
+      ...previewCircle(a.center as LonLat, a.radiusM),
+      id: a.id,
+      properties: { name: a.name },
+    })),
+  }
 
   return (
     <div className="space-y-6">
@@ -45,7 +55,12 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <WatchAreaMapClient areas={mapAreas} />
+      <MapView
+        center={(areas[0]?.center as LonLat | undefined) ?? FINLAND_CENTER}
+        sources={mapSources()}
+        watchAreaGeoJSON={areaCircles}
+        zoom={areas.length > 0 ? undefined : FINLAND_ZOOM}
+      />
 
       {areas.length === 0 ? (
         <p className="text-muted-foreground" data-testid="no-watch-areas">

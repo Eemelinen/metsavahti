@@ -178,6 +178,7 @@ src/
   app/api/health          liveness + PostGIS check
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
   app/api/alerts/[id]/map-image.png  static map PNG for alert emails (owner session or signed token; ENABLE_MAP_IMAGES)
+  app/maplibre-gl/[version]/[file]   MapLibre's web worker, served from the installed package (prerendered)
   app/api/consent         cookie consent: sets mv_consent (12 months), records a consent event for a signed-in user
   app/api/account/export  account data export: POST queues the export job (1 / day); GET [id]?token= downloads the zip from the emailed link (24 h)
   app/api/account/delete  account deletion: POST (POISTA + password, JSON) ends every session and runs the delete-account job
@@ -204,7 +205,7 @@ src/
   emails                  React Email templates: EmailLayout (shared frame), AlertEmail, renderEmail()
   lib/notifications       provider.ts (which email adapter is active)
   lib/privacy             ip.ts (IP → network prefix before storage)
-  components/             site header/footer/frame, brand mark, legal/ (LegalDocument, CookieTable), system pages, attribution, map (MapLibre), forms/ (PasswordInput, FormError, FormSuccess), shadcn ui/
+  components/             site header/footer/frame, brand mark, legal/ (LegalDocument, CookieTable), system pages, attribution, map/ (MapView: MapLibre map with legend, WMS toggle, draggable pin), forms/ (PasswordInput, FormError, FormSuccess), shadcn ui/
   i18n/fi.ts              Finnish UI copy (new strings go here)
   proxy.ts                Next 16 middleware: maintenance mode, login redirect, security headers (lib/auth/route-protection.ts, lib/security-headers.ts)
   lib/auth                password-strength.ts (zxcvbn score + E03 thresholds), guards.ts (getSessionUser, requireUser, redirectSignedInUser), page-access.ts (assertOwner)
@@ -226,6 +227,7 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
   `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
 - Migrations run automatically when the production server boots (`prodMigrations`), never during `next build`.
 - Pricing page: set `SHOW_PRICING=1` to serve `/hinnoittelu` and list it in the header and `sitemap.xml` (the sitemap is built at `next build`, so set it there too); off (the default), it is a 404 and nothing links to it.
+- Map tiles: OpenStreetMap's public tiles by default, which is fine for development only; in production set `MAP_TILE_URL` (an XYZ template) and `MAP_TILE_ATTRIBUTION` to your tile provider. The optional "Metsäkeskuksen karttataso" layer is the WMS of `WFS_BASE_URL`. Both origins are added to the CSP automatically.
 - Static map images in alert emails: set `ENABLE_MAP_IMAGES=1`; off, `/api/alerts/[id]/map-image.png` answers 404 and emails go without the image.
 - Analytics: set `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL` (build time) to the Plausible/Umami script; the cookie banner loads it only for visitors who accept analytics. Unset, no analytics loads.
 - Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.
