@@ -7,18 +7,18 @@ import 'dotenv/config'
 import { getPayload } from 'payload'
 
 async function main() {
-  const [{ default: config }, { RUNNABLE_JOBS, runJobNow }] = await Promise.all([
+  const [{ default: config }, { RUNNABLE_JOBS, runJobNow, runnableJobSchema }] = await Promise.all([
     import('../src/payload.config'),
     import('../src/lib/jobs/run-now'),
   ])
-  const job = process.argv[2] ?? 'sync-declarations'
-  if (!(RUNNABLE_JOBS as readonly string[]).includes(job)) {
-    throw new Error(`Unknown job "${job}"; expected one of ${RUNNABLE_JOBS.join(', ')}`)
+  const job = runnableJobSchema.safeParse(process.argv[2])
+  if (!job.success) {
+    throw new Error(`Unknown job "${process.argv[2]}"; expected one of ${RUNNABLE_JOBS.join(', ')}`)
   }
   const payload = await getPayload({ config })
-  const summary = await runJobNow(payload, job as (typeof RUNNABLE_JOBS)[number])
+  const summary = await runJobNow(payload, job.data)
   console.log(JSON.stringify(summary, null, 2))
-  process.exit(summary.status === 'error' ? 1 : 0)
+  process.exit(summary.ok ? 0 : 1)
 }
 
 main().catch((err) => {

@@ -3,13 +3,16 @@ import { HttpResponse, http } from 'msw'
 import type { Payload } from 'payload'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { createJobContext } from '@/lib/jobs/context'
+import { withJobRun } from '@/lib/jobs/job-runs'
 import { env } from '@/lib/env'
-import type { User } from '@/payload-types'
+import type { User, WatchArea } from '@/payload-types'
 import { insertDeclarationRaw } from '../helpers/declarations'
 import { server } from '../helpers/msw'
 import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payload'
 import { loadWfsFixture, wfsResponseForBbox } from '../helpers/wfs-fixture'
 
+const WFS_URL = 'http://wfs.test/rajapinnat/v1/ows/'
 const DAY_MS = 24 * 60 * 60 * 1000
 const daysAgo = (days: number) => new Date(Date.now() - days * DAY_MS).toISOString()
 
@@ -52,9 +55,7 @@ describe('jobs infrastructure (MV-070)', () => {
   beforeAll(async () => {
     server.listen({ onUnhandledRequest: 'bypass' })
     server.use(
-      http.get('http://wfs.test/rajapinnat/v1/ows/', () =>
-        HttpResponse.json(wfsResponseForBbox(loadWfsFixture(), null)),
-      ),
+      http.get(WFS_URL, () => HttpResponse.json(wfsResponseForBbox(loadWfsFixture(), null))),
     )
     payload = await getTestPayload()
     await resetDatabase(payload)
@@ -122,6 +123,62 @@ describe('jobs infrastructure (MV-070)', () => {
       expect(res.status).toBe(200)
       expect(((await res.json()) as RunResponse).ok).toBe(true)
     })
+
+    // Leaves the failed job queued for Payload's retry; the cleanup block resets the database.
+    it('answers ok: false and records the failed step when a step throws', async () => {
+      // A 4xx is not retried by the WFS client, so the step fails at once.
+      server.use(http.get(WFS_URL, () => new HttpResponse('bad request', { status: 400 })))
+
+      const res = await post('', cron)
+      expect(res.status).toBe(200)
+      const body = (await res.json()) as RunResponse
+      // The workflow has no retries of its own, so Payload reports `error-reached-max-retries`.
+      expect(body).toMatchObject({ ok: false, status: expect.stringMatching(/^error/) })
+
+      const { docs } = await payload.find({
+        collection: 'job-runs',
+        where: { runId: { equals: body.runId } },
+        overrideAccess: true,
+      })
+      // The row is written outside the task's transaction, so the failed attempt stays.
+      expect(docs).toHaveLength(1)
+      expect(docs[0]).toMatchObject({ task: 'fetch-declarations', status: 'failed' })
+      expect(docs[0]!.error).toMatch(/400/)
+      expect(docs[0]!.finishedAt).toBeTruthy()
+    })
+  })
+
+  describe('withJobRun', () => {
+    const ctx = () => createJobContext(payload, 'with-job-run-test')
+
+    it('records a thrown error as failed with its message and rethrows it', async () => {
+      await expect(
+        withJobRun(ctx(), 'cleanup', () => Promise.reject(new Error('disk full'))),
+      ).rejects.toThrow('disk full')
+
+      const { docs } = await payload.find({
+        collection: 'job-runs',
+        where: { runId: { equals: 'with-job-run-test' } },
+        overrideAccess: true,
+      })
+      expect(docs).toHaveLength(1)
+      expect(docs[0]).toMatchObject({ task: 'cleanup', status: 'failed', error: 'disk full' })
+      expect(docs[0]!.finishedAt).toBeTruthy()
+      expect(docs[0]!.stats ?? null).toBeNull()
+    })
+
+    it('returns the result of a succeeding step and stores it as stats', async () => {
+      const ctx2 = createJobContext(payload, 'with-job-run-ok')
+      await expect(withJobRun(ctx2, 'cleanup', async () => ({ removed: 3 }))).resolves.toEqual({
+        removed: 3,
+      })
+      const { docs } = await payload.find({
+        collection: 'job-runs',
+        where: { runId: { equals: 'with-job-run-ok' } },
+        overrideAccess: true,
+      })
+      expect(docs[0]).toMatchObject({ status: 'succeeded', stats: { removed: 3 } })
+    })
   })
 
   describe('cleanup task', () => {
@@ -131,13 +188,15 @@ describe('jobs infrastructure (MV-070)', () => {
     let expiringSoon: number
     let current: number
 
+    let owner: User
+    let area: WatchArea
+
     async function alertOn(declarationId: number, createdAt: string) {
-      const area = await payload.find({ collection: 'watch-areas', limit: 1, overrideAccess: true })
       const alert = await payload.create({
         collection: 'alerts',
         data: {
-          user: member.id,
-          watchArea: area.docs[0]!.id,
+          user: owner.id,
+          watchArea: area.id,
           declaration: declarationId,
           changeType: 'new',
           snapshot: { cuttingTypeLabel: 'Avohakkuu', areaHa: 1, distanceM: 100, receivedAt: null },
@@ -183,7 +242,16 @@ describe('jobs infrastructure (MV-070)', () => {
     let staleExport: number
     let liveExport: number
 
+    // A database of its own, so the counts below do not depend on the WFS fixture's dates.
     beforeAll(async () => {
+      await resetDatabase(payload)
+      owner = await createTestUser(payload, { role: 'user' })
+      area = await payload.create({
+        collection: 'watch-areas',
+        data: { name: 'Mökki', center: [25.75, 62.24], radiusM: 800, owner: owner.id },
+        overrideAccess: true,
+      })
+
       const declaration = (sourceId: string, validUntilDaysAgo: number) =>
         insertDeclarationRaw(payload, {
           sourceId,
@@ -216,7 +284,7 @@ describe('jobs infrastructure (MV-070)', () => {
         (
           await payload.create({
             collection: 'data-export-requests',
-            data: { user: member.id, status: 'ready', expiresAt },
+            data: { user: owner.id, status: 'ready', expiresAt },
             overrideAccess: true,
           })
         ).id

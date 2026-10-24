@@ -1,16 +1,12 @@
 import { getPayload } from 'payload'
-import { z } from 'zod'
-
 import config from '@payload-config'
-import { RUNNABLE_JOBS, runJobNow } from '@/lib/jobs/run-now'
+import { runJobNow, runnableJobSchema } from '@/lib/jobs/run-now'
 import { logger } from '@/lib/logger'
 import { isAdminUser } from '@/payload/access'
 import { hasValidCronSecret } from '@/payload/jobs/access'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
-
-const querySchema = z.object({ task: z.enum(RUNNABLE_JOBS).default('sync-declarations') })
 
 /**
  * Job entrypoint (`01 §4`, MV-070). Cron sends `Authorization: Bearer $CRON_SECRET`; the admin
@@ -26,12 +22,12 @@ export async function POST(request: Request) {
     if (!isAdminUser(user)) return Response.json({ ok: false, error: 'forbidden' }, { status: 403 })
   }
 
-  const query = querySchema.safeParse({
-    task: new URL(request.url).searchParams.get('task') ?? undefined,
-  })
-  if (!query.success) return Response.json({ ok: false, error: 'invalid_task' }, { status: 400 })
+  const task = runnableJobSchema.safeParse(
+    new URL(request.url).searchParams.get('task') ?? undefined,
+  )
+  if (!task.success) return Response.json({ ok: false, error: 'invalid_task' }, { status: 400 })
 
-  const summary = await runJobNow(payload, query.data.task)
+  const summary = await runJobNow(payload, task.data)
   logger.info(summary, 'jobs run via /api/jobs/run')
-  return Response.json({ ok: summary.status !== 'error', ...summary })
+  return Response.json(summary)
 }

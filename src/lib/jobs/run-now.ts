@@ -1,14 +1,20 @@
 import type { Payload } from 'payload'
+import { z } from 'zod'
 
 /** What `POST /api/jobs/run?task=` and `pnpm jobs:run [task]` can start (00-deviations D8). */
 export const RUNNABLE_JOBS = ['sync-declarations', 'cleanup'] as const
 export type RunnableJob = (typeof RUNNABLE_JOBS)[number]
 
+/** The `task` query parameter / CLI argument: missing → the sync workflow, unknown → an error. */
+export const runnableJobSchema = z.enum(RUNNABLE_JOBS).default('sync-declarations')
+
 export type JobRunSummary = {
+  /** `true` only when Payload reports the job as `success`. */
+  ok: boolean
   /** The queued job's id; the `job_runs` rows of this run carry it as `runId`. */
   runId: string
   job: RunnableJob
-  /** Payload's result for the job (`success`, `error`, …) or `unknown` if it did not run. */
+  /** Payload's result for the job (`success`, `error`, `error-reached-max-retries`) or `unknown` if it did not run. */
   status: string
   durationMs: number
   remainingJobs: number
@@ -26,10 +32,12 @@ export async function runJobNow(payload: Payload, job: RunnableJob): Promise<Job
       : await payload.jobs.queue({ workflow: 'sync-declarations', input: {} })
   const started = Date.now()
   const result = await payload.jobs.run({ allQueues: true })
+  const status = result.jobStatus?.[String(queued.id)]?.status ?? 'unknown'
   return {
+    ok: status === 'success',
     runId: String(queued.id),
     job,
-    status: result.jobStatus?.[String(queued.id)]?.status ?? 'unknown',
+    status,
     durationMs: Date.now() - started,
     remainingJobs: result.remainingJobsFromQueried,
   }
