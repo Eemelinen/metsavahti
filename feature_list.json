@@ -1149,8 +1149,8 @@
         "2026-10-24 pnpm check → pass (working tree on 6e42dea)",
         "2026-10-24 pnpm test:integration tests/integration/preview-endpoint.int.test.ts → pass (working tree on 6e42dea, Docker available)"
       ],
-      "attempts": 0,
-      "notes": "Tests (ticket): integration: cold bbox triggers exactly one mocked WFS call; warm bbox none."
+      "attempts": 1,
+      "notes": "Tests (ticket): integration: cold bbox triggers exactly one mocked WFS call; warm bbox none. Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-064",
