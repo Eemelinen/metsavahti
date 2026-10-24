@@ -116,6 +116,12 @@ Any coding agent can use it; nothing updates it automatically.
 
 ## Session Log
 
+### Session 065 — 2026-10-24 (interactive: F-066 PR after the loop gave up on it)
+
+- Goal: get F-066's PR (#43) green; it conflicted with F-063 (merged meanwhile), so CI never ran and the driver gave up after 20 min.
+- Completed: merged `main` (both sides kept; F-066's ledger row is R39, its sessions 063–064). CI's full e2e run then failed the `@smoke` card test: `api.spec.ts` runs the pipeline for the shared e2e user's seeded area first, so it shows "Uusia: 3", not 1. The test now reads the area's unread alerts through the REST API and expects that count, as `app-layout-sidebar-bottom-tabs.spec.ts` does for the nav badge.
+- Verification: `pnpm check` (431 tests), `pnpm test:integration` (32 files, 215 tests) and `pnpm test:e2e tests/e2e/dashboard-vahtialueet.spec.ts` on the merge pass; `pnpm test:e2e tests/e2e/api.spec.ts tests/e2e/dashboard-vahtialueet.spec.ts` failed before the test change (3, one per browser) and passes after it (20).
+
 ### Session 064 — 2026-10-24 (driver-run: F-066 attempt 2, evaluator revisions)
 
 - Goal: address the attempt-1 review (Revise: correctness 1, reliability 1).

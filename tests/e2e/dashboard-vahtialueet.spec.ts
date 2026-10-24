@@ -37,8 +37,25 @@ async function createArea(page: Page, token: string, name: string, lastCheckedAt
 }
 
 /**
- * MV-066: `/vahtialueet`, the app home. The shared e2e user sees its seeded area with the
- * seeded unread alert (`@smoke`); an account of the test's own walks the empty state, the plan
+ * The watch area's alerts with `readAt` unset, read through the REST API as the admin: the one
+ * db.setup.ts seeds plus any the pipeline spec (`api.spec.ts`) creates for it in the same run.
+ */
+async function unreadAlertsOfArea(areaId: string): Promise<number> {
+  const { api } = await adminApi()
+  try {
+    const res = await api.get(
+      `/api/alerts?where[watchArea][equals]=${areaId}&where[readAt][exists]=false&limit=1`,
+    )
+    expect(res.ok(), await res.text()).toBeTruthy()
+    return ((await res.json()) as { totalDocs: number }).totalDocs
+  } finally {
+    await api.dispose()
+  }
+}
+
+/**
+ * MV-066: `/vahtialueet`, the app home. The shared e2e user sees its seeded area with its
+ * unread alerts (`@smoke`); an account of the test's own walks the empty state, the plan
  * limit, the e-mail switch and deletion through the kebab.
  */
 test.describe('/vahtialueet (anonymous)', () => {
@@ -62,13 +79,17 @@ test.describe('/vahtialueet (shared e2e user)', () => {
       /^(Tiedot päivitetty viimeksi .+ \(Metsäkeskus\)|Metsäkeskuksen tietoja ei ole vielä haettu\.)$/,
     )
     const card = page.getByTestId('watch-area-card').filter({ hasText: E2E_WATCH_AREA.name })
-    await expect(card.getByRole('link', { name: E2E_WATCH_AREA.name })).toHaveAttribute(
-      'href',
-      /^\/vahtialueet\/\d+$/,
-    )
+    const link = card.getByRole('link', { name: E2E_WATCH_AREA.name })
+    await expect(link).toHaveAttribute('href', /^\/vahtialueet\/\d+$/)
+    const areaId = (await link.getAttribute('href'))!.split('/').pop()!
     await expect(card).toContainText('Säde 800 m')
     await expect(card).toContainText(/\d+ voimassa/)
-    await expect(card).toContainText('Uusia: 1')
+    await expect(async () => {
+      const unread = await unreadAlertsOfArea(areaId)
+      expect(unread).toBeGreaterThan(0)
+      await page.reload()
+      await expect(card).toContainText(`Uusia: ${unread}`, { timeout: 2_000 })
+    }).toPass()
     // No pipeline step writes `lastCheckedAt` yet (MV-072), so the seeded area is unchecked.
     await expect(card).toContainText('Ei vielä tarkistettu')
     await expect(
