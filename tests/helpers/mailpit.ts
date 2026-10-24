@@ -11,6 +11,7 @@ export type MailpitMessageSummary = {
 export type MailpitMessage = MailpitMessageSummary & {
   Text: string
   HTML: string
+  ReplyTo: Array<{ Name: string; Address: string }>
 }
 
 export function createMailpitClient(apiUrl: string) {

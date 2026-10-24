@@ -1616,7 +1616,7 @@
       "area": "gdpr",
       "title": "Public data-request and contact forms /tietopyynto, /yhteystiedot",
       "user_visible_behavior": "`/tietopyynto`: form (email, type, message, consent), rate-limited, emails `DPO_EMAIL` (`DataRequestReceived`) and confirmation to requester. `/yhteystiedot`: as spec; honeypot + rate limit; `ContactReceived` email.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-040", "F-048"],
       "ticket": "MV-095",
       "epic": "E08",

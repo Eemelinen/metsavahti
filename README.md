@@ -77,6 +77,11 @@ pnpm dev                        # http://localhost:3000
   emails "Tilisi on poistettu" and deletes the account and everything it owns before the browser
   lands on `/tili-poistettu`; only the consent events stay, without the user and with the
   address as a SHA-256 hash.
+- `/yhteystiedot` — the contact form (name, email, message, consent) mails `ContactReceived` to
+  `CONTACT_EMAIL`; `/tietopyynto` — a data subject request without an account (email, Tarkastus /
+  Poisto / Muu, message, consent) mails `DataRequestReceived` to `DPO_EMAIL` and a receipt with the
+  same `TP-…` reference to the requester. Both have a honeypot and a 5/h per-IP limit; locally all
+  three emails land in Mailpit.
 - Run the pipeline by hand: `pnpm jobs:run` (`pnpm jobs:run cleanup` for the weekly cleanup), the
   "Aja haku nyt" button above Admin → Tehtäväajot, or
   `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`. Every step
