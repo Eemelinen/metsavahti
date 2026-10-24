@@ -109,6 +109,10 @@ database or points at port 5432.
   per change, dedupes and batches above 500; three consecutive misses in a box remove a declaration,
   overlapping boxes of one run count once, a sighting resets and restores; the map GeoJSON in WGS 84;
   `previewCount()` equals what a saved area matches),
+  the preview endpoint (`preview-endpoint.int.test.ts`: a cold box triggers exactly one mocked WFS call
+  for the grid-snapped box and records it, a warm box (same circle, smaller radius, nudged pin, or covered
+  by two earlier boxes) none; the sixth live fetch in a minute is 429 without a WFS call; a failed fetch
+  records nothing; the route answers `{ count, geojson }`, 401 to a guest, 400 to a bad query),
   the `notification-log` + `consent-events` + `data-export-requests` + `job-runs` + `exports`
   collections (`01 §3.6–3.9` columns and indexes, consent events rejecting update/delete through
   access control and through the hooks even with `overrideAccess`, IP stored as a /24 prefix, owner-only

@@ -15,6 +15,7 @@ import * as migration_20261024_033242_data_export_task from './20261024_033242_d
 import * as migration_20261024_040826_account_deletion from './20261024_040826_account_deletion';
 import * as migration_20261024_053058_admin_gdpr_audit from './20261024_053058_admin_gdpr_audit';
 import * as migration_20261024_134227_declarations_missing_runs from './20261024_134227_declarations_missing_runs';
+import * as migration_20261024_160502_wfs_bbox_fetches from './20261024_160502_wfs_bbox_fetches';
 
 export const migrations = [
   {
@@ -100,6 +101,11 @@ export const migrations = [
   {
     up: migration_20261024_134227_declarations_missing_runs.up,
     down: migration_20261024_134227_declarations_missing_runs.down,
-    name: '20261024_134227_declarations_missing_runs'
+    name: '20261024_134227_declarations_missing_runs',
+  },
+  {
+    up: migration_20261024_160502_wfs_bbox_fetches.up,
+    down: migration_20261024_160502_wfs_bbox_fetches.down,
+    name: '20261024_160502_wfs_bbox_fetches'
   },
 ];

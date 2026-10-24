@@ -36,6 +36,13 @@ export const wfs = {
    * `src/lib/geo/spatial-queries.ts`).
    */
   missingRunsBeforeRemoval: 3,
+  /**
+   * Grid (metres, EPSG:3067) the preview endpoint snaps its live-fetch box out to (MV-063):
+   * a cold preview fetches whole cells, so moving the pin a little or changing the radius
+   * stays inside boxes already fetched. A 5 000 m radius box (11 km padded) spans at most
+   * 3 × 3 cells.
+   */
+  previewFetchCellM: 5_000,
   /** Rows per `upsertDeclarations()` statement (`01 §4.1` step 4: transactions of 500). */
   upsertBatchSize: 500,
 } as const

@@ -1135,8 +1135,8 @@
       "priority": 63,
       "area": "watch-areas",
       "title": "Preview endpoint",
-      "user_visible_behavior": "`GET /api/watch-areas/preview?lng&lat&radius` → `{ count, geojson }` from local `declarations` via `previewCount`; if the bbox has never been fetched (tracked in `wfs_bbox_fetches` table, migration `0005`), perform one live bbox fetch through `WfsClient` (rate limit 5/min/user) then answer.",
-      "status": "not_started",
+      "user_visible_behavior": "`GET /api/watch-areas/preview?lng&lat&radius` → `{ count, geojson }` from local `declarations` via `previewCount`; if the bbox has never been fetched (tracked in the `wfs_bbox_fetches` table, migration `20261024_160502_wfs_bbox_fetches`; ledger R38), perform one live bbox fetch through `WfsClient` (rate limit 5/min/user) then answer.",
+      "status": "passing",
       "depends_on": ["F-023", "F-037", "F-048"],
       "ticket": "MV-063",
       "epic": "E05",
@@ -1145,9 +1145,14 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/preview-endpoint.int.test.ts (integration: cold bbox triggers exactly one mocked WFS call; warm bbox none.)"
       ],
-      "evidence": [],
-      "attempts": 0,
-      "notes": "Tests (ticket): integration: cold bbox triggers exactly one mocked WFS call; warm bbox none."
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 6e42dea)",
+        "2026-10-24 pnpm test:integration tests/integration/preview-endpoint.int.test.ts → pass (working tree on 6e42dea, Docker available)",
+        "2026-10-24 pnpm check → pass (working tree on 49cf2a1)",
+        "2026-10-24 pnpm test:integration tests/integration/preview-endpoint.int.test.ts → pass (working tree on 49cf2a1, Docker available)"
+      ],
+      "attempts": 1,
+      "notes": "Tests (ticket): integration: cold bbox triggers exactly one mocked WFS call; warm bbox none. Attempt 1 failed 2026-10-24: evaluator: Revise Blocked 2026-10-24: The generated down() of src/payload/migrations/20261024_160502_wfs_bbox_fetches.ts drops wfs_bbox_fetches CASCADE before dropping payload_locked_documents_rels_wfs_bbox_fetches_fk by name, so migrate:down fails. The guard refuses migration edits in driver-run sessions (attempt 2 tried). A human must reorder it like 20261023_121838_rate_limit_buckets (DROP CONSTRAINT IF EXISTS, index, column, then table), run pnpm test:integration, unblock and re-run pnpm harness:verify F-063. Unblocked 2026-10-24."
     },
     {
       "id": "F-064",

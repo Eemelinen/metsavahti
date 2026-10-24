@@ -25,6 +25,7 @@ import {
   UserSessions,
   WatchAreaDeclarations,
   WatchAreas,
+  WfsBboxFetches,
 } from '@/payload/collections'
 import { canRunJobs } from '@/payload/jobs/access'
 import { tasks } from '@/payload/jobs/tasks'
@@ -105,6 +106,7 @@ export default buildConfig({
     LegalDocuments,
     RateLimitBuckets,
     UserSessions,
+    WfsBboxFetches,
   ],
   // One editor for every richText field (legal_documents.body); admin UI + JSON storage.
   editor: lexicalEditor(),

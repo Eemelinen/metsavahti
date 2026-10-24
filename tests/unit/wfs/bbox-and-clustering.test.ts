@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { wfs } from '@/config/wfs'
-import { bboxContains, bboxForWatchArea, clusterBboxes } from '@/lib/geo/bbox'
+import { bboxContains, bboxForWatchArea, clusterBboxes, snapBboxToGrid } from '@/lib/geo/bbox'
 import type { Bbox } from '@/lib/geo/buffer'
 import { FINLAND_BOUNDS_3067, type LonLat, to3067, toWgs84 } from '@/lib/geo/crs'
 
@@ -160,4 +160,29 @@ describe('clusterBboxes', () => {
       }
     },
   )
+})
+
+describe('snapBboxToGrid', () => {
+  it('grows a box outwards to whole grid cells', () => {
+    expect(snapBboxToGrid([386_200, 6_671_900, 397_400, 6_683_100], 5_000)).toEqual([
+      385_000, 6_670_000, 400_000, 6_685_000,
+    ])
+  })
+
+  it('keeps a box already on the grid and contains every box it snaps', () => {
+    const onGrid: Bbox = [385_000, 6_670_000, 400_000, 6_685_000]
+    expect(snapBboxToGrid(onGrid, 5_000)).toEqual(onGrid)
+    const area = bboxForWatchArea(helsinki, 5_000)
+    expect(bboxContains(snapBboxToGrid(area, wfs.previewFetchCellM), area)).toBe(true)
+  })
+
+  it('maps nearby boxes to the same cells', () => {
+    const [e, n] = to3067(helsinki)
+    const snapped = (de: number) => snapBboxToGrid(square(e + de, n, 1_000), 5_000)
+    expect(snapped(0)).toEqual(snapped(50))
+  })
+
+  it('rejects a cell size that is not positive', () => {
+    expect(() => snapBboxToGrid([0, 0, 1, 1], 0)).toThrow(RangeError)
+  })
 })
