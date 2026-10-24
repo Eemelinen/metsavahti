@@ -276,6 +276,10 @@ export interface Declaration {
   firstSeenAt: string;
   lastSeenAt: string;
   /**
+   * Ajot peräkkäin, joilla kohde puuttui oman hakualueensa tuloksista.
+   */
+  missingRuns?: number | null;
+  /**
    * Asetetaan, kun kohde puuttuu tuloksista kolmella peräkkäisellä ajolla.
    */
   removedAt?: string | null;
@@ -834,6 +838,7 @@ export interface DeclarationsSelect<T extends boolean = true> {
   attrHash?: T;
   firstSeenAt?: T;
   lastSeenAt?: T;
+  missingRuns?: T;
   removedAt?: T;
   updatedAt?: T;
   createdAt?: T;

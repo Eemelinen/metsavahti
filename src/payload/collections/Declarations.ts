@@ -108,6 +108,18 @@ export const Declarations: CollectionConfig = {
       admin: { readOnly: true, position: 'sidebar' },
     },
     {
+      name: 'missingRuns',
+      type: 'number',
+      defaultValue: 0,
+      min: 0,
+      label: 'Peräkkäiset puuttumiset',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description: 'Ajot peräkkäin, joilla kohde puuttui oman hakualueensa tuloksista.',
+      },
+    },
+    {
       name: 'removedAt',
       type: 'date',
       index: true,

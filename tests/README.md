@@ -77,6 +77,12 @@ database or points at port 5432.
 - Each file calls `resetDatabase()` (TRUNCATE … CASCADE) in `beforeAll`.
 - The WFS is stubbed with `msw` (`helpers/wfs-fixture.ts` answers bbox queries
   like the real service).
+- Factories live in `tests/factories/` (MV-037): `fixtureDeclarations(set)` normalises a named
+  fixture set (`inside`, `borderline`, `outside`, `changed-*`) exactly as the pipeline does,
+  `buildDeclaration(sourceId, center3067, overrides)` makes a `NormalisedDeclaration` for a
+  hand-made polygon (`squareMultiPolygon()`), and `createWatchArea(payload, ownerId)` creates
+  `SAMPLE_WATCH_AREA` (or an override) through the Local API. Write declarations with
+  `upsertDeclarations()` and pass an explicit `now` so validity and missing runs are deterministic.
 - Covers: PostGIS enabled (`PostGIS_Version()`, adapter `extensions`), applied migrations equal `index.ts`,
   migrations applied (generated `geom_3067`, GIST indexes), access
   control, the `users` collection (self-only read/update, admin-only `role`/`plan`/`deletedAt`,
@@ -91,6 +97,13 @@ database or points at port 5432.
   (watch_area, declaration), cascading FKs, `(user, created_at DESC)` / `(user, notified_at)` indexes,
   admin read-only join rows, owner-only alert read, `readAt`-only owner update, no owner create/delete,
   and a `down` → `up` round-trip of the MV-034 migration converting pre-MV-034 alerts),
+  the spatial query module (`spatial-query-module.int.test.ts`: inside / borderline fixtures match and
+  outside ones do not, a re-run inserts and returns nothing, distance 0 for a polygon covering the centre
+  and the true distance for one crossing the edge, a changed declaration returned once with its stored
+  hashes, removed / expired declarations skipped; upsert inserts, bumps `lastSeenAt`, writes one revision
+  per change, dedupes and batches above 500; three consecutive misses in a box remove a declaration,
+  overlapping boxes of one run count once, a sighting resets and restores; the map GeoJSON in WGS 84;
+  `previewCount()` equals what a saved area matches),
   the `notification-log` + `consent-events` + `data-export-requests` + `job-runs` + `exports`
   collections (`01 §3.6–3.9` columns and indexes, consent events rejecting update/delete through
   access control and through the hooks even with `overrideAccess`, IP stored as a /24 prefix, owner-only
