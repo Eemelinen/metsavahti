@@ -40,7 +40,15 @@ export const fetchDeclarationsTask: TaskConfig<'fetch-declarations'> = {
 export const matchWatchAreasTask: TaskConfig<'match-watch-areas'> = {
   slug: 'match-watch-areas',
   retries: 1,
-  outputSchema: [count('matched'), count('alertsCreated')],
+  outputSchema: [
+    count('watchAreas'),
+    count('matched'),
+    count('alertsCreated'),
+    count('new'),
+    count('geometryChanged'),
+    count('attributesChanged'),
+    count('removed'),
+  ],
   handler: async ({ job, req }) => {
     const ctx = createJobContext(req.payload, job.id)
     const output = await withJobRun(ctx, 'match-watch-areas', () => matchWatchAreas(ctx))

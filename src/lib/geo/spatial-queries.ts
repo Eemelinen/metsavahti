@@ -3,7 +3,7 @@
  * geometry columns, so we talk to Drizzle directly via the Postgres adapter.
  */
 import { type PostgresAdapter, sql } from '@payloadcms/db-postgres'
-import type { Payload } from 'payload'
+import type { Payload, PayloadRequest } from 'payload'
 
 import type { Feature, FeatureCollection, MultiPolygon } from 'geojson'
 
@@ -15,6 +15,17 @@ import type { DeclarationGeometry } from '@/lib/wfs/schemas'
 
 function drizzle(payload: Payload) {
   return (payload.db as unknown as PostgresAdapter).drizzle
+}
+
+/**
+ * The Drizzle instance of `req`'s open transaction (`initTransaction(req)`), or the plain one
+ * when `req` has none: what Payload's own `getTransaction()` does, so a statement here and a
+ * Local API call with the same `req` commit or roll back together.
+ */
+async function drizzleFor(payload: Payload, req?: Partial<PayloadRequest>) {
+  const adapter = payload.db as unknown as PostgresAdapter
+  const id = req?.transactionID === undefined ? undefined : await req.transactionID
+  return (id !== undefined && adapter.sessions[id]?.db) || adapter.drizzle
 }
 
 /** Drizzle wraps driver errors; surface the Postgres message so failures are debuggable. */
@@ -196,88 +207,6 @@ export async function markMissing(
   return { missed: Number(rows[0]?.missed ?? 0), removed: Number(rows[0]?.removed ?? 0) }
 }
 
-export type WatchAreaMatch = {
-  watchAreaId: number
-  ownerId: number
-  declarationId: number
-  /** `watch_area_declarations.id` when the pair has been matched before, else null. */
-  watchAreaDeclarationId: number | null
-  geomHash: string
-  attrHash: string
-  lastSeenGeomHash: string | null
-  lastSeenAttrHash: string | null
-  distanceM: number
-  cuttingTypeLabel: string | null
-  areaHa: number | null
-  receivedAt: string | null
-}
-
-/**
- * Intersecting (watch area, declaration) pairs whose `watch_area_declarations` row is
- * missing or stores hashes that differ from the declaration's current ones (`01 §3.4`).
- * Pairs that are already recorded with the current hashes are not returned, which is what
- * makes a re-run with identical data a no-op. `distanceM` is centre → polygon (0 inside).
- */
-export async function findUnrecordedMatches(payload: Payload): Promise<WatchAreaMatch[]> {
-  const { rows } = await run('findUnrecordedMatches', () =>
-    drizzle(payload).execute<{
-      watch_area_id: number
-      owner_id: number
-      declaration_id: number
-      watch_area_declaration_id: number | null
-      geom_hash: string
-      attr_hash: string
-      last_seen_geom_hash: string | null
-      last_seen_attr_hash: string | null
-      distance_m: string | number
-      cutting_type_label: string | null
-      area_ha: string | number | null
-      received_at: string | Date | null
-    }>(sql`
-    SELECT
-      wa.id                                             AS watch_area_id,
-      wa.owner_id                                       AS owner_id,
-      d.id                                              AS declaration_id,
-      wad.id                                            AS watch_area_declaration_id,
-      d.geom_hash                                       AS geom_hash,
-      d.attr_hash                                       AS attr_hash,
-      wad.last_seen_geom_hash                           AS last_seen_geom_hash,
-      wad.last_seen_attr_hash                           AS last_seen_attr_hash,
-      ST_Distance(ST_Transform(ST_SetSRID(wa.center, 4326), 3067), d.geom) AS distance_m,
-      d.cutting_type_label                              AS cutting_type_label,
-      d.area_ha                                         AS area_ha,
-      d.received_at                                     AS received_at
-    FROM watch_areas wa
-    JOIN declarations d ON ST_Intersects(d.geom, wa.geom_3067)
-    LEFT JOIN watch_area_declarations wad
-      ON wad.watch_area_id = wa.id AND wad.declaration_id = d.id
-    WHERE d.geom IS NOT NULL
-      AND (
-        wad.id IS NULL
-        OR wad.last_seen_geom_hash <> d.geom_hash
-        OR wad.last_seen_attr_hash <> d.attr_hash
-      )
-    ORDER BY wa.id, d.id
-  `),
-  )
-
-  return rows.map((r) => ({
-    watchAreaId: Number(r.watch_area_id),
-    ownerId: Number(r.owner_id),
-    declarationId: Number(r.declaration_id),
-    watchAreaDeclarationId:
-      r.watch_area_declaration_id == null ? null : Number(r.watch_area_declaration_id),
-    geomHash: r.geom_hash,
-    attrHash: r.attr_hash,
-    lastSeenGeomHash: r.last_seen_geom_hash,
-    lastSeenAttrHash: r.last_seen_attr_hash,
-    distanceM: Number(r.distance_m),
-    cuttingTypeLabel: r.cutting_type_label,
-    areaHa: r.area_ha == null ? null : Number(r.area_ha),
-    receivedAt: r.received_at == null ? null : new Date(r.received_at).toISOString(),
-  }))
-}
-
 export type MatchedDeclaration = {
   watchAreaDeclarationId: number
   watchAreaId: number
@@ -301,19 +230,23 @@ export type MatchedDeclaration = {
  * The matching statement of `01 §4.2`: records every intersecting (watch area, declaration)
  * pair in `watch_area_declarations` and returns the rows that need an alert, i.e. pairs
  * inserted now and pairs whose stored hashes differ from the declaration's current ones.
- * Only declarations that are not removed and still valid at `now` match. An existing pair
- * gets `lastMatchedAt = now` and a fresh `distanceM` (the centre or the polygon may have
- * moved) but keeps its stored hashes: the caller creates the alerts, then stores the new
- * hashes. Re-running with unchanged data inserts nothing and returns nothing.
+ * Only declarations that are not removed and still valid at `now` match, and only watch
+ * areas whose owner is not being deleted (`deletedAt`, as in `fetch-declarations`). An
+ * existing pair gets `lastMatchedAt = now` and a fresh `distanceM` (the centre or the
+ * polygon may have moved) but keeps its stored hashes: the caller creates the alerts, then
+ * stores the new hashes (`storeSeenHashes()`), in one transaction (`req`). Re-running with
+ * unchanged data inserts nothing and returns nothing.
  * `distanceM` is centre → polygon in metres, 0 when the polygon covers the centre.
  */
 export async function matchWatchAreas(
   payload: Payload,
   now: Date = new Date(),
+  req?: Partial<PayloadRequest>,
 ): Promise<MatchedDeclaration[]> {
   const at = now.toISOString()
+  const db = await drizzleFor(payload, req)
   const { rows } = await run('matchWatchAreas', () =>
-    drizzle(payload).execute<{
+    db.execute<{
       watch_area_declaration_id: number
       watch_area_id: number
       owner_id: number
@@ -336,6 +269,7 @@ export async function matchWatchAreas(
         d.attr_hash,
         ST_Distance(ST_Transform(ST_SetSRID(wa.center, 4326), 3067), d.geom) AS distance_m
       FROM watch_areas wa
+      JOIN users u ON u.id = wa.owner_id AND u.deleted_at IS NULL
       JOIN declarations d ON ST_Intersects(wa.geom_3067, d.geom)
       WHERE d.removed_at IS NULL AND d.valid_until > ${at}::timestamptz
     ),
@@ -395,6 +329,148 @@ export async function matchWatchAreas(
     areaHa: r.area_ha == null ? null : Number(r.area_ha),
     receivedAt: r.received_at == null ? null : new Date(r.received_at).toISOString(),
   }))
+}
+
+/**
+ * After the alerts of a `matchWatchAreas()` run exist: store each pair's current hashes on
+ * its `watch_area_declarations` row, so the next run sees the pair as unchanged (`01 §4.2`).
+ */
+export async function storeSeenHashes(
+  payload: Payload,
+  pairs: readonly Pick<MatchedDeclaration, 'watchAreaDeclarationId' | 'geomHash' | 'attrHash'>[],
+  req?: Partial<PayloadRequest>,
+): Promise<void> {
+  if (pairs.length === 0) return
+  const rows = pairs.map((p) => ({
+    id: p.watchAreaDeclarationId,
+    geom_hash: p.geomHash,
+    attr_hash: p.attrHash,
+  }))
+  const db = await drizzleFor(payload, req)
+  await run('storeSeenHashes', () =>
+    db.execute(sql`
+    UPDATE watch_area_declarations wad
+    SET last_seen_geom_hash = i.geom_hash,
+        last_seen_attr_hash = i.attr_hash
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb) AS i(id int, geom_hash text, attr_hash text)
+    WHERE wad.id = i.id
+  `),
+  )
+}
+
+export type RemovedMatch = {
+  watchAreaDeclarationId: number
+  watchAreaId: number
+  ownerId: number
+  declarationId: number
+  /** The distance stored on the join row at the pair's last match. */
+  distanceM: number
+  cuttingTypeLabel: string | null
+  areaHa: number | null
+  receivedAt: string | null
+}
+
+/**
+ * Recorded (watch area, declaration) pairs whose declaration got `removedAt` since the
+ * watch area was last checked (`watch_areas.last_checked_at`, written by
+ * `recordWatchAreaChecks()` at the end of every run), for the optional `removed` alert of
+ * `01 §4.2`. Call it before `recordWatchAreaChecks()` of the same run; a removal is then
+ * returned by exactly one run. Owners being deleted are skipped as in `matchWatchAreas()`.
+ */
+export async function findRemovedMatches(
+  payload: Payload,
+  req?: Partial<PayloadRequest>,
+): Promise<RemovedMatch[]> {
+  const db = await drizzleFor(payload, req)
+  const { rows } = await run('findRemovedMatches', () =>
+    db.execute<{
+      watch_area_declaration_id: number
+      watch_area_id: number
+      owner_id: number
+      declaration_id: number
+      distance_m: string | number
+      cutting_type_label: string | null
+      area_ha: string | number | null
+      received_at: string | Date | null
+    }>(sql`
+    SELECT
+      wad.id               AS watch_area_declaration_id,
+      wa.id                AS watch_area_id,
+      wa.owner_id          AS owner_id,
+      d.id                 AS declaration_id,
+      wad.distance_m       AS distance_m,
+      d.cutting_type_label AS cutting_type_label,
+      d.area_ha            AS area_ha,
+      d.received_at        AS received_at
+    FROM watch_area_declarations wad
+    JOIN watch_areas wa ON wa.id = wad.watch_area_id
+    JOIN users u ON u.id = wa.owner_id AND u.deleted_at IS NULL
+    JOIN declarations d ON d.id = wad.declaration_id
+    WHERE d.removed_at IS NOT NULL
+      AND (wa.last_checked_at IS NULL OR d.removed_at > wa.last_checked_at)
+    ORDER BY wa.id, d.id
+  `),
+  )
+  return rows.map((r) => ({
+    watchAreaDeclarationId: Number(r.watch_area_declaration_id),
+    watchAreaId: Number(r.watch_area_id),
+    ownerId: Number(r.owner_id),
+    declarationId: Number(r.declaration_id),
+    distanceM: Number(r.distance_m),
+    cuttingTypeLabel: r.cutting_type_label,
+    areaHa: r.area_ha == null ? null : Number(r.area_ha),
+    receivedAt: r.received_at == null ? null : new Date(r.received_at).toISOString(),
+  }))
+}
+
+export type WatchAreaChecksResult = {
+  /** Watch areas stamped with `lastCheckedAt = now`. */
+  watchAreas: number
+  /** Sum of their `lastDeclarationCount`s. */
+  declarations: number
+}
+
+/**
+ * The last step of a `match-watch-areas` run (`01 §4.2`): every watch area whose owner is
+ * not being deleted gets `lastCheckedAt = now` and `lastDeclarationCount` = the declarations
+ * it matches now, by the same "intersects `geom_3067`, not removed, valid at `now`" rule as
+ * `matchWatchAreas()` and `activeDeclarationCounts()`. `updatedAt` stays: it is the owner's
+ * last edit.
+ */
+export async function recordWatchAreaChecks(
+  payload: Payload,
+  now: Date = new Date(),
+  req?: Partial<PayloadRequest>,
+): Promise<WatchAreaChecksResult> {
+  const at = now.toISOString()
+  const db = await drizzleFor(payload, req)
+  const { rows } = await run('recordWatchAreaChecks', () =>
+    db.execute<{ watch_areas: string | number; declarations: string | number | null }>(sql`
+    WITH counts AS (
+      SELECT wa.id, count(d.id) AS n
+      FROM watch_areas wa
+      JOIN users u ON u.id = wa.owner_id AND u.deleted_at IS NULL
+      LEFT JOIN declarations d
+        ON ST_Intersects(wa.geom_3067, d.geom)
+       AND d.removed_at IS NULL
+       AND d.valid_until > ${at}::timestamptz
+      GROUP BY wa.id
+    ),
+    updated AS (
+      UPDATE watch_areas wa
+      SET last_checked_at = ${at}::timestamptz,
+          last_declaration_count = c.n
+      FROM counts c
+      WHERE wa.id = c.id
+      RETURNING c.n
+    )
+    SELECT count(*) AS watch_areas, sum(n) AS declarations FROM updated
+  `),
+  )
+  return {
+    watchAreas: Number(rows[0]?.watch_areas ?? 0),
+    declarations: Number(rows[0]?.declarations ?? 0),
+  }
 }
 
 export type DeclarationMapProperties = {

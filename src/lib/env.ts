@@ -49,6 +49,8 @@ export const env = createEnv({
     MAP_TILE_ATTRIBUTION: z.string().min(1).default('© OpenStreetMap contributors'),
     /** `1` serves `GET /api/alerts/[id]/map-image.png` (MV-077); `0` answers 404 there. */
     ENABLE_MAP_IMAGES: z.enum(['0', '1']).default('0'),
+    /** `1` creates `removed` alerts for matched declarations that left the WFS (`01 §4.2`, MV-072). */
+    ALERT_ON_REMOVED: z.enum(['0', '1']).default('0'),
     /** `1` serves `/hinnoittelu` and shows it in the header and sitemap (MV-101); `0` answers 404. */
     SHOW_PRICING: z.enum(['0', '1']).default('0'),
     /** Auth Server Actions (registration) allowed per IP per hour (`01 §8`; ticket MV-042 says 5). */
