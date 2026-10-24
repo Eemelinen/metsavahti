@@ -979,6 +979,7 @@ export const fi = {
       running: 'Haku käynnissä…',
       succeeded: 'Haku valmis.',
       failed: 'Haku epäonnistui. Katso virhe tehtäväajoista.',
+      alreadyRunning: 'Haku on jo käynnissä. Odota, että se valmistuu.',
     },
     gdpr: {
       title: 'Tietosuoja',

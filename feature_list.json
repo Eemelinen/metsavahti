@@ -1399,7 +1399,7 @@
       "area": "pipeline",
       "title": "Pipeline orchestration task and health status",
       "user_visible_behavior": "`pipeline` runs fetch → match → notify sequentially with shared `runId`; skips notify if match failed; overall `job_runs` summary; guard against overlapping runs (advisory lock). Extend `/api/health` with last pipeline run (status, finishedAt, stats), `stale: true` if > 14 h old; `?deep=1` performs WFS GetCapabilities.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-071", "F-072", "F-074"],
       "ticket": "MV-075",
       "epic": "E06",
@@ -1408,7 +1408,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/pipeline.int.test.ts (integration end-to-end with fixtures: area + fake WFS → email in Mailpit; second run → no email; concurrent trigger → second returns 409; h…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 4a2428e)",
+        "2026-10-24 pnpm test:integration tests/integration/pipeline.int.test.ts → pass (working tree on 4a2428e, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration end-to-end with fixtures: area + fake WFS → email in Mailpit; second run → no email; concurrent trigger → second returns 409; health reports the last run and `stale`. Status (ticket): absorbs MV-078 (merged 2026-09-20, ledger P11)."
     },

@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 import { z } from 'zod'
 
+import { withPipelineLock } from '@/lib/jobs/pipeline-lock'
 import { scheduledDigestFor } from '@/lib/notifications/digest-schedule'
 
 /** What `POST /api/jobs/run?task=` and `pnpm jobs:run [task]` can start (00-deviations D8). */
@@ -27,8 +28,16 @@ export type JobRunSummary = {
  * the queue in this process (`01 §4`). The cron endpoint, the admin button and the CLI script
  * all come through here, so they behave the same. The sync run's digest (`01 §4.3`) is read
  * from the Finnish time at queue time: a morning run started by hand sends the digests too.
+ * The sync run holds the pipeline's advisory lock while it is queued and drained, so a
+ * second trigger during a run throws `PipelineAlreadyRunning` and queues nothing (MV-075).
  */
 export async function runJobNow(payload: Payload, job: RunnableJob): Promise<JobRunSummary> {
+  return job === 'cleanup'
+    ? queueAndRun(payload, job)
+    : withPipelineLock(payload, () => queueAndRun(payload, job))
+}
+
+async function queueAndRun(payload: Payload, job: RunnableJob): Promise<JobRunSummary> {
   const queued =
     job === 'cleanup'
       ? await payload.jobs.queue({ task: 'cleanup', input: {} })

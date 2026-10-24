@@ -11,7 +11,8 @@ const t = fi.admin.runPipeline
 /**
  * Admin "Run pipeline now" (MV-070), above the `job-runs` list. Posts to `/api/jobs/run` with
  * the admin's session cookie (the route accepts an admin as well as the cron secret), waits for
- * the run and refreshes the list so the new rows show. Only admins reach the admin panel.
+ * the run and refreshes the list so the new rows show. Only admins reach the admin panel. A 409
+ * means another run holds the pipeline lock (MV-075).
  */
 export function RunPipelineButton() {
   const router = useRouter()
@@ -23,6 +24,7 @@ export function RunPipelineButton() {
       const res = await fetch('/api/jobs/run', { method: 'POST', credentials: 'same-origin' })
       const body = (await res.json().catch(() => null)) as { ok?: boolean } | null
       if (res.ok && body?.ok) toast.success(t.succeeded)
+      else if (res.status === 409) toast.error(t.alreadyRunning)
       else toast.error(t.failed)
     } catch {
       toast.error(t.failed)
