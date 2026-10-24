@@ -7,9 +7,9 @@ import { env } from '@/lib/env'
 /**
  * What a signed link is for (`01 §9`: "short expiry, single purpose claim"). A token signed for
  * one purpose never verifies for another, so a leaked link cannot be replayed elsewhere.
- * The unsubscribe link adds its purpose when its ticket lands.
+ * `unsub` is the per-area opt-out link of the alert emails (MV-073).
  */
-export type TokenPurpose = 'email-change' | 'map-image' | 'data-export'
+export type TokenPurpose = 'email-change' | 'map-image' | 'data-export' | 'unsub'
 
 const ALGORITHM = 'HS256'
 const ISSUER = 'metsavahti'

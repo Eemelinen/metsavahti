@@ -615,6 +615,101 @@ export const fi = {
       subject: 'Metsävahti: testisähköposti',
       watchAreaName: 'Esimerkkialue',
     },
+    /** Shared by `AlertImmediate` and `AlertDigest` (Email artboard templates 3 and 4, MV-073). */
+    alert: {
+      /** Alert subjects keep the brand prefix the test email has ("Metsävahti: …"). */
+      subject: (heading: string) => `Metsävahti: ${heading}`,
+      cuttingType: 'Hakkuun tyyppi',
+      area: 'Pinta-ala',
+      distance: 'Etäisyys',
+      received: 'Ilmoitus saapunut',
+      change: 'Muutos',
+      declarationNumber: 'Ilmoituksen numero',
+      changeLabel: {
+        new: 'Uusi ilmoitus',
+        geometry_changed: 'Rajaus muuttunut',
+        attributes_changed: 'Tiedot muuttuneet',
+        removed: 'Poistunut aineistosta',
+      },
+      /** "noin 350 m tontistasi"; the polygon covering the centre reads "tonttisi kohdalla". */
+      distanceFromPlot: (distance: string) => `noin ${distance} tontistasi`,
+      atPlot: 'tonttisi kohdalla',
+      receivedShort: (date: string) => `saapunut ${date}`,
+      showOnMap: 'Näytä kartalla',
+      onMapLink: 'Kartalla →',
+      mapAlt: 'Kartta vahtialueesta ja hakkuualueesta',
+      unsubscribeArea: 'Lopeta tämän alueen ilmoitukset',
+      openAll: 'Avaa kaikki ilmoitukset',
+      more: (count: number) =>
+        count === 1
+          ? 'Lisäksi 1 ilmoitus – näet sen ilmoituslistalta'
+          : `Lisäksi ${count} ilmoitusta – näet ne ilmoituslistalta`,
+    },
+    alertImmediate: {
+      badge: {
+        new: 'Uusi ilmoitus',
+        geometry_changed: 'Rajaus muuttunut',
+        attributes_changed: 'Tiedot muuttuneet',
+        removed: 'Poistunut',
+        many: 'Uusia ilmoituksia',
+      },
+      heading: {
+        new: (area: string) => `Uusi metsänkäyttöilmoitus vahtialueellasi ${area}`,
+        geometry_changed: (area: string) =>
+          `Metsänkäyttöilmoituksen rajaus muuttui vahtialueellasi ${area}`,
+        attributes_changed: (area: string) =>
+          `Metsänkäyttöilmoituksen tiedot muuttuivat vahtialueellasi ${area}`,
+        removed: (area: string) => `Metsänkäyttöilmoitus poistui vahtialueeltasi ${area}`,
+      },
+      headingMany: (count: number, area: string, allNew: boolean) =>
+        allNew
+          ? `${count} uutta metsänkäyttöilmoitusta vahtialueellasi ${area}`
+          : `${count} uutta tai muuttunutta metsänkäyttöilmoitusta vahtialueellasi ${area}`,
+      lead: {
+        new: (distance: string) =>
+          `Metsäkeskuksen aineistoon on lisätty hakkuuaikomus, joka on ${distance}.`,
+        geometry_changed: (distance: string) =>
+          `Hakkuuaikomuksen rajaus on muuttunut Metsäkeskuksen aineistossa. Ilmoitus on ${distance}.`,
+        attributes_changed: (distance: string) =>
+          `Hakkuuaikomuksen tiedot ovat muuttuneet Metsäkeskuksen aineistossa. Ilmoitus on ${distance}.`,
+        removed: (distance: string) =>
+          `Hakkuuaikomus, joka oli ${distance}, ei ole enää Metsäkeskuksen aineistossa.`,
+      },
+      leadMany: (count: number) =>
+        `Vahtialueesi läheltä löytyi ${count} metsänkäyttöilmoitusta, jotka ovat uusia tai muuttuneet edellisen tarkistuksen jälkeen.`,
+      previewMore: (count: number) => ` ja ${count} muuta`,
+      note: 'Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata. Hakkuu voi alkaa aikaisintaan 10 päivää ilmoituksesta, ja ilmoitus on voimassa kolme vuotta.',
+      footerWhy: (area: string) => `Saat tämän viestin, koska seuraat aluetta ”${area}”.`,
+    },
+    alertDigest: {
+      badge: {
+        daily: (day: string) => `Päiväkooste ${day}`,
+        weekly: (from: string, to: string) => `Viikkokooste ${from}–${to}`,
+      },
+      heading: (count: number, allNew: boolean) => {
+        if (count === 1) {
+          return allNew
+            ? 'Uusi metsänkäyttöilmoitus vahtialueellasi'
+            : 'Muuttunut metsänkäyttöilmoitus vahtialueellasi'
+        }
+        return allNew
+          ? `${count} uutta metsänkäyttöilmoitusta vahtialueillasi`
+          : `${count} uutta tai muuttunutta metsänkäyttöilmoitusta vahtialueillasi`
+      },
+      previewPeriod: { daily: ' viimeisen vuorokauden aikana', weekly: ' tällä viikolla' },
+      lead: {
+        daily:
+          'Kooste viimeisen vuorokauden aikana löytyneistä uusista ja muuttuneista ilmoituksista.',
+        weekly: 'Kooste viikon aikana löytyneistä uusista ja muuttuneista ilmoituksista.',
+      },
+      groupCount: (count: number) => (count === 1 ? '1 ilmoitus' : `${count} ilmoitusta`),
+      unsubscribeGroup: 'Lopeta alueen ilmoitukset',
+      note: 'Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata. Voit vaihtaa koosteen tahdin tai siirtyä välittömiin ilmoituksiin asetuksista.',
+      footerWhy: {
+        daily: 'Saat tämän viestin, koska olet valinnut päivittäisen koosteen.',
+        weekly: 'Saat tämän viestin, koska olet valinnut viikoittaisen koosteen.',
+      },
+    },
     verify: {
       subject: 'Vahvista sähköpostiosoitteesi',
       preview: 'Vahvista sähköpostiosoitteesi, niin vahtialueet aukeavat',
@@ -725,6 +820,23 @@ export const fi = {
       footerWhy:
         'Sait tämän viestin, koska osoitteesi annettiin Metsävahdin tietopyyntölomakkeella.',
     },
+  },
+  /** `/ilmoitukset-lopetettu`: where the unsubscribe link of an alert email lands (MV-073). */
+  unsubscribe: {
+    metaTitle: 'Ilmoitusten lopetus',
+    done: {
+      title: 'Ilmoitukset lopetettu',
+      body: 'Et saa enää sähköposti-ilmoituksia tältä vahtialueelta. Vahtialue säilyy tililläsi, ja voit ottaa ilmoitukset takaisin käyttöön ilmoitusasetuksista.',
+    },
+    used: {
+      title: 'Linkki on jo käytetty',
+      body: 'Tämän alueen ilmoitukset on jo lopetettu tällä linkillä. Kirjaudu sisään, jos haluat tarkistaa tai muuttaa ilmoitusasetuksiasi.',
+    },
+    expired: {
+      title: 'Linkki ei ole enää voimassa',
+      body: 'Lopetuslinkki toimii 30 päivää, eikä vanhentunut tai poistetun alueen linkki muuta mitään. Kirjaudu sisään ja lopeta ilmoitukset ilmoitusasetuksista.',
+    },
+    login: 'Kirjaudu ilmoitusasetuksiin',
   },
   publicForms: {
     tabsLabel: 'Lomakkeen valinta',

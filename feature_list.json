@@ -1352,7 +1352,7 @@
       "area": "pipeline",
       "title": "Alert email templates and unsubscribe endpoint",
       "user_visible_behavior": "`AlertImmediate` (one watch area, N alerts) and `AlertDigest` (grouped by area) React Email templates with Finnish copy, cutting-type explanation lines, distance formatting (\"noin 350 m tontistasi\"), CTA to `/ilmoitukset/[id]`, unsubscribe link (signed token, purpose `unsub`, watchAreaId, 30 d), settings link, attribution; optional static-map `<img>` when `ENABLE_MAP_IMAGES`. `GET /api/notifications/unsubscribe?token=` → sets `notificationsEnabled=false`, renders confirmation page with login link; token single-use recorded in `notification_log` or a small table.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-024", "F-032", "F-040", "F-046"],
       "ticket": "MV-073",
       "epic": "E06",
@@ -1363,7 +1363,11 @@
         "L1: pnpm test:unit tests/unit/pipeline/alert-emails.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)",
         "L2: pnpm test:integration tests/integration/alert-emails.int.test.ts (unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on b34efab)",
+        "2026-10-24 pnpm test:unit tests/unit/pipeline/alert-emails.test.ts → pass (working tree on b34efab)",
+        "2026-10-24 pnpm test:integration tests/integration/alert-emails.int.test.ts → pass (working tree on b34efab, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit snapshots; assert required links present; HTML < 100 KB; integration: valid token → disabled; tampered → 400. Status (ticket): absorbs MV-055 (merged 2026-09-20, ledger P11)."
     },

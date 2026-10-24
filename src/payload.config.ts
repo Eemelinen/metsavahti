@@ -21,6 +21,7 @@ import {
   LegalDocuments,
   NotificationLog,
   RateLimitBuckets,
+  UsedTokens,
   Users,
   UserSessions,
   WatchAreaDeclarations,
@@ -107,6 +108,7 @@ export default buildConfig({
     RateLimitBuckets,
     UserSessions,
     WfsBboxFetches,
+    UsedTokens,
   ],
   // One editor for every richText field (legal_documents.body); admin UI + JSON storage.
   editor: lexicalEditor(),

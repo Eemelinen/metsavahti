@@ -82,6 +82,7 @@ export interface Config {
     'rate-limit-buckets': RateLimitBucket;
     'user-sessions': UserSession;
     'wfs-bbox-fetches': WfsBboxFetch;
+    'used-tokens': UsedToken;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -105,6 +106,7 @@ export interface Config {
     'rate-limit-buckets': RateLimitBucketsSelect<false> | RateLimitBucketsSelect<true>;
     'user-sessions': UserSessionsSelect<false> | UserSessionsSelect<true>;
     'wfs-bbox-fetches': WfsBboxFetchesSelect<false> | WfsBboxFetchesSelect<true>;
+    'used-tokens': UsedTokensSelect<false> | UsedTokensSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -551,6 +553,18 @@ export interface WfsBboxFetch {
   maxN: number;
   featureCount: number;
   fetchedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "used-tokens".
+ */
+export interface UsedToken {
+  id: number;
+  jti: string;
+  purpose: 'unsub';
+  expiresAt: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1034,6 +1048,17 @@ export interface WfsBboxFetchesSelect<T extends boolean = true> {
   maxN?: T;
   featureCount?: T;
   fetchedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "used-tokens_select".
+ */
+export interface UsedTokensSelect<T extends boolean = true> {
+  jti?: T;
+  purpose?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
