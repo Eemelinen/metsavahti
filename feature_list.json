@@ -375,7 +375,7 @@
       "area": "wfs",
       "title": "Discover and pin WFS layer contract and record fixtures",
       "user_visible_behavior": "Script `pnpm wfs:describe` that calls `GetCapabilities` + `DescribeFeatureType`, prints layer names/attributes for the metsänkäyttöilmoitus layer; pin results in `src/lib/wfs/layer.ts` (layer name, attribute names, id field, date fields, cutting type field). Record `tests/fixtures/wfs/capabilities.xml` and `describe.xml`. Then `pnpm fixtures:record --bbox <3067 bbox> --name <name>` writing GeoJSON pages to `tests/fixtures/wfs/`; produce the fixture set listed in `05-conventions.md` (inside/outside/borderline/changed-_/empty/paged-_). Choose a real bbox with several declarations and define `SAMPLE_WATCH_AREA` (centre + radius) in `tests/fixtures/sample-area.ts` such that fixtures are meaningful.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-003"],
       "ticket": "MV-021",
       "epic": "E01",
@@ -385,7 +385,14 @@
         "L1: pnpm test:unit tests/unit/wfs/wfs-layer-contract.test.ts (unit: schema parses recorded fixtures.)",
         "manual: recorded fixtures reviewed (network access to the live WFS was needed)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 271b9e5)",
+        "2026-10-24 pnpm test:unit tests/unit/wfs/wfs-layer-contract.test.ts → pass (working tree on 271b9e5)",
+        "2026-10-24 manual: recorded fixtures reviewed (network access to the live WFS was needed) → observed by eemeli: named set recorded live from avoin.metsakeskus.fi on 2026-10-24 around SAMPLE_WATCH_AREA (Sipoo, 1 km): inside 6 / borderline 4 / outside 9 stands, paged 10+9, empty, changed-geometry and changed-attributes derived; 504 KB, no personal fields; reviewed and accepted by the user (working tree on 271b9e5)",
+        "2026-10-24 pnpm check → pass (working tree on 271b9e5)",
+        "2026-10-24 pnpm test:unit tests/unit/wfs/wfs-layer-contract.test.ts → pass (working tree on 271b9e5)",
+        "2026-10-24 manual: recorded fixtures reviewed (network access to the live WFS was needed) → observed by eemeli: named set recorded live from avoin.metsakeskus.fi on 2026-10-24 around SAMPLE_WATCH_AREA (Sipoo, 1 km): inside 6 / borderline 4 / outside 9 stands, none skipped, paged 10+9, empty, changed-geometry and changed-attributes derived; 495 KB, no personal fields; reviewed and accepted by the user. Same session: pnpm wfs:describe --write printed v1:forestusedeclaration, EPSG:3067, CountDefault 10000, paging TRUE, 43 properties, 'matches', and wrote capabilities.xml / describe.xml; pnpm fixtures:record --bbox 402000,6690500,405000,6693500 --name single-page-check --count 5 --start-index 3 wrote 5 stands equal to paged-1 entries 3-7 (file removed afterwards) (working tree on 271b9e5)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit: schema parses recorded fixtures. Acceptance: `layer.ts` documented with the discovery date; Zod schema `WfsFeatureSchema` matches real attributes; fixtures < 2 MB total, anonymised if any personal fields exist (there should be none). Status (ticket): absorbs MV-022 (merged 2026-09-20, ledger P11)."
     },

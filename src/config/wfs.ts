@@ -20,7 +20,9 @@ export const wfs = {
   /**
    * Longest side (metres) a single `GetFeature` bbox may have. Large enough that 1 000
    * watch areas spread over the whole country still fit in ≤ 200 requests
-   * (`01 §13`), small enough that one box stays at a few pages of 1 000 features.
+   * (`01 §13`). A dense southern box of this size held 33 416 declarations in force on
+   * 2026-10-24 (34 pages of 1 000, ~1.3 s each); D-012 keeps the cap until MV-071 / MV-079
+   * measure real request counts.
    */
   maxBboxSizeM: 100_000,
 } as const

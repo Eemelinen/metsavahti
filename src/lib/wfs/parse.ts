@@ -1,5 +1,11 @@
 import { attrHash, geomHash } from '@/lib/geo/hash'
 import {
+  AREA_FIELD,
+  CUTTING_TYPE_FIELD,
+  DATE_FIELDS,
+  DECLARATION_NUMBER_FIELD,
+} from '@/lib/wfs/layer'
+import {
   type DeclarationFeature,
   type DeclarationFeatureCollection,
   type DeclarationGeometry,
@@ -28,10 +34,10 @@ export function toDeclarationRecord(feature: DeclarationFeature): DeclarationRec
   const p = feature.properties
   return {
     sourceId: feature.id,
-    declarationNumber: p.FORESTUSEDECLARATIONNUMBER,
-    cuttingTypeCode: p.CUTTINGREALIZATIONPRACTICE ?? null,
-    areaHa: p.AREA ?? null,
-    receivedAt: p.DECLARATIONARRIVALDATE ?? null,
+    declarationNumber: p[DECLARATION_NUMBER_FIELD],
+    cuttingTypeCode: p[CUTTING_TYPE_FIELD] ?? null,
+    areaHa: p[AREA_FIELD] ?? null,
+    receivedAt: p[DATE_FIELDS.received] ?? null,
     geometry: feature.geometry,
     geomHash: geomHash(feature.geometry),
     attrHash: attrHash(p),

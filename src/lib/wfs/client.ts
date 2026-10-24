@@ -1,6 +1,7 @@
 import pRetry, { AbortError } from 'p-retry'
 
 import { type Bbox, formatBbox } from '@/lib/geo/buffer'
+import { GEOMETRY_FIELD, VALID_NOW_FIELD } from '@/lib/wfs/layer'
 import { type DeclarationFeatureCollection } from '@/lib/wfs/schemas'
 import { parseFeatureCollection } from '@/lib/wfs/parse'
 
@@ -33,28 +34,47 @@ export class WfsError extends Error {
   }
 }
 
+/**
+ * GeoServer CQL filter for the declarations in force that intersect `bbox` (EPSG:3067).
+ * The layer keeps expired declarations too, and WFS 2.0 does not combine the `bbox`
+ * parameter with a filter, so both go here (D-032).
+ */
+export function inForceBboxFilter(bbox: Bbox): string {
+  return `BBOX(${GEOMETRY_FIELD},${formatBbox(bbox)},'EPSG:3067') AND ${VALID_NOW_FIELD}=1`
+}
+
+function baseRequestUrl(baseUrl: string, request: string): URL {
+  const url = new URL(baseUrl)
+  url.searchParams.set('service', 'WFS')
+  url.searchParams.set('version', '2.0.0')
+  url.searchParams.set('request', request)
+  return url
+}
+
 export function buildGetFeatureUrl(
   { baseUrl, layer }: Pick<WfsClientOptions, 'baseUrl' | 'layer'>,
   { bbox, count, startIndex }: GetFeatureParams,
 ): URL {
-  const url = new URL(baseUrl)
-  url.searchParams.set('service', 'WFS')
-  url.searchParams.set('version', '2.0.0')
-  url.searchParams.set('request', 'GetFeature')
+  const url = baseRequestUrl(baseUrl, 'GetFeature')
   url.searchParams.set('typeNames', layer)
   url.searchParams.set('outputFormat', 'application/json')
   url.searchParams.set('srsName', 'EPSG:3067')
-  url.searchParams.set('bbox', `${formatBbox(bbox)},EPSG:3067`)
+  url.searchParams.set('CQL_FILTER', inForceBboxFilter(bbox))
   if (count !== undefined) url.searchParams.set('count', String(count))
   if (startIndex !== undefined) url.searchParams.set('startIndex', String(startIndex))
   return url
 }
 
 export function buildGetCapabilitiesUrl({ baseUrl }: Pick<WfsClientOptions, 'baseUrl'>): URL {
-  const url = new URL(baseUrl)
-  url.searchParams.set('service', 'WFS')
-  url.searchParams.set('version', '2.0.0')
-  url.searchParams.set('request', 'GetCapabilities')
+  return baseRequestUrl(baseUrl, 'GetCapabilities')
+}
+
+export function buildDescribeFeatureTypeUrl({
+  baseUrl,
+  layer,
+}: Pick<WfsClientOptions, 'baseUrl' | 'layer'>): URL {
+  const url = baseRequestUrl(baseUrl, 'DescribeFeatureType')
+  url.searchParams.set('typeNames', layer)
   return url
 }
 
@@ -81,19 +101,25 @@ export function createWfsClient(options: WfsClientOptions) {
     )
   }
 
+  async function getText(url: URL): Promise<string> {
+    const res = await fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs) })
+    if (!res.ok) throw new WfsError(`WFS responded ${res.status}`, res.status)
+    return res.text()
+  }
+
   return {
     /** Fetch declarations intersecting a bbox (EPSG:3067). */
     async getDeclarations(params: GetFeatureParams): Promise<DeclarationFeatureCollection> {
       const url = buildGetFeatureUrl(options, params)
       return parseFeatureCollection(await getJson(url))
     },
-    /** Raw GetCapabilities XML (used by the live contract test). */
+    /** Raw GetCapabilities XML (`pnpm wfs:describe`, the live contract test). */
     async getCapabilitiesXml(): Promise<string> {
-      const res = await fetchImpl(buildGetCapabilitiesUrl(options), {
-        signal: AbortSignal.timeout(timeoutMs),
-      })
-      if (!res.ok) throw new WfsError(`WFS responded ${res.status}`, res.status)
-      return res.text()
+      return getText(buildGetCapabilitiesUrl(options))
+    },
+    /** Raw DescribeFeatureType XSD of the layer (`pnpm wfs:describe`, the live contract test). */
+    async describeFeatureTypeXml(): Promise<string> {
+      return getText(buildDescribeFeatureTypeUrl(options))
     },
   }
 }

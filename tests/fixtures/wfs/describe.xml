@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:v1="https://avoin.metsakeskus.fi/rajapinnat/v1" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="https://avoin.metsakeskus.fi/rajapinnat/v1">
+  <xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="https://avoin.metsakeskus.fi/rajapinnat/schemas/gml/3.2.1/gml.xsd"/>
+  <xsd:complexType name="forestusedeclarationType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="0" name="GEOMETRY" nillable="true" type="gml:SurfacePropertyType">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoitukseen liittyvät geometriat</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="FORESTUSEDECLARATIONNUMBER" nillable="true" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoituksen numero</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONREFERENCE" nillable="true" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoitusviite</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="PROCESSINGAREANUMBER" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Käsittelyaluenumero</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONSTATE" nillable="true" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoituksen tila. Koodisto: 1002</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONSTATEDATASOURCE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoituskuvion tilan tietolähde. Koodisto: 1045</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="VALID_NOW" nillable="true" type="xsd:decimal"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONSTANDREFERENCE" nillable="true" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Metsänkäyttöilmoituskuvion viite</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="STANDNUMBER" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvionumero</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="STANDNUMBEREXTENSION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion alanumero (-merkki)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="AREA" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion pinta-ala (ha)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="MAINGROUP" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion pääryhmä. Koodisto: 101</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="SUBGROUP" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion alaryhmä. Koodisto: 102</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="FERTILITYCLASS" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion kasvupaikka. Koodisto: 1009</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="SOILTYPE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion maalaji. Koodisto: 1010</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONDEVELOPMENTCLASS" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion kehitysluokka. Koodisto: 1012</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONMAINTREESPECIES" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion pääpuulaji. Koodisto: 1011</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="MEANAGE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion keski-ikä (vuosi)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="MEANDIAMETER" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Kuvion keskiläpimitta (cm)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="HABITATCODE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Erityisen tärkeä elinympäristö kuviolla. Koodisto: 1015</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DETAILEDHABITATCODE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Erityisen tärkeän elinympäristön tarkenne. Koodisto: 1021</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="OTHERHABITATCODE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Muu luontokohde kuviolla. Koodisto: 1016</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="CUTTINGPURPOSE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Hakkuun tarkoitus metsänkäyttöilmoituksella. Koodisto: 1013</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="CUTTINGREALIZATIONPRACTICE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Toimenpiteen hakkuutapa. Koodisto: 1014</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGENERATIONCOMMITMENT" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Syykoodi uudistamisvelvoitteelle. Koodisto: 1240</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLSOILPREPARATIONOPERATION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Maanpinnan käsittelytapa. Koodisto: 1017</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLREGENERATIONOPERATION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Uudistamistapa ja puulaji. Koodisto: 1041</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="HABITATOPERATION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Erityisen tärkeä elinympäristöön kohdistuva muu toimenpide. Koodisto: 1020</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="FORESTDAMAGEQUALIFIER" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Metsätuhon aiheuttaja. Koodisto: 1055</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="COMPLETIONYEAR" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Hakkuun toteutusvuosi (taimikon perustamisilmoitus)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGENSOILPREPARATIONOPERATION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Uudistamisen maanmuokkauksen työlaji (taimikon perustamisilmoitus). Koodisto: 1017</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGENERATIONYEAR" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Uudistamisen toteutusvuosi (taimikon perustamisilmoitus)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGENERATIONOPERATION" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Uudistamistapa ja puulaji (taimikon perustamisilmoitus). Koodisto: 1041</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGERATIONAREA" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Uudistamisen pinta-ala (taimikon perustamisilmoitus)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONARRIVALDATE" nillable="true" type="xsd:dateTime">
+            <xsd:annotation>
+              <xsd:documentation>Ilmoituksen saapumispvm</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONARRIVALYEAR" nillable="true" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>Ilmoituksen saapumisvuosi</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DECLARATIONARRIVALMETHOD" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Ilmoituksen saapumistapa. Koodisto: 1008</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="STANDARRIVALDATE" nillable="true" type="xsd:dateTime">
+            <xsd:annotation>
+              <xsd:documentation>Ilmoituskuvion saapumispvm</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="STANDARRIVALMETHOD" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Ilmoituskuvion saapumistapa. Koodisto: 1008</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="REGENERATIONARRIVALDATE" nillable="true" type="xsd:dateTime">
+            <xsd:annotation>
+              <xsd:documentation>Taimikon perustamisilmoituksen saapumispvm (taimikon perustamisilmoitus)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DATASOURCE" nillable="true" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Tietolähde (taimikon perustamisilmoitus). Koodisto: 1045</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="CREATIONTIME" nillable="true" type="xsd:dateTime">
+            <xsd:annotation>
+              <xsd:documentation>Luontiaika</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element maxOccurs="1" minOccurs="0" name="UPDATETIME" nillable="true" type="xsd:dateTime">
+            <xsd:annotation>
+              <xsd:documentation>Päivitysaika</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="forestusedeclaration" substitutionGroup="gml:AbstractFeature" type="v1:forestusedeclarationType"/>
+</xsd:schema>

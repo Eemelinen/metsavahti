@@ -8,7 +8,7 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 
-import { loadWfsFixture, parseBboxParam, wfsResponseForBbox } from '../../helpers/wfs-fixture'
+import { loadWfsFixture, requestBbox, wfsResponseForBbox } from '../../helpers/wfs-fixture'
 
 const port = Number(process.env.WFS_MOCK_PORT ?? 3200)
 const fixture = loadWfsFixture()
@@ -30,7 +30,7 @@ app.get('/ows/', (c) => {
     )
   }
   if (request === 'getfeature') {
-    const bbox = parseBboxParam(c.req.query('bbox') ?? null)
+    const bbox = requestBbox(new URL(c.req.url).searchParams)
     return c.json(wfsResponseForBbox(fixture, bbox))
   }
   return c.json({ error: `unsupported request "${request}"` }, 400)
