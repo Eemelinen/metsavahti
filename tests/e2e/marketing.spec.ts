@@ -8,7 +8,9 @@ const attributionPattern =
 
 /**
  * Every `(marketing)` page of `03-pages.md`. `.env.test` sets `SHOW_PRICING=1`, so
- * `/hinnoittelu` is served; with the flag off it is a 404 and unlinked (unit-tested).
+ * `/hinnoittelu` is served. The flag-off half is unit-tested: the page's 404
+ * (`tests/unit/marketing/pricing-page.test.ts`), the header links (`routes.test.ts`) and the
+ * sitemap (`landing-page.test.ts`).
  */
 const MARKETING_PAGES = [
   { path: '/', name: 'etusivu' },
