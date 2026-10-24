@@ -1,3 +1,4 @@
+import { plans } from '@/config/plans'
 import { FAQ } from '@/content/faq'
 import { expectNoA11yViolations } from './a11y'
 import { expect, test } from './fixtures'
@@ -24,6 +25,12 @@ test.describe('landing page', () => {
     await expect(main.getByRole('list', { name: 'Esimerkkikartta' })).toContainText(
       'Uudistushakkuu',
     )
+    // Trust row: data source, privacy and price, the price taken from the plan limit.
+    const trust = main.getByRole('region', { name: 'Luotettavuus' })
+    for (const heading of ['Tietolähde', 'Yksityisyys', 'Hinta']) {
+      await expect(trust.getByRole('heading', { level: 2, name: heading })).toBeVisible()
+    }
+    await expect(trust).toContainText(`enintään ${plans.free.maxWatchAreas} vahtialuetta`)
     await expect(page.getByTestId('attribution')).toContainText(attributionPattern)
     // Design system: Figtree is loaded through next/font (docs/design/README.md).
     await expect(page.locator('body')).toHaveCSS('font-family', /Figtree/)
@@ -87,6 +94,17 @@ test.describe('landing page', () => {
     expect(faqPage.mainEntity.map((question) => question.name)).toEqual(
       FAQ.map((entry) => entry.question),
     )
+  })
+
+  test('legal and form pages carry their own canonical', async ({ page, baseURL }) => {
+    const origin = new URL(baseURL!).origin
+    for (const path of ['/tietosuoja', '/tietopyynto', '/yhteystiedot']) {
+      await page.goto(path)
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        `${origin}${path}`,
+      )
+    }
   })
 
   test('serves sitemap.xml and robots.txt', async ({ request, baseURL }) => {
