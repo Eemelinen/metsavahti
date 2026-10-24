@@ -6,7 +6,9 @@ import {
   killTransaction,
 } from 'payload'
 
-import { type AlertEmailDeclaration, renderAlertEmail } from '@/emails/AlertEmail'
+import { renderAlertImmediate } from '@/emails/AlertImmediate'
+import type { AlertEmailItem } from '@/emails/AlertParts'
+import { EMAIL_SETTINGS_PATH } from '@/emails/EmailLayout'
 import { fi } from '@/i18n/fi'
 import type { NotificationMode, NotificationPrefsInput } from '@/lib/account/account-schema'
 import { metsakeskusAttribution } from '@/lib/attribution'
@@ -161,29 +163,38 @@ export async function setMarketingConsent(
   return { changed: true }
 }
 
-/** The sample rows of the test email: one new declaration and one whose boundary changed. */
-export const TEST_ALERT_DECLARATIONS: AlertEmailDeclaration[] = [
-  {
-    declarationNumber: '2026-TESTI-0001',
-    hakkuutapa: 5,
-    areaHa: 2.4,
-    distanceM: 320,
-    changeType: 'new',
-  },
-  {
-    declarationNumber: '2026-TESTI-0002',
-    hakkuutapa: 3,
-    areaHa: 5.1,
-    distanceM: 780,
-    changeType: 'geometry_changed',
-  },
-]
+/**
+ * The sample rows of the test email: one new declaration and one whose boundary changed. Their
+ * links open the alert list (there is no alert behind them).
+ */
+function testAlertItems(baseUrl: string): AlertEmailItem[] {
+  return [
+    {
+      href: `${baseUrl}/ilmoitukset`,
+      changeType: 'new',
+      declarationNumber: '2026-TESTI-0001',
+      cuttingTypeCode: 5,
+      areaHa: 2.4,
+      distanceM: 320,
+      receivedAt: '2026-09-05T09:30:00.000Z',
+    },
+    {
+      href: `${baseUrl}/ilmoitukset`,
+      changeType: 'geometry_changed',
+      declarationNumber: '2026-TESTI-0002',
+      cuttingTypeCode: 3,
+      areaHa: 5.1,
+      distanceM: 780,
+      receivedAt: '2026-09-04T09:30:00.000Z',
+    },
+  ]
+}
 
 export type TestEmailOutcome =
   { status: 'sent'; email: string } | { status: 'limited'; retryAfterSeconds: number }
 
 /**
- * "Lähetä testisähköposti": the immediate alert email (`AlertEmail`) with fixture rows, sent to
+ * "Lähetä testisähköposti": the immediate alert email (`AlertImmediate`) with fixture rows, sent to
  * the account's own address so the user sees what an alert looks like and that mail arrives.
  * It does not touch alerts or the notification log, and it is sent whatever the switches say.
  */
@@ -196,10 +207,13 @@ export async function sendTestAlertEmail(
   // mailbox, and a retry within the hour is still possible twice.
   const limit = await testEmailLimiter.check(String(user.id))
   if (!limit.allowed) return { status: 'limited', retryAfterSeconds: limit.retryAfterSeconds }
-  const { html, text } = await renderAlertEmail({
+  const baseUrl = env.NEXT_PUBLIC_SERVER_URL
+  // The sample area does not exist, so its "stop" link opens the settings page instead.
+  const { html, text } = await renderAlertImmediate({
     watchAreaName: fi.emails.testAlert.watchAreaName,
-    declarations: TEST_ALERT_DECLARATIONS,
-    baseUrl: env.NEXT_PUBLIC_SERVER_URL,
+    alerts: testAlertItems(baseUrl),
+    unsubscribeUrl: `${baseUrl}${EMAIL_SETTINGS_PATH}`,
+    baseUrl,
     attribution: metsakeskusAttribution(now),
   })
   await payload.sendEmail({ to: user.email, subject: fi.emails.testAlert.subject, html, text })

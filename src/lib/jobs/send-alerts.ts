@@ -1,9 +1,6 @@
-import { type AlertEmailDeclaration, renderAlertEmail } from '@/emails/AlertEmail'
-import { metsakeskusAttribution } from '@/lib/attribution'
-import { env } from '@/lib/env'
 import type { JobContext } from '@/lib/jobs/context'
+import { buildAlertImmediateEmail } from '@/lib/notifications/alert-emails'
 import { emailProvider } from '@/lib/notifications/provider'
-import { alertSnapshot } from '@/payload/collections/Alerts'
 import type { Alert, Declaration, User, WatchArea } from '@/payload-types'
 
 export type SendAlertsResult = { emailsSent: number; emailsFailed: number; alertsHandled: number }
@@ -55,22 +52,12 @@ export async function sendAlerts(ctx: JobContext, jobRunId: string): Promise<Sen
     const first = alerts[0]
     if (!first) continue
     const { user, watchArea } = first
-    const declarations: AlertEmailDeclaration[] = alerts.map((a) => {
-      const snapshot = alertSnapshot(a)
-      return {
-        declarationNumber: a.declaration.declarationNumber,
-        hakkuutapa: a.declaration.cuttingTypeCode ?? null,
-        areaHa: snapshot.areaHa,
-        distanceM: snapshot.distanceM,
-        changeType: a.changeType,
-      }
-    })
-
-    const { html, text } = await renderAlertEmail({
-      watchAreaName: watchArea.name,
-      declarations,
-      baseUrl: env.NEXT_PUBLIC_SERVER_URL,
-      attribution: metsakeskusAttribution(now()),
+    const { subject, html, text } = await buildAlertImmediateEmail({
+      userId: user.id,
+      watchArea,
+      alerts,
+      timeZone: user.timezone ?? undefined,
+      now: now(),
     })
 
     let status: 'sent' | 'failed' = 'sent'
@@ -79,7 +66,7 @@ export async function sendAlerts(ctx: JobContext, jobRunId: string): Promise<Sen
     try {
       const sent = await payload.sendEmail({
         to: user.email,
-        subject: `Metsävahti: ${declarations.length} ilmoitusta alueella ${watchArea.name}`,
+        subject,
         html,
         text,
       })

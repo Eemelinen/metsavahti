@@ -17,6 +17,7 @@ import * as migration_20261024_053058_admin_gdpr_audit from './20261024_053058_a
 import * as migration_20261024_134227_declarations_missing_runs from './20261024_134227_declarations_missing_runs';
 import * as migration_20261024_160502_wfs_bbox_fetches from './20261024_160502_wfs_bbox_fetches';
 import * as migration_20261024_193632_fetch_partial_status from './20261024_193632_fetch_partial_status';
+import * as migration_20261024_210651_used_tokens from './20261024_210651_used_tokens';
 
 export const migrations = [
   {
@@ -112,6 +113,11 @@ export const migrations = [
   {
     up: migration_20261024_193632_fetch_partial_status.up,
     down: migration_20261024_193632_fetch_partial_status.down,
-    name: '20261024_193632_fetch_partial_status'
+    name: '20261024_193632_fetch_partial_status',
+  },
+  {
+    up: migration_20261024_210651_used_tokens.up,
+    down: migration_20261024_210651_used_tokens.down,
+    name: '20261024_210651_used_tokens'
   },
 ];
