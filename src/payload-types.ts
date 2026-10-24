@@ -125,6 +125,7 @@ export interface Config {
       'fetch-declarations': TaskFetchDeclarations;
       'match-watch-areas': TaskMatchWatchAreas;
       'send-alerts': TaskSendAlerts;
+      cleanup: TaskCleanup;
       inline: {
         input: unknown;
         output: unknown;
@@ -436,6 +437,10 @@ export interface Export {
 export interface JobRun {
   id: number;
   task: 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export' | 'delete-account';
+  /**
+   * Payloadin jonotehtävän id; sama kaikilla saman ajon vaiheilla.
+   */
+  runId?: string | null;
   startedAt: string;
   finishedAt?: string | null;
   status: 'running' | 'succeeded' | 'failed';
@@ -590,7 +595,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts';
+        taskSlug: 'inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup';
         taskID: string;
         input?:
           | {
@@ -624,7 +629,7 @@ export interface PayloadJob {
       }[]
     | null;
   workflowSlug?: 'sync-declarations' | null;
-  taskSlug?: ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts') | null;
+  taskSlug?: ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -928,6 +933,7 @@ export interface ExportsSelect<T extends boolean = true> {
  */
 export interface JobRunsSelect<T extends boolean = true> {
   task?: T;
+  runId?: T;
   startedAt?: T;
   finishedAt?: T;
   status?: T;
@@ -1091,6 +1097,20 @@ export interface TaskSendAlerts {
     emailsSent: number;
     emailsFailed: number;
     alertsHandled: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskCleanup".
+ */
+export interface TaskCleanup {
+  input?: unknown;
+  output: {
+    declarations: number;
+    declarationRevisions: number;
+    dataExports: number;
+    jobRuns: number;
+    rateLimitBuckets: number;
   };
 }
 /**

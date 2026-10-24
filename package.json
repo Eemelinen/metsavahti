@@ -61,6 +61,7 @@
     "@payloadcms/next": "3.88.0",
     "@payloadcms/richtext-lexical": "3.88.0",
     "@payloadcms/storage-s3": "3.88.0",
+    "@payloadcms/ui": "3.88.0",
     "@react-email/components": "1.0.12",
     "@react-email/render": "2.1.0",
     "@sentry/nextjs": "10.73.0",

@@ -1,35 +1,33 @@
 import { getPayload } from 'payload'
-
 import config from '@payload-config'
+import { runJobNow, runnableJobSchema } from '@/lib/jobs/run-now'
 import { logger } from '@/lib/logger'
+import { isAdminUser } from '@/payload/access'
 import { hasValidCronSecret } from '@/payload/jobs/access'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 /**
- * Cron entrypoint. `Authorization: Bearer $CRON_SECRET`.
- * Queues the sync workflow and drains the queue in-process, returning a summary.
+ * Job entrypoint (`01 §4`, MV-070). Cron sends `Authorization: Bearer $CRON_SECRET`; the admin
+ * "Aja haku nyt" button sends the admin's session cookie. `?task=cleanup` runs the weekly
+ * cleanup, no `task` the sync workflow. Queues the job, drains the queue in-process and
+ * returns a summary with the `runId` that the run's `job_runs` rows carry.
  */
 export async function POST(request: Request) {
+  const payload = await getPayload({ config })
   if (!hasValidCronSecret(request.headers.get('authorization'))) {
-    return Response.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+    const { user } = await payload.auth({ headers: request.headers })
+    if (!user) return Response.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+    if (!isAdminUser(user)) return Response.json({ ok: false, error: 'forbidden' }, { status: 403 })
   }
 
-  const payload = await getPayload({ config })
-  const job = await payload.jobs.queue({ workflow: 'sync-declarations', input: {} })
-  const started = Date.now()
-  const result = await payload.jobs.run({ allQueues: true })
-  const durationMs = Date.now() - started
+  const task = runnableJobSchema.safeParse(
+    new URL(request.url).searchParams.get('task') ?? undefined,
+  )
+  if (!task.success) return Response.json({ ok: false, error: 'invalid_task' }, { status: 400 })
 
-  const status = result.jobStatus?.[String(job.id)]?.status ?? 'unknown'
-  logger.info({ jobId: job.id, status, durationMs }, 'jobs run via cron endpoint')
-
-  return Response.json({
-    ok: status !== 'error',
-    jobId: job.id,
-    status,
-    durationMs,
-    remainingJobs: result.remainingJobsFromQueried,
-  })
+  const summary = await runJobNow(payload, task.data)
+  logger.info(summary, 'jobs run via /api/jobs/run')
+  return Response.json(summary)
 }

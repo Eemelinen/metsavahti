@@ -70,8 +70,10 @@ pnpm dev                        # http://localhost:3000
 - `/admin` — Payload admin. The **first account created becomes admin**; use
   `/admin/create-first-user` or `pnpm db:seed` (creates `admin@metsavahti.local`).
 - Mailpit UI: http://localhost:8025 — every email sent locally ends up here.
-- Run the pipeline by hand: `pnpm jobs:run`, or
-  `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`.
+- Run the pipeline by hand: `pnpm jobs:run` (`pnpm jobs:run cleanup` for the weekly cleanup), the
+  "Aja haku nyt" button above Admin → Tehtäväajot, or
+  `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`. Every step
+  writes a `job-runs` row; the response's `runId` finds them.
 
 ## Environments and databases
 
@@ -111,7 +113,7 @@ Safeguards:
 | `pnpm test:e2e` / `test:e2e:ui`                                      | Playwright against `next dev -p 3100` + `db_test` + WFS mock                                                      |
 | `pnpm test:e2e:ci`                                                   | same, but builds first and runs `next start` (what CI does)                                                       |
 | `pnpm test:live`                                                     | opt-in contract test against the real Metsäkeskus WFS                                                             |
-| `pnpm jobs:run`                                                      | run the sync workflow once against the dev DB                                                                     |
+| `pnpm jobs:run`                                                      | run the sync workflow (or `cleanup`) once against the dev DB                                                      |
 | `pnpm fixtures:record -- --bbox …`                                   | record a fresh WFS sample into `tests/fixtures/wfs`                                                               |
 | `pnpm lint` / `format` / `typecheck` / `knip`                        | quality gates (also run by Husky on commit and in CI)                                                             |
 | `pnpm check` / `check:full`                                          | L1 verification (lint, typecheck, knip, format:check, harness:check, unit); `check:full` adds integration + build |
@@ -157,7 +159,7 @@ src/
   app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing, 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
   app/(payload)/          generated Payload admin + REST/GraphQL routes
   app/api/health          liveness + PostGIS check
-  app/api/jobs/run        cron entrypoint (Bearer CRON_SECRET)
+  app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
   payload.config.ts       Payload config (postgres adapter, email, jobs)
   payload/collections     Users, WatchAreas, Declarations, DeclarationRevisions, WatchAreaDeclarations, Alerts, NotificationLog, ConsentEvents, DataExportRequests, JobRuns, LegalDocuments, RateLimitBuckets, Exports (upload)
   payload/access          access-control helpers
@@ -170,7 +172,7 @@ src/
   lib/geo                 crs.ts, buffer.ts, bbox.ts, hash.ts, spatial-queries.ts
   lib/legal/documents.ts  legal document slugs, latest-published resolver, placeholder seed
   lib/wfs                 client.ts, schemas.ts, parse.ts, hakkuutapa.ts
-  lib/jobs                fetch-declarations, match-watch-areas, send-alerts
+  lib/jobs                fetch-declarations, match-watch-areas, send-alerts, cleanup, withJobRun
   emails                  React Email templates: EmailLayout (shared frame), AlertEmail, renderEmail()
   lib/notifications       provider.ts (which email adapter is active)
   lib/privacy             ip.ts (IP → network prefix before storage)
@@ -192,7 +194,8 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
   `.env.example`; `RESEND_API_KEY` without `SMTP_HOST` selects Resend. `S3_BUCKET` (+ key, secret, optional
   `S3_ENDPOINT` for non-AWS providers) moves account-export archives from `EXPORTS_DIR` to object storage.
 - Schedule `POST /api/jobs/run` with `Authorization: Bearer $CRON_SECRET` at
-  09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates).
+  09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates), and
+  `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
 - Migrations run automatically on boot in production (`prodMigrations`).
 - Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.
 

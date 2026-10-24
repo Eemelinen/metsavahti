@@ -2,6 +2,7 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "src/app/**/global-error.tsx",
+    "src/app/(payload)/admin/importMap.js",
     "src/payload/migrations/*.ts",
     "scripts/*.ts",
     "tests/**/*.{ts,tsx}",

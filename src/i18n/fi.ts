@@ -321,4 +321,49 @@ export const fi = {
       },
     },
   },
+  /** Retention rules for the privacy page (`config/retention.ts` fills in the periods). */
+  retention: {
+    declarations: {
+      data: 'Metsänkäyttöilmoitukset (välimuisti)',
+      start: 'ilmoituksen voimassaolon päättyminen',
+      description: (days: number, alertGraceDays: number) =>
+        `Metsänkäyttöilmoitus poistetaan ${days} päivää voimassaolonsa päättymisen jälkeen, ellei siitä ole tehty hälytystä viimeisten ${alertGraceDays} päivän aikana. Ilmoituksen mukana poistuvat sen hälytykset ja aiemmat versiot.`,
+    },
+    declarationRevisions: {
+      data: 'Metsänkäyttöilmoitusten aiemmat versiot',
+      start: 'muutos',
+      description: (days: number) =>
+        `Ilmoituksen aiempi versio poistetaan ${days} päivän kuluttua muutoksesta.`,
+    },
+    dataExports: {
+      data: 'Tietojen vientitiedostot',
+      start: 'latauslinkin vanheneminen',
+      description: (days: number) =>
+        days === 0
+          ? 'Vientitiedosto poistetaan ja pyyntö merkitään vanhentuneeksi, kun latauslinkki vanhenee.'
+          : `Vientitiedosto poistetaan ja pyyntö merkitään vanhentuneeksi ${days} päivän kuluttua latauslinkin vanhenemisesta.`,
+    },
+    jobRuns: {
+      data: 'Taustatehtävien ajolokit',
+      start: 'ajon alku',
+      description: (days: number) =>
+        `Taustatehtävien ajotiedot poistetaan ${days} päivän kuluttua.`,
+    },
+    rateLimitBuckets: {
+      data: 'Pyyntörajoitusten laskurit',
+      start: 'laskentaikkunan päättyminen',
+      description: (days: number) =>
+        days === 0
+          ? 'Pyyntörajoituksen laskuri poistetaan, kun sen laskentaikkuna on päättynyt.'
+          : `Pyyntörajoituksen laskuri poistetaan ${days} päivän kuluttua laskentaikkunan päättymisestä.`,
+    },
+  },
+  admin: {
+    runPipeline: {
+      button: 'Aja haku nyt',
+      running: 'Haku käynnissä…',
+      succeeded: 'Haku valmis.',
+      failed: 'Haku epäonnistui. Katso virhe tehtäväajoista.',
+    },
+  },
 } as const

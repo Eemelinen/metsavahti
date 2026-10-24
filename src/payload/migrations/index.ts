@@ -10,6 +10,7 @@ import * as migration_20261023_121838_rate_limit_buckets from './20261023_121838
 import * as migration_20261023_214734_user_sessions from './20261023_214734_user_sessions';
 import * as migration_20261023_223512_users_pending_email from './20261023_223512_users_pending_email';
 import * as migration_20261024_000522_alerts_watch_area_cascade from './20261024_000522_alerts_watch_area_cascade';
+import * as migration_20261024_004131_jobs_cleanup from './20261024_004131_jobs_cleanup';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20261024_000522_alerts_watch_area_cascade.up,
     down: migration_20261024_000522_alerts_watch_area_cascade.down,
-    name: '20261024_000522_alerts_watch_area_cascade'
+    name: '20261024_000522_alerts_watch_area_cascade',
+  },
+  {
+    up: migration_20261024_004131_jobs_cleanup.up,
+    down: migration_20261024_004131_jobs_cleanup.down,
+    name: '20261024_004131_jobs_cleanup'
   },
 ];
