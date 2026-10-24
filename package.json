@@ -50,6 +50,8 @@
     "harness:loop": "harness loop",
     "harness:report": "harness report",
     "harness:doctor": "harness doctor",
+    "harness:update": "harness update",
+    "harness:selftest": "harness selftest",
     "harness:import-tickets": "tsx scripts/import-tickets.ts",
     "prepare": "husky"
   },
@@ -99,7 +101,7 @@
     "@axe-core/playwright": "4.13.0",
     "@commitlint/cli": "21.2.2",
     "@commitlint/config-conventional": "21.2.2",
-    "@eemelinen/harness": "github:Eemelinen/harness#v0.3.0",
+    "@eemelinen/harness": "github:Eemelinen/harness#v0.3.1",
     "@hono/node-server": "2.1.1",
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "4.3.3",

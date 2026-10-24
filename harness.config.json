@@ -204,6 +204,7 @@
   ],
   "worktreeRoot": "../metsavahti-worktrees",
   "merge": "auto",
+  "update": { "auto": true },
   "traceDir": ".harness/traces",
   "runsLog": ".harness/runs.jsonl"
 }
