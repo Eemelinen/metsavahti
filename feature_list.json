@@ -1616,7 +1616,7 @@
       "area": "gdpr",
       "title": "Public data-request and contact forms /tietopyynto, /yhteystiedot",
       "user_visible_behavior": "`/tietopyynto`: form (email, type, message, consent), rate-limited, emails `DPO_EMAIL` (`DataRequestReceived`) and confirmation to requester. `/yhteystiedot`: as spec; honeypot + rate limit; `ContactReceived` email.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-040", "F-048"],
       "ticket": "MV-095",
       "epic": "E08",
@@ -1630,7 +1630,14 @@
         "L2: pnpm test:integration tests/integration/public-forms.int.test.ts (integration: both data-request emails, contact email; E2E both forms.)",
         "L3: pnpm test:e2e tests/e2e/public-forms.spec.ts (integration: both data-request emails, contact email; E2E both forms.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (commit 2e9cd2d)",
+        "2026-10-24 pnpm test:integration tests/integration/public-forms.int.test.ts → pass (commit 2e9cd2d, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/public-forms.spec.ts → pass (commit 2e9cd2d, Docker available)",
+        "2026-10-24 pnpm check → pass (commit 265c50b)",
+        "2026-10-24 pnpm test:integration tests/integration/public-forms.int.test.ts → pass (commit 265c50b, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/public-forms.spec.ts → pass (commit 265c50b, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: both data-request emails, contact email; E2E both forms. Status (ticket): absorbs MV-096 (merged 2026-09-20, ledger P11)."
     },

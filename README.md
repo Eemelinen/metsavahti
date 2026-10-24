@@ -77,6 +77,11 @@ pnpm dev                        # http://localhost:3000
   emails "Tilisi on poistettu" and deletes the account and everything it owns before the browser
   lands on `/tili-poistettu`; only the consent events stay, without the user and with the
   address as a SHA-256 hash.
+- `/yhteystiedot` — the contact form (name, email, message, consent) mails `ContactReceived` to
+  `CONTACT_EMAIL`; `/tietopyynto` — a data subject request without an account (email, Tarkastus /
+  Poisto / Muu, message, consent) mails `DataRequestReceived` to `DPO_EMAIL` and a receipt with the
+  same `TP-…` reference to the requester. Both have a honeypot and a 5/h per-IP limit; locally all
+  three emails land in Mailpit.
 - Run the pipeline by hand: `pnpm jobs:run` (`pnpm jobs:run cleanup` for the weekly cleanup), the
   "Aja haku nyt" button above Admin → Tehtäväajot, or
   `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`. Every step
@@ -210,7 +215,7 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
 - Schedule `POST /api/jobs/run` with `Authorization: Bearer $CRON_SECRET` at
   09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates), and
   `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
-- Migrations run automatically on boot in production (`prodMigrations`).
+- Migrations run automatically when the production server boots (`prodMigrations`), never during `next build`.
 - Static map images in alert emails: set `ENABLE_MAP_IMAGES=1`; off, `/api/alerts/[id]/map-image.png` answers 404 and emails go without the image.
 - Analytics: set `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL` (build time) to the Plausible/Umami script; the cookie banner loads it only for visitors who accept analytics. Unset, no analytics loads.
 - Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.

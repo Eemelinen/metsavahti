@@ -56,6 +56,12 @@ database or points at port 5432.
   form rule wants `POISTA` in upper case (spaces forgiven) and a password, both errors at once; `hashEmail()` is
   the SHA-256 of the trimmed, lower-cased address; `Poista tili` is the last account tab; `AccountDeleted` lists
   what was deleted and kept, the time and the attribution, has no settings link, words the area count),
+  public forms (`gdpr/public-forms.test.ts`: both schemas trim and lower-case, name every field with the
+  artboard copy, refuse an unknown request type; the honeypot rule; `TP-XXXXXXXX` references; the three emails
+  (message escaped, receipt without the message, attribution); send order DPO → receipt with one reference and
+  `Reply-To`, receipts capped at 3 a day per address, nothing sent for a filled honeypot; `….ui.test.tsx`
+  (jsdom): browser validation, success state and "Lähetä toinen viesti", the honeypot out of the tab order and
+  the accessibility tree, server field errors and the form-level alert),
   legal pages (`legal/legaldocument-renderer.test.tsx`: `splitLegalSections()` slugs, suffixes and reserved
   ids; `LegalDocument` markup: date in Finnish time, version, numbered sections whose ids match the TOC links,
   lists and links, extra sections first, no TOC without sections; the `config/cookies.ts` lifetimes),
@@ -143,7 +149,12 @@ database or points at port 5432.
   events (user null, `emailHash`), deletes the notification-log rows sent to the address, sends
   `AccountDeleted` (Mailpit) logged without user or address, records its counters in `job-runs` and leaves a
   second account untouched; a run interrupted after the email finishes on retry without a second email; a
-  user who did not ask is refused; 5 password attempts per 15 min; the route takes JSON only (415)).
+  user who did not ask is refused; 5 password attempts per 15 min; the route takes JSON only (415)), and the
+  public forms (`public-forms.int.test.ts`: `submitContact` → `ContactReceived` to `CONTACT_EMAIL` with
+  `Reply-To`, nothing to the visitor; `submitDataRequest` → the receipt to the requester and
+  `DataRequestReceived` to `DPO_EMAIL` with the same reference (Mailpit); invalid input field by field and no
+  email; a filled honeypot answers success and sends nothing; the sixth post of one form from one address
+  redirects to `/liikaa-pyyntoja` while the other form keeps its budget).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 
@@ -164,7 +175,11 @@ database or points at port 5432.
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
   the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents, each with a lead and the `E2E_LEGAL_SECTIONS` of `fixtures.ts`, through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: account deletion (`account-deletion.spec.ts`: a new account's `/tili/poista` shows the explanation
+- Specs: public forms (`public-forms.spec.ts`: footer → `/yhteystiedot` with the addresses, the form switch
+  and the attribution (axe); the browser errors (axe), then a sent message shows "Kiitos viestistäsi" and
+  arrives at `CONTACT_EMAIL` with `Reply-To`; `/tietopyynto` through the switch, Tarkastus preselected, the
+  self-service link, an invalid address, then Poisto → "Tietopyyntö vastaanotettu", the receipt and the DPO email
+  with one reference), account deletion (`account-deletion.spec.ts`: a new account's `/tili/poista` shows the explanation
   and passes axe; the button stays disabled for `poista` or without a password, a wrong password shows the field
   error, the right one lands on `/tili-poistettu` (axe), the Mailpit email arrives, `/tili` then redirects to
   the login and the same credentials are refused), privacy page and data export (`data-export.spec.ts`: a new account's `/tili/tietosuoja` shows the

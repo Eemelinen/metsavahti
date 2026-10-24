@@ -3,6 +3,7 @@ import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildConfig } from 'payload'
@@ -117,7 +118,10 @@ export default buildConfig({
     // Schema comes exclusively from committed migrations in every environment.
     push: false,
     migrationDir: path.resolve(dirname, 'payload/migrations'),
-    prodMigrations: migrations,
+    // Applied once when the production server boots, never by `next build`: its workers each boot
+    // Payload while prerendering pages that read the database, so on an empty database they ran
+    // the same migrations at once and the loser failed the build (CI E2E, F-095).
+    prodMigrations: env.NEXT_PHASE === PHASE_PRODUCTION_BUILD ? undefined : migrations,
     beforeSchemaInit: [cascadeDeletes],
     afterSchemaInit: [addPostgisColumns],
   }),

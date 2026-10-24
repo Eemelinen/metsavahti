@@ -4,7 +4,7 @@ import { Attribution } from '@/components/attribution'
 import { CookieSettingsButton } from '@/components/cookie-settings-button'
 import { fi } from '@/i18n/fi'
 
-/** Legal routes from 03-pages.md → (legal) (MV-091); `/yhteystiedot` arrives with MV-095. */
+/** Legal routes from 03-pages.md → (legal) (MV-091) and the contact page (MV-095). */
 const legalLinks = [
   { href: '/tietosuoja', label: 'Tietosuojaseloste' },
   { href: '/kayttoehdot', label: 'Käyttöehdot' },

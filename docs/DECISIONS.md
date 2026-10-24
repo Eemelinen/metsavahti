@@ -31,6 +31,7 @@ Format: **Context** (what forced a choice) · **Decision** · **Consequences**.
 - Decision: `push: false` everywhere; `prodMigrations` apply on boot in production.
 - Consequences: every schema change needs `pnpm db:migrate:create`; integration tests run `payload migrate` against the throwaway container.
 - Update 2026-09-20 (F-030 / MV-030): the ticket's `0001_postgis` cannot exist as a separate first migration — Payload records every migration in `payload_migrations`, which the initial migration creates, so nothing can run before it. PostGIS is enabled by the adapter's `extensions: ['postgis']` before every `migrate` (CLI and boot) and by the first statement of `20260906_125038_initial`. Raw-SQL migration pattern: `src/payload/migrations/README.md`.
+- Update 2026-10-24 (F-095 CI): "boot" means the server's boot only; `next build` (`NEXT_PHASE=phase-production-build`) leaves `prodMigrations` unset. The build workers boot Payload while prerendering pages that read the database before bailing out to dynamic rendering, and against the empty CI E2E database two of them ran the initial migration at once, so the loser failed the build. The adapter's `CREATE EXTENSION IF NOT EXISTS postgis` can still race there; Payload only logs that.
 
 ## D-005 · Three isolated database environments (2026-09-06)
 

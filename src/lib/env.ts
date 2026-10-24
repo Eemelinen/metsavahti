@@ -13,6 +13,8 @@ const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    /** Set by Next.js itself (`phase-production-build` during `next build`); never configured. */
+    NEXT_PHASE: z.string().min(1).optional(),
     DATABASE_URL: z.url().startsWith('postgres'),
     PAYLOAD_SECRET: z.string().min(16),
     /** HS256 key of the app's signed links (`lib/tokens.ts`, `01 §9`); unset = derived from `PAYLOAD_SECRET`. */
@@ -21,6 +23,10 @@ export const env = createEnv({
     WFS_LAYER: z.string().min(1).default('v1:forestusedeclaration'),
     CRON_SECRET: z.string().min(8),
     EMAIL_FROM: z.string().min(3),
+    /** Inbox of the `/yhteystiedot` form (`ContactReceived`, MV-095); unset = `DEFAULT_CONTACT_EMAIL`. */
+    CONTACT_EMAIL: z.email().optional(),
+    /** Data-protection inbox of the `/tietopyynto` form (`DataRequestReceived`, MV-095); unset = `DEFAULT_DPO_EMAIL`. */
+    DPO_EMAIL: z.email().optional(),
     SMTP_HOST: z.string().min(1).optional(),
     SMTP_PORT: z.coerce.number().int().positive().default(1025),
     RESEND_API_KEY: z.string().min(1).optional(),
