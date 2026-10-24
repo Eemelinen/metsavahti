@@ -1,11 +1,13 @@
 import type { Page } from '@playwright/test'
 
+import { DEFAULT_TIMEZONE } from '@/lib/account/timezone'
+
 import { AUTH_STATE } from '../../playwright.config'
 import { adminApi, signInOwnAccount } from './accounts'
 import { expectNoA11yViolations } from './a11y'
 import { E2E_WATCH_AREA, expect, test } from './fixtures'
 
-/** `lastCheckedAt` stands in for the pipeline's match, which nothing writes yet (MV-072). */
+/** `lastCheckedAt` stands in for a `match-watch-areas` run (MV-072) on the test's own account. */
 async function createArea(page: Page, token: string, name: string, lastCheckedAt?: string) {
   const area = await page.request.post('/api/watch-areas', {
     headers: { authorization: `JWT ${token}` },
@@ -29,6 +31,33 @@ async function unreadAlertsOfArea(areaId: string): Promise<number> {
   } finally {
     await api.dispose()
   }
+}
+
+/**
+ * The watch area's `lastCheckedAt`, read as the admin: unset until the pipeline spec
+ * (`api.spec.ts`) runs `match-watch-areas` in the same run, which stamps it (MV-072).
+ */
+async function lastCheckedAtOfArea(areaId: string): Promise<string | null> {
+  const { api } = await adminApi()
+  try {
+    const res = await api.get(`/api/watch-areas/${areaId}?depth=0`)
+    expect(res.ok(), await res.text()).toBeTruthy()
+    return ((await res.json()) as { lastCheckedAt?: string | null }).lastCheckedAt ?? null
+  } finally {
+    await api.dispose()
+  }
+}
+
+/** "24.10.2026 klo 09.10": the card's format in the e2e user's (default) time zone. */
+function checkedAt(iso: string): string {
+  return new Intl.DateTimeFormat('fi-FI', {
+    timeZone: DEFAULT_TIMEZONE,
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(iso))
 }
 
 /**
@@ -62,14 +91,19 @@ test.describe('/vahtialueet (shared e2e user)', () => {
     const areaId = (await link.getAttribute('href'))!.split('/').pop()!
     await expect(card).toContainText('Säde 800 m')
     await expect(card).toContainText(/\d+ voimassa/)
+    // The pipeline spec may run before or alongside this one: it adds alerts to the seeded area
+    // and stamps its `lastCheckedAt`, so the card is compared with what the API says right then.
     await expect(async () => {
       const unread = await unreadAlertsOfArea(areaId)
+      const lastCheckedAt = await lastCheckedAtOfArea(areaId)
       expect(unread).toBeGreaterThan(0)
       await page.reload()
       await expect(card).toContainText(`Uusia: ${unread}`, { timeout: 2_000 })
+      await expect(card).toContainText(
+        lastCheckedAt ? `Tarkistettu ${checkedAt(lastCheckedAt)}` : 'Ei vielä tarkistettu',
+        { timeout: 2_000 },
+      )
     }).toPass()
-    // No pipeline step writes `lastCheckedAt` yet (MV-072), so the seeded area is unchecked.
-    await expect(card).toContainText('Ei vielä tarkistettu')
     await expect(
       card.getByRole('switch', { name: `Sähköposti-ilmoitukset: ${E2E_WATCH_AREA.name}` }),
     ).toBeVisible()

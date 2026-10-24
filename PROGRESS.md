@@ -121,6 +121,14 @@ Any coding agent can use it; nothing updates it automatically.
 
 ## Session Log
 
+### Session 069 — 2026-10-24 (driver-run: F-072 CI fix attempt 1)
+
+- What failed in CI: job "E2E (Playwright)", step `pnpm test:e2e:ci`: `tests/e2e/dashboard-vahtialueet.spec.ts` "lists the seeded area … @smoke" on all three projects, expecting "Ei vielä tarkistettu" on the seeded area's card but finding "Tarkistettu 24.10.2026 klo 23.24".
+- Root cause: the spec assumed no pipeline step writes `lastCheckedAt` (written before MV-072). `api.spec.ts` runs the jobs endpoint against the WFS mock, and with this branch `match-watch-areas` stamps `lastCheckedAt` on the shared user's seeded area, so the card's label depends on whether the pipeline spec ran first. Classification: fixed (a stale assertion this branch's behaviour exposed).
+- Fix: inside the existing `toPass()` the spec reads the area's `lastCheckedAt` through the admin REST API and expects the matching label: "Ei vielä tarkistettu", or "Tarkistettu <d.m.yyyy klo hh.mm>" formatted in `DEFAULT_TIMEZONE` like the page does. No product code changed.
+- Why local verification missed it: F-072's verification lists L1 and L2 only, so the e2e suite never ran on the branch.
+- Verification: the old spec after `api.spec.ts` (`pnpm test:e2e:ci tests/e2e/api.spec.ts tests/e2e/dashboard-vahtialueet.spec.ts --project=chromium --workers=1`) failed with CI's error; the fixed spec passed in the same order (20 tests) and the full `pnpm test:e2e:ci` passed (245 tests). `pnpm harness:verify F-072` (L1, L2) → pass; `pnpm test:integration` (35 files, 235 tests) pass.
+
 ### Session 068 — 2026-10-24 (driver-run: F-072 match-watch-areas task, attempt 1)
 
 - Goal: MV-072 — the `01 §4.2` match step: alerts `new` / `geometry_changed` / `attributes_changed` (+ `removed` behind `ALERT_ON_REMOVED`), join hashes, `lastCheckedAt` / `lastDeclarationCount`, snapshot in the alert.
