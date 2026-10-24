@@ -64,6 +64,7 @@
     "@payloadcms/ui": "3.88.0",
     "@react-email/components": "1.0.12",
     "@react-email/render": "2.1.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@sentry/nextjs": "10.73.0",
     "@t3-oss/env-nextjs": "0.13.11",
     "@turf/turf": "7.4.0",

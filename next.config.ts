@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname),
   },
+  // Native (napi) renderer of the alert map image; it must be required at runtime, not bundled.
+  serverExternalPackages: ['@resvg/resvg-js'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

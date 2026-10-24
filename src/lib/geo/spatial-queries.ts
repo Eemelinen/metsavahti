@@ -143,6 +143,54 @@ export async function findDeclarationsForWatchArea(
   }))
 }
 
+export type AlertMapGeometry = {
+  ownerId: number
+  /** Watch-area centre in EPSG:3067. */
+  center: [number, number]
+  radiusM: number
+  /** The declaration's polygon in EPSG:3067; null when the row or its geometry is gone. */
+  declaration: DeclarationGeometry | null
+  cuttingTypeCode: number | null
+}
+
+/** What the static map image of an alert draws (MV-077), all in EPSG:3067; null = no alert. */
+export async function findAlertMapGeometry(
+  payload: Payload,
+  alertId: number,
+): Promise<AlertMapGeometry | null> {
+  const { rows } = await run('findAlertMapGeometry', () =>
+    drizzle(payload).execute<{
+      owner_id: number
+      center_e: string | number
+      center_n: string | number
+      radius_m: string | number
+      geojson: string | null
+      cutting_type_code: number | null
+    }>(sql`
+    SELECT
+      a.user_id                                                 AS owner_id,
+      ST_X(ST_Transform(ST_SetSRID(wa.center, 4326), 3067))     AS center_e,
+      ST_Y(ST_Transform(ST_SetSRID(wa.center, 4326), 3067))     AS center_n,
+      wa.radius_m                                               AS radius_m,
+      ST_AsGeoJSON(d.geom)                                      AS geojson,
+      d.cutting_type_code                                       AS cutting_type_code
+    FROM alerts a
+    JOIN watch_areas wa ON wa.id = a.watch_area_id
+    LEFT JOIN declarations d ON d.id = a.declaration_id
+    WHERE a.id = ${alertId}
+  `),
+  )
+  const r = rows[0]
+  if (!r) return null
+  return {
+    ownerId: Number(r.owner_id),
+    center: [Number(r.center_e), Number(r.center_n)],
+    radiusM: Number(r.radius_m),
+    declaration: r.geojson == null ? null : (JSON.parse(r.geojson) as DeclarationGeometry),
+    cuttingTypeCode: r.cutting_type_code == null ? null : Number(r.cutting_type_code),
+  }
+}
+
 /** Used by health checks and tests. */
 export async function postgisVersion(payload: Payload): Promise<string> {
   const { rows } = await run('postgisVersion', () =>

@@ -34,6 +34,8 @@ export const env = createEnv({
     MAINTENANCE_MODE: z.enum(['0', '1']).default('0'),
     /** Shown on `/huolto` as "Palaamme noin klo …" (e.g. `07.00`); without it the page says "pian". */
     MAINTENANCE_RETURN_TIME: z.string().min(1).max(40).optional(),
+    /** `1` serves `GET /api/alerts/[id]/map-image.png` (MV-077); `0` answers 404 there. */
+    ENABLE_MAP_IMAGES: z.enum(['0', '1']).default('0'),
     /** Auth Server Actions (registration) allowed per IP per hour (`01 §8`; ticket MV-042 says 5). */
     AUTH_RATE_LIMIT_PER_HOUR: z.coerce.number().int().positive().default(5),
     /** Local directory for the `exports` upload collection (relative to the working directory). */
