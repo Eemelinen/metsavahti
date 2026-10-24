@@ -261,10 +261,29 @@ vahtialue` points at `/aloita` → login succeeds → the same link is `used`; a
 
 - `vitest.live.config.ts`; hits the real Metsäkeskus WFS. Runs nightly in CI
   (`.github/workflows/nightly.yml`) and tells you when the upstream data model
-  drifts from `src/lib/wfs/schemas.ts`.
+  drifts from the contract pinned in `src/lib/wfs/layer.ts` (attributes, types, CRS, the
+  `VALID_NOW` filter). `pnpm wfs:describe` prints what changed.
 
 ## Fixtures
 
-`fixtures/wfs/forestusedeclaration.sample.json` is a real 2-feature sample
-recorded with `pnpm fixtures:record` (coordinates rounded to cm). The E2E seed
-and the integration tests derive the watch-area centre from its bbox.
+Everything in `fixtures/wfs/` except `forestusedeclaration.sample.json` was recorded from the
+live WFS on 2026-10-24 (MV-021), coordinates rounded to cm; `wfs-layer-contract.test.ts` checks
+every file, the sample included, against the schema.
+
+- `capabilities.xml`, `describe.xml`: the discovery documents behind `src/lib/wfs/layer.ts`
+  (`pnpm wfs:describe --write`).
+- The named set around `SAMPLE_WATCH_AREA` (`fixtures/sample-area.ts`, a 1 km circle in Sipoo),
+  rebuilt with `pnpm fixtures:record --set`; `manifest.json` lists the query, the ids and the
+  edits:
+  - `inside` / `borderline` / `outside`: stands of the area's request box that lie in the
+    circle, cross its edge, or miss it, each at least 10 m clear of the class boundary.
+  - `paged-1` / `paged-2`: the same box in two live pages (`count` in the manifest), the second
+    one shorter.
+  - `empty`: a live box at sea (note `"crs": null`).
+  - `changed-geometry` / `changed-attributes`: `inside` with one stand shifted 5 m east, or with
+    its cutting method changed. Derived, not recorded.
+- `forestusedeclaration.sample.json` is an older real 2-feature sample; the E2E seed and the
+  integration tests derive their watch-area centre from its bbox.
+
+Mocks read the request box with `requestBbox()` (`helpers/wfs-fixture.ts`): the client sends it
+inside `CQL_FILTER`, not as `bbox=` (D-032).

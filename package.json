@@ -35,6 +35,7 @@
     "test:live": "vitest run --config vitest.live.config.ts",
     "jobs:run": "tsx scripts/run-jobs.ts",
     "fixtures:record": "tsx scripts/record-fixtures.ts",
+    "wfs:describe": "tsx scripts/wfs-describe.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

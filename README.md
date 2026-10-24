@@ -130,7 +130,8 @@ Safeguards:
 | `pnpm test:e2e:ci`                                                   | same, but builds first and runs `next start` (what CI does)                                                       |
 | `pnpm test:live`                                                     | opt-in contract test against the real Metsäkeskus WFS                                                             |
 | `pnpm jobs:run`                                                      | run the sync workflow (or `cleanup`) once against the dev DB                                                      |
-| `pnpm fixtures:record -- --bbox …`                                   | record a fresh WFS sample into `tests/fixtures/wfs`                                                               |
+| `pnpm fixtures:record --bbox … --name …` / `--set`                   | record one WFS page, or rebuild the named fixture set around `SAMPLE_WATCH_AREA`, into `tests/fixtures/wfs`       |
+| `pnpm wfs:describe [--write]`                                        | print the live WFS layer and its attributes, compare them with `src/lib/wfs/layer.ts`; `--write` records the XML  |
 | `pnpm lint` / `format` / `typecheck` / `knip`                        | quality gates (also run by Husky on commit and in CI)                                                             |
 | `pnpm check` / `check:full`                                          | L1 verification (lint, typecheck, knip, format:check, harness:check, unit); `check:full` adds integration + build |
 | `pnpm harness:check`                                                 | validate `feature_list.json` (WIP=1, evidence, layer labels)                                                      |

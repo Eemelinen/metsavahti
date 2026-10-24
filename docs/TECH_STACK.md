@@ -89,7 +89,7 @@ Data source: Suomen metsäkeskus open data, WFS 2.0.0 at `https://avoin.metsakes
 - `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`.
 - `msw` (Mock Service Worker) for mocking WFS / geocoder HTTP in unit tests.
 - Targets: CRS transforms, buffer/intersect helpers, hakkuutapa code → label mapping, WFS response parsing (Zod schemas against recorded fixtures), change detection logic, email template rendering.
-- Fixtures: `tests/fixtures/wfs/*.json` recorded from the real WFS (script `pnpm fixtures:record`). Snapshot tests on parsed output.
+- Fixtures: `tests/fixtures/wfs/*.json` recorded from the real WFS (`pnpm fixtures:record`; `--set` rebuilds the named set of `05-conventions.md` around `SAMPLE_WATCH_AREA`), plus the discovery XML from `pnpm wfs:describe --write`. Snapshot tests on parsed output.
 
 ### 4.2 Feature / integration tests — Vitest + Testcontainers
 
@@ -126,7 +126,8 @@ Data source: Suomen metsäkeskus open data, WFS 2.0.0 at `https://avoin.metsakes
   - `db:up`, `db:migrate`, `db:seed`, `db:reset`
   - `test` (unit + integration), `test:unit`, `test:integration`, `test:e2e`, `test:e2e:ui`, `test:live`, `test:coverage`
   - `jobs:run` (runs the queue once locally)
-  - `fixtures:record` (pulls fresh WFS samples for a given bbox into `tests/fixtures`)
+  - `fixtures:record` (pulls fresh WFS samples for a given bbox, or the whole named set with `--set`, into `tests/fixtures`)
+  - `wfs:describe` (prints the live layer and its attributes and compares them with `src/lib/wfs/layer.ts`)
   - `lint`, `format`, `typecheck`, `knip`
 
 ## 6. CI — GitHub Actions

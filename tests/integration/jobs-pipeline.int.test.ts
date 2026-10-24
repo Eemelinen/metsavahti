@@ -9,7 +9,7 @@ import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payloa
 import {
   fixtureBbox,
   loadWfsFixture,
-  parseBboxParam,
+  requestBbox,
   wfsResponseForBbox,
 } from '../helpers/wfs-fixture'
 
@@ -23,7 +23,7 @@ describe('sync-declarations pipeline', () => {
   function useWfsFixture(fc: DeclarationFeatureCollection) {
     server.use(
       http.get(WFS_URL, ({ request }) => {
-        const bbox = parseBboxParam(new URL(request.url).searchParams.get('bbox'))
+        const bbox = requestBbox(new URL(request.url).searchParams)
         return HttpResponse.json(wfsResponseForBbox(fc, bbox))
       }),
     )

@@ -1,0 +1,111 @@
+{
+  "recordedAt": "2026-10-24T08:59:00.206Z",
+  "source": {
+    "url": "https://avoin.metsakeskus.fi/rajapinnat/v1/ows/",
+    "layer": "v1:forestusedeclaration"
+  },
+  "sampleArea": {
+    "name": "Sipoo testialue",
+    "center": {
+      "lng": 25.251118,
+      "lat": 60.352954
+    },
+    "radiusM": 1000,
+    "center3067": [
+      403500.01,
+      6692000.05
+    ]
+  },
+  "requestBbox": [
+    402000.01,
+    6690500.05,
+    405000.01,
+    6693500.05
+  ],
+  "filter": "BBOX(GEOMETRY,402000.01,6690500.05,405000.01,6693500.05,'EPSG:3067') AND VALID_NOW=1",
+  "minMarginM": 10,
+  "skipped": [],
+  "fixtures": {
+    "inside": {
+      "ids": [
+        "forestusedeclaration.27481273",
+        "forestusedeclaration.27927665",
+        "forestusedeclaration.28213960",
+        "forestusedeclaration.28213961",
+        "forestusedeclaration.28213962",
+        "forestusedeclaration.28213963"
+      ]
+    },
+    "borderline": {
+      "ids": [
+        "forestusedeclaration.25753616",
+        "forestusedeclaration.25753617",
+        "forestusedeclaration.27927664",
+        "forestusedeclaration.27998609"
+      ]
+    },
+    "outside": {
+      "ids": [
+        "forestusedeclaration.25753615",
+        "forestusedeclaration.26640954",
+        "forestusedeclaration.26640955",
+        "forestusedeclaration.27000430",
+        "forestusedeclaration.27000431",
+        "forestusedeclaration.28308203",
+        "forestusedeclaration.28315139",
+        "forestusedeclaration.28476670",
+        "forestusedeclaration.28476671"
+      ]
+    },
+    "paged-1": {
+      "count": 10,
+      "startIndex": 0,
+      "ids": [
+        "forestusedeclaration.25753615",
+        "forestusedeclaration.25753616",
+        "forestusedeclaration.25753617",
+        "forestusedeclaration.26640954",
+        "forestusedeclaration.26640955",
+        "forestusedeclaration.27000430",
+        "forestusedeclaration.27000431",
+        "forestusedeclaration.27481273",
+        "forestusedeclaration.27927664",
+        "forestusedeclaration.27927665"
+      ]
+    },
+    "paged-2": {
+      "count": 10,
+      "startIndex": 10,
+      "ids": [
+        "forestusedeclaration.27998609",
+        "forestusedeclaration.28213960",
+        "forestusedeclaration.28213961",
+        "forestusedeclaration.28213962",
+        "forestusedeclaration.28213963",
+        "forestusedeclaration.28308203",
+        "forestusedeclaration.28315139",
+        "forestusedeclaration.28476670",
+        "forestusedeclaration.28476671"
+      ]
+    },
+    "empty": {
+      "bbox": [
+        380000,
+        6630000,
+        382000,
+        6632000
+      ],
+      "ids": []
+    },
+    "changed-geometry": {
+      "derivedFrom": "inside",
+      "changedId": "forestusedeclaration.28213960",
+      "change": "geometry shifted 5 m east"
+    },
+    "changed-attributes": {
+      "derivedFrom": "inside",
+      "changedId": "forestusedeclaration.28213960",
+      "change": "CUTTINGREALIZATIONPRACTICE 1 → 4"
+    }
+  }
+}

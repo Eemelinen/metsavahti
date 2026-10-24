@@ -1,9 +1,14 @@
 import { HttpResponse, http } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { WfsError, buildGetFeatureUrl, createWfsClient } from '@/lib/wfs/client'
+import {
+  WfsError,
+  buildDescribeFeatureTypeUrl,
+  buildGetFeatureUrl,
+  createWfsClient,
+} from '@/lib/wfs/client'
 import { server } from '../../helpers/msw'
-import { loadWfsFixture } from '../../helpers/wfs-fixture'
+import { loadWfsFixture, requestBbox } from '../../helpers/wfs-fixture'
 
 const baseUrl = 'https://wfs.test/rajapinnat/v1/ows/'
 const layer = 'v1:forestusedeclaration'
@@ -19,8 +24,23 @@ describe('wfs client', () => {
     expect(url.searchParams.get('typeNames')).toBe(layer)
     expect(url.searchParams.get('outputFormat')).toBe('application/json')
     expect(url.searchParams.get('srsName')).toBe('EPSG:3067')
-    expect(url.searchParams.get('bbox')).toBe('399000.00,6688000.00,401000.00,6690000.00,EPSG:3067')
     expect(url.searchParams.get('count')).toBe('100')
+  })
+
+  it('asks for the stands in force inside the bbox through CQL_FILTER, not the bbox parameter', () => {
+    const url = buildGetFeatureUrl({ baseUrl, layer }, { bbox, count: 100, startIndex: 200 })
+    expect(url.searchParams.get('CQL_FILTER')).toBe(
+      "BBOX(GEOMETRY,399000.00,6688000.00,401000.00,6690000.00,'EPSG:3067') AND VALID_NOW=1",
+    )
+    expect(url.searchParams.has('bbox')).toBe(false)
+    expect(url.searchParams.get('startIndex')).toBe('200')
+    expect(requestBbox(url.searchParams)).toEqual(bbox)
+  })
+
+  it('builds a DescribeFeatureType URL for the layer', () => {
+    const url = buildDescribeFeatureTypeUrl({ baseUrl, layer })
+    expect(url.searchParams.get('request')).toBe('DescribeFeatureType')
+    expect(url.searchParams.get('typeNames')).toBe(layer)
   })
 
   it('fetches and validates declarations', async () => {
