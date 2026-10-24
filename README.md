@@ -66,7 +66,7 @@ pnpm db:migrate                 # applies src/payload/migrations to the dev DB
 pnpm dev                        # http://localhost:3000
 ```
 
-- `/` — landing page, `/rekisteroidy` — create an account (verification email → `/vahvista-sahkoposti`, resend with a 60 s cooldown), `/vahvista?token=` — the link from the email (verified / expired / used), `/kirjaudu` — sign in (remember-me, `?next=`), `/unohtunut-salasana` — request a reset link (neutral answer), `/uusi-salasana?token=` — set a new password (ends every session) → `/kirjaudu?reset=1`, `/vaihda-sahkoposti/vahvista?token=` — the link that applies an address change requested on `/tili`, `/kirjaudu-ulos` — log out (POST) → `/kirjauduttu-ulos`, `/dashboard` — your watch areas on a map. `src/proxy.ts` sends guests from the app pages to `/kirjaudu?next=`, signed-in users skip the login, registration and forgot-password pages, and every response carries a nonce-based CSP, HSTS and `X-Frame-Options: DENY`
+- `/` — landing page, `/miten-se-toimii` — how the twice-daily check and the alert email work, `/hinnoittelu` — plan cards (only with `SHOW_PRICING=1`), `/rekisteroidy` — create an account (verification email → `/vahvista-sahkoposti`, resend with a 60 s cooldown), `/vahvista?token=` — the link from the email (verified / expired / used), `/kirjaudu` — sign in (remember-me, `?next=`), `/unohtunut-salasana` — request a reset link (neutral answer), `/uusi-salasana?token=` — set a new password (ends every session) → `/kirjaudu?reset=1`, `/vaihda-sahkoposti/vahvista?token=` — the link that applies an address change requested on `/tili`, `/kirjaudu-ulos` — log out (POST) → `/kirjauduttu-ulos`, `/dashboard` — your watch areas on a map. `src/proxy.ts` sends guests from the app pages to `/kirjaudu?next=`, signed-in users skip the login, registration and forgot-password pages, and every response carries a nonce-based CSP, HSTS and `X-Frame-Options: DENY`
 - `/admin` — Payload admin. The **first account created becomes admin**; use
   `/admin/create-first-user` or `pnpm db:seed` (creates `admin@metsavahti.local`).
   A user's detail view ends with a "Tietosuoja" panel for support requests: the consent
@@ -172,7 +172,7 @@ See [tests/README.md](tests/README.md) for details. In short:
 
 ```
 src/
-  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing (hero, steps, explainer, FAQ, JSON-LD), 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
+  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing (hero, steps, explainer, FAQ, JSON-LD), miten-se-toimii, hinnoittelu (SHOW_PRICING), 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
   app/(payload)/          generated Payload admin + REST/GraphQL routes
   app/api/health          liveness + PostGIS check
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
@@ -223,6 +223,7 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
   09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates), and
   `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
 - Migrations run automatically when the production server boots (`prodMigrations`), never during `next build`.
+- Pricing page: set `SHOW_PRICING=1` to serve `/hinnoittelu` and list it in the header and `sitemap.xml` (the sitemap is built at `next build`, so set it there too); off (the default), it is a 404 and nothing links to it.
 - Static map images in alert emails: set `ENABLE_MAP_IMAGES=1`; off, `/api/alerts/[id]/map-image.png` answers 404 and emails go without the image.
 - Analytics: set `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL` (build time) to the Plausible/Umami script; the cookie banner loads it only for visitors who accept analytics. Unset, no analytics loads.
 - Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.

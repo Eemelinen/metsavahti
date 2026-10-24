@@ -6,6 +6,8 @@
 export const plans = {
   free: {
     label: 'Ilmainen',
+    /** Shown on `/hinnoittelu` (MV-101). */
+    monthlyPriceEur: 0,
     /** Watch areas one account may own at the same time. */
     maxWatchAreas: 2,
   },

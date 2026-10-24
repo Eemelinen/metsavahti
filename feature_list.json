@@ -1737,7 +1737,7 @@
       "area": "marketing",
       "title": "/miten-se-toimii, /hinnoittelu and marketing E2E + visual snapshots",
       "user_visible_behavior": "`/miten-se-toimii`: long-form page with two SVG illustrations (2×/day cycle; sample email). `/hinnoittelu` behind `SHOW_PRICING`: plan cards from `plans.ts`. `tests/e2e/marketing.spec.ts` with `@visual` snapshots desktop/mobile for every marketing page.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-011", "F-100"],
       "ticket": "MV-101",
       "epic": "E09",

@@ -1,0 +1,8 @@
+/*
+ * Injected into every `@visual` screenshot (playwright.config.ts → toHaveScreenshot.stylePath).
+ * Locally the suite runs `next dev`, whose dev-tools indicator CI's `next start` does not render;
+ * hiding it keeps one baseline valid for both.
+ */
+nextjs-portal {
+  display: none !important;
+}
