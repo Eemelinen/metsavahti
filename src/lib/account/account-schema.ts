@@ -6,6 +6,7 @@ import { MIN_PASSWORD_LENGTH } from '@/lib/auth/password-strength'
 
 const profileCopy = fi.account.profile.errors
 const passwordCopy = fi.account.password.errors
+const deleteCopy = fi.account.deleteAccount
 
 export const MAX_NAME_LENGTH = 100
 
@@ -58,6 +59,32 @@ export const changePasswordFormSchema = z
 export type ChangePasswordFormValues = z.infer<typeof changePasswordFormSchema>
 export type ChangePasswordField = keyof ChangePasswordFormValues
 export type ChangePasswordFieldErrors = Partial<Record<ChangePasswordField, string>>
+
+/** The word `/tili/poista` asks for before it deletes the account (App artboard `poista`). */
+export const DELETE_ACCOUNT_CONFIRMATION = deleteCopy.confirmWord
+
+/** Where the deletion lands: the public "Tilisi on poistettu" page (`03-pages.md`). */
+export const ACCOUNT_DELETED_PATH = '/tili-poistettu'
+
+/**
+ * Input of `POST /api/account/delete` (`/tili/poista`, E08 MV-094): `POISTA` typed exactly
+ * (upper case; surrounding spaces are forgiven) and the current password, which
+ * `requestAccountDeletion()` checks on the server.
+ */
+export const deleteAccountFormSchema = z.object({
+  confirm: z
+    .string()
+    .trim()
+    .refine(
+      (value): boolean => value === DELETE_ACCOUNT_CONFIRMATION,
+      deleteCopy.errors.confirmMismatch,
+    ),
+  password: z.string().min(1, deleteCopy.errors.passwordMissing),
+})
+
+export type DeleteAccountFormValues = z.infer<typeof deleteAccountFormSchema>
+export type DeleteAccountField = keyof DeleteAccountFormValues
+export type DeleteAccountFieldErrors = Partial<Record<DeleteAccountField, string>>
 
 /** Field errors of a failed parse, the first message per field (the forms show one each). */
 export function fieldErrorsOf<Field extends string>(

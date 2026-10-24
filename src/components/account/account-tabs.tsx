@@ -6,15 +6,13 @@ import { cn } from 'cn'
 
 import { fi } from '@/i18n/fi'
 
-/**
- * The account pages' tab row (App artboard `tiliTabs`). Only pages that exist are listed;
- * Poista tili joins when MV-094 builds it (00-deviations R21).
- */
+/** The account pages' tab row (App artboard `tiliTabs`), in the artboard's order. */
 export const ACCOUNT_TABS = [
   { href: '/tili', label: fi.account.tabs.profile },
   { href: '/tili/turvallisuus', label: fi.account.tabs.security },
   { href: '/tili/ilmoitukset', label: fi.account.tabs.notifications },
   { href: '/tili/tietosuoja', label: fi.account.tabs.privacy },
+  { href: '/tili/poista', label: fi.account.tabs.deleteAccount },
 ] as const
 
 export function AccountTabs() {

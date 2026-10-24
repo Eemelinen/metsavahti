@@ -49,6 +49,8 @@ export type EmailLayoutProps = {
   baseUrl: string
   /** Per-area opt-out link (signed token, MV-073); rendered only when present. */
   unsubscribeUrl?: string
+  /** The footer's "Ilmoitusasetukset" link; off when there is no account left (AccountDeleted). */
+  showSettingsLink?: boolean
   /** Metsäkeskus attribution line; defaults to the current month (CC BY 4.0, README). */
   attribution?: string
 }
@@ -74,6 +76,7 @@ export function EmailLayout({
   footerWhy,
   baseUrl,
   unsubscribeUrl,
+  showSettingsLink = true,
   attribution = metsakeskusAttribution(),
 }: EmailLayoutProps) {
   const settingsUrl = `${baseUrl}${EMAIL_SETTINGS_PATH}`
@@ -243,18 +246,22 @@ export function EmailLayout({
             >
               {footerWhy}
               <br />
-              <Link href={settingsUrl} style={footerLink}>
-                Ilmoitusasetukset
-              </Link>
+              {showSettingsLink ? (
+                <>
+                  <Link href={settingsUrl} style={footerLink}>
+                    Ilmoitusasetukset
+                  </Link>
+                  {' · '}
+                </>
+              ) : null}
               {unsubscribeUrl ? (
                 <>
-                  {' · '}
                   <Link href={unsubscribeUrl} style={footerLink}>
                     Lopeta tämän alueen ilmoitukset
                   </Link>
+                  {' · '}
                 </>
               ) : null}
-              {' · '}
               <Link href={privacyUrl} style={footerLink}>
                 Tietosuojaseloste
               </Link>

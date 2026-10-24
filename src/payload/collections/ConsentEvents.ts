@@ -13,8 +13,10 @@ const appendOnly = () => {
  * Audit trail of every consent decision (`01 §3.7`, `01 §8`, MV-035). Append-only: no
  * update or delete through access control, and the hooks reject them even for the Local
  * API with `overrideAccess` so no code path can rewrite history. `user` is nullable so
- * account deletion can keep the rows with the user cleared (`01 §4.6`). The IP is reduced
- * to its network prefix before it is stored.
+ * account deletion can keep the rows with the user cleared (`01 §4.6`): the `delete-account`
+ * job (`lib/jobs/delete-account.ts`) is the one writer that goes past the hooks, through the
+ * database adapter, and only to set `user` to null and `emailHash` to the SHA-256 of the
+ * address. The IP is reduced to its network prefix before it is stored.
  */
 export const ConsentEvents: CollectionConfig = {
   slug: 'consent-events',
@@ -61,5 +63,16 @@ export const ConsentEvents: CollectionConfig = {
     { name: 'granted', type: 'checkbox', required: true, defaultValue: false, label: 'Annettu' },
     { name: 'ip', type: 'text', label: 'IP (verkko-osa)' },
     { name: 'userAgent', type: 'text', label: 'Selain' },
+    {
+      name: 'emailHash',
+      type: 'text',
+      index: true,
+      label: 'Sähköpostin tiiviste',
+      admin: {
+        readOnly: true,
+        description:
+          'Poistetun tilin osoitteen SHA-256 (pienin kirjaimin): todiste suostumuksesta ilman osoitetta.',
+      },
+    },
   ],
 }
