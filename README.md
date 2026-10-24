@@ -69,6 +69,10 @@ pnpm dev                        # http://localhost:3000
 - `/` — landing page, `/rekisteroidy` — create an account (verification email → `/vahvista-sahkoposti`, resend with a 60 s cooldown), `/vahvista?token=` — the link from the email (verified / expired / used), `/kirjaudu` — sign in (remember-me, `?next=`), `/unohtunut-salasana` — request a reset link (neutral answer), `/uusi-salasana?token=` — set a new password (ends every session) → `/kirjaudu?reset=1`, `/vaihda-sahkoposti/vahvista?token=` — the link that applies an address change requested on `/tili`, `/kirjaudu-ulos` — log out (POST) → `/kirjauduttu-ulos`, `/dashboard` — your watch areas on a map. `src/proxy.ts` sends guests from the app pages to `/kirjaudu?next=`, signed-in users skip the login, registration and forgot-password pages, and every response carries a nonce-based CSP, HSTS and `X-Frame-Options: DENY`
 - `/admin` — Payload admin. The **first account created becomes admin**; use
   `/admin/create-first-user` or `pnpm db:seed` (creates `admin@metsavahti.local`).
+  A user's detail view ends with a "Tietosuoja" panel for support requests: the consent
+  history, the latest export, "Vie käyttäjän tiedot" (the export link goes to the user's own
+  address) and "Poista käyttäjän tili" (not for admin accounts). Each action leaves an
+  `admin-gdpr` row in Tehtäväajot (`job_runs`) under the run id of the job it started.
 - Mailpit UI: http://localhost:8025 — every email sent locally ends up here.
 - `/tili/tietosuoja` — consent history, cookie settings and "Lataa tietoni": the export job runs
   right after the request and emails a 24 h download link (Mailpit locally); the zip holds
@@ -176,6 +180,7 @@ src/
   app/api/consent         cookie consent: sets mv_consent (12 months), records a consent event for a signed-in user
   app/api/account/export  account data export: POST queues the export job (1 / day); GET [id]?token= downloads the zip from the emailed link (24 h)
   app/api/account/delete  account deletion: POST (POISTA + password, JSON) ends every session and runs the delete-account job
+  app/api/admin/users/[id]/{export,delete}  admin GDPR tooling: export / delete an account for a support request (admin session, JSON), audited in job_runs
   payload.config.ts       Payload config (postgres adapter, email, jobs)
   payload/collections     Users, WatchAreas, Declarations, DeclarationRevisions, WatchAreaDeclarations, Alerts, NotificationLog, ConsentEvents, DataExportRequests, JobRuns, LegalDocuments, RateLimitBuckets, Exports (upload)
   payload/access          access-control helpers

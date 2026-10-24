@@ -9,7 +9,10 @@ const deny = () => false
  * counters. Admin read-only; every task writes its rows through `withJobRun()`
  * (`lib/jobs/job-runs.ts`, MV-070), `runId` ties the steps of one workflow run together and
  * the weekly cleanup purges rows older than 90 days. `task` uses the repository's task slugs
- * (`send-alerts`, 00-deviations D8). The list view carries the admin "Aja haku nyt" button.
+ * (`send-alerts`, 00-deviations D8). `admin-gdpr` is not a task but the audit entry of an
+ * admin's export or deletion of an account (MV-098, `lib/account/admin-gdpr.ts`): who, for
+ * whom, which action, under the `runId` of the job it queued. The list view carries the admin
+ * "Aja haku nyt" button.
  */
 export const JobRuns: CollectionConfig = {
   slug: 'job-runs',
@@ -41,6 +44,7 @@ export const JobRuns: CollectionConfig = {
         { label: 'cleanup', value: 'cleanup' },
         { label: 'export', value: 'export' },
         { label: 'delete-account', value: 'delete-account' },
+        { label: 'admin-gdpr', value: 'admin-gdpr' },
       ],
     },
     {

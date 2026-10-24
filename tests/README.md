@@ -154,7 +154,14 @@ database or points at port 5432.
   `Reply-To`, nothing to the visitor; `submitDataRequest` → the receipt to the requester and
   `DataRequestReceived` to `DPO_EMAIL` with the same reference (Mailpit); invalid input field by field and no
   email; a filled honeypot answers success and sends nothing; the sixth post of one form from one address
-  redirects to `/liikaa-pyyntoja` while the other form keeps its budget).
+  redirects to `/liikaa-pyyntoja` while the other form keeps its budget), and the admin GDPR tooling
+  (`admin-gdpr-tooling.int.test.ts`: both admin routes answer 401 to a guest, 403 to a member (also for their
+  own account) and to an admin cookie from another origin, 415 to a form post, 404 to an unknown id, and change
+  nothing; an admin's export runs the `export` job, mails the link to the account only and writes one `admin-gdpr`
+  `job-runs` row under the job's run id, a second one the same day is 429 without a row; an admin's deletion
+  deletes the account without its password, mails `AccountDeleted` and leaves an audit row with ids only next to
+  the `delete-account` row; admin accounts (the acting one too) are refused, an account being deleted cannot be
+  exported; the panel data lists the consent history newest first and never the download link).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 
@@ -179,7 +186,10 @@ database or points at port 5432.
   and the attribution (axe); the browser errors (axe), then a sent message shows "Kiitos viestistäsi" and
   arrives at `CONTACT_EMAIL` with `Reply-To`; `/tietopyynto` through the switch, Tarkastus preselected, the
   self-service link, an invalid address, then Poisto → "Tietopyyntö vastaanotettu", the receipt and the DPO email
-  with one reference), account deletion (`account-deletion.spec.ts`: a new account's `/tili/poista` shows the explanation
+  with one reference), admin GDPR tooling (`admin-gdpr-tooling.spec.ts`: the seeded admin opens a new account in
+  `/admin`, the "Tietosuoja" panel lists its two consents, "Vie käyttäjän tiedot" shows the toast and the ready
+  export, "Poista käyttäjän tili" → the confirmation modal → the user list, and the REST API no longer finds the
+  account), account deletion (`account-deletion.spec.ts`: a new account's `/tili/poista` shows the explanation
   and passes axe; the button stays disabled for `poista` or without a password, a wrong password shows the field
   error, the right one lands on `/tili-poistettu` (axe), the Mailpit email arrives, `/tili` then redirects to
   the login and the same credentials are refused), privacy page and data export (`data-export.spec.ts`: a new account's `/tili/tietosuoja` shows the

@@ -1666,14 +1666,15 @@
       "area": "gdpr",
       "title": "Admin GDPR tooling",
       "user_visible_behavior": "Payload admin: user detail shows consent history, export/delete triggers for admins (support requests), audit log entries in `job_runs`.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-093", "F-094"],
       "ticket": "MV-098",
       "epic": "E08",
       "spec": "docs/product/tickets/E08-gdpr-legal.md#mv-098-admin-gdpr-tooling",
       "verification": [
         "L1: pnpm check",
-        "L2: pnpm test:integration tests/integration/admin-gdpr-tooling.int.test.ts (integration admin-only.)"
+        "L2: pnpm test:integration tests/integration/admin-gdpr-tooling.int.test.ts (integration admin-only.)",
+        "L3: pnpm test:e2e tests/e2e/admin-gdpr-tooling.spec.ts (the panel renders in the Payload admin; export and delete through the buttons)"
       ],
       "evidence": [],
       "attempts": 0,

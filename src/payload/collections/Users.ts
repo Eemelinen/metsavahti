@@ -15,7 +15,8 @@ export const DEFAULT_DAILY_HOUR = 9
  * consent together with its event); `marketingConsentAt` is derived.
  * `locale` is stored for MV-041+ (the UI is Finnish-only today); `notificationPrefs.mode`
  * follows `01 §4.3` (every run, daily digest, weekly digest); plan limits arrive with
- * `src/config/plans.ts` in MV-032 (ledger S15).
+ * `src/config/plans.ts` in MV-032 (ledger S15). The detail view ends with the admin GDPR
+ * panel (`gdpr` ui field, MV-098).
  */
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -265,6 +266,16 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Poistotyön merkki; rivi poistetaan pysyvästi työn lopussa.',
+      },
+    },
+    {
+      // Admin GDPR tooling (MV-098): consent history, latest export and the support-request
+      // export / delete buttons on the user detail view. No column, display only.
+      name: 'gdpr',
+      type: 'ui',
+      admin: {
+        components: { Field: '/components/admin/user-gdpr-panel#UserGdprPanel' },
+        disableListColumn: true,
       },
     },
   ],
