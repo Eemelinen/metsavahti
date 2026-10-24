@@ -131,8 +131,9 @@ database or points at port 5432.
   export (`data-export.int.test.ts`: request → `export` job → a zip of exactly the five files, WGS 84 GeoJSON,
   no credentials in `account.json`, the `ExportReady` link from Mailpit downloads it, `notification-log` and
   `job-runs` rows; an expired token or request is 410, a forged, missing or foreign token 403; a second
-  request the same day is refused, a failed export (SMTP down) keeps no file and can be retried, a lapsed
-  pending request allows a new one the next day).
+  request the same day is refused, a failed export (SMTP down) keeps no file and can be retried, a failed log write
+  after the send keeps the export ready, the route takes JSON only (415), a lapsed pending request allows a
+  new one the next day; every test makes its own export).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 

@@ -170,8 +170,10 @@ export function zipDataExport(files: Record<string, string>, at: Date = new Date
  * The `export` job (`01 §4.5`, MV-093): build the account's archive, store it in the private
  * `exports` collection, mark the request `ready` for 24 hours from now and email the signed
  * download link (`ExportReady`), logging the send in `notification-log` as `data_export`. Any
- * failure (including the email) marks the request `failed` and removes its file, so the page
- * offers a new request; the error is rethrown so `withJobRun` records it. A request that is no longer `pending` is left alone.
+ * failure up to and including the send marks the request `failed` and removes its file, so the
+ * page offers a new request; the error is rethrown so `withJobRun` records it. A request that
+ * is no longer `pending` is left alone (Payload's `processing` flag keeps two runners off one
+ * job).
  */
 export async function runDataExport(ctx: JobContext, requestId: number): Promise<DataExportResult> {
   const { payload, logger, now } = ctx
@@ -225,17 +227,34 @@ export async function runDataExport(ctx: JobContext, requestId: number): Promise
     return { files: Object.keys(files).length, bytes: zip.byteLength, emailsSent }
   } catch (error) {
     logger.error({ err: error, requestId }, 'data export failed')
+    await markExportFailed(ctx, requestId, fileId)
+    throw error
+  }
+}
+
+/**
+ * Mark the request `failed` and delete its file (the cleanup only sweeps pending / ready
+ * requests, so a failed one must not keep a file). Best effort: when the database is the
+ * reason the export failed, these writes fail too, and the caller's original error is the one
+ * that must reach `withJobRun`; the request then lapses at its `expiresAt` as a pending one.
+ */
+async function markExportFailed(
+  { payload, logger }: JobContext,
+  requestId: number,
+  fileId: number | null,
+): Promise<void> {
+  try {
     await payload.update({
       collection: 'data-export-requests',
       id: requestId,
       data: { status: 'failed', file: null },
       overrideAccess: true,
     })
-    // The cleanup only sweeps pending / ready requests, so a failed one must not keep a file.
     if (fileId !== null) {
       await payload.delete({ collection: 'exports', id: fileId, overrideAccess: true })
     }
-    throw error
+  } catch (err) {
+    logger.error({ err, requestId, fileId }, 'could not mark the data export failed')
   }
 }
 
@@ -251,7 +270,7 @@ export function signDataExportToken(
 }
 
 async function sendExportReady(
-  { payload, runId }: JobContext,
+  { payload, logger, runId }: JobContext,
   user: User,
   archive: { requestId: number; files: string[]; sizeBytes: number; expiresAt: Date; at: Date },
 ): Promise<number> {
@@ -269,18 +288,24 @@ async function sendExportReady(
   })
   // A failed send fails the job: without the email the person never learns the link.
   await payload.sendEmail({ to: user.email, subject: EXPORT_READY_SUBJECT, ...email })
-  await payload.create({
-    collection: 'notification-log',
-    data: {
-      type: 'data_export',
-      user: user.id,
-      recipient: user.email,
-      provider: emailProvider(),
-      status: 'sent',
-      sentAt: archive.at.toISOString(),
-      jobRunId: runId,
-    },
-    overrideAccess: true,
-  })
+  // After a successful send the link is out, so a failed log write must not fail the export
+  // (that would delete the file behind the link).
+  try {
+    await payload.create({
+      collection: 'notification-log',
+      data: {
+        type: 'data_export',
+        user: user.id,
+        recipient: user.email,
+        provider: emailProvider(),
+        status: 'sent',
+        sentAt: archive.at.toISOString(),
+        jobRunId: runId,
+      },
+      overrideAccess: true,
+    })
+  } catch (err) {
+    logger.error({ err, requestId: archive.requestId }, 'could not log the export email')
+  }
   return 1
 }

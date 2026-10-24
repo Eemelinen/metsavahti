@@ -164,13 +164,11 @@ describe('account data export (MV-093)', () => {
   })
 
   it('answers 410 for an expired link and an expired request, 403 for a bad one', async () => {
-    const { docs } = await payload.find({
-      collection: 'data-export-requests',
-      where: { user: { equals: user.id } },
-      overrideAccess: true,
-    })
-    const request = docs[0]!
-    const link = await emailedLink(user.email)
+    const account = await createTestUser(payload)
+    const request = await exportNow(account)
+    expect(request.status).toBe('ready')
+    const link = await emailedLink(account.email)
+    expect(link).toContain(`/api/account/export/${request.id}?token=`)
 
     // Past the 24 h the token itself has expired: Gone.
     const later = new Date(Date.now() + 25 * HOUR_MS)
@@ -179,7 +177,7 @@ describe('account data export (MV-093)', () => {
     expect((await expired.json()).error.code).toBe('gone')
     // A link signed long ago and expired an hour ago is Gone as well.
     const old = await signDataExportToken(
-      user.id,
+      account.id,
       request.id,
       new Date(Date.now() - HOUR_MS),
       new Date(Date.now() - 25 * HOUR_MS),
@@ -216,7 +214,7 @@ describe('account data export (MV-093)', () => {
       overrideAccess: true,
     })
     expect((await download(payload, link)).status).toBe(410)
-    expect((await dataExportState(payload, user)).status).toBe('expired')
+    expect((await dataExportState(payload, account)).status).toBe('expired')
   })
 
   it('marks a failed export, keeps no file and lets the person ask again', async () => {
@@ -241,6 +239,31 @@ describe('account data export (MV-093)', () => {
 
     const retried = await exportNow(account)
     expect(retried.status).toBe('ready')
+  })
+
+  it('keeps a sent export ready when only the notification-log write fails', async () => {
+    const account = await createTestUser(payload)
+    const create = payload.create.bind(payload)
+    vi.spyOn(payload, 'create').mockImplementation(((args: Parameters<Payload['create']>[0]) =>
+      args.collection === 'notification-log'
+        ? Promise.reject(new Error('log down'))
+        : create(args)) as Payload['create'])
+    const request = await exportNow(account)
+    expect(request.status).toBe('ready')
+    const link = await emailedLink(account.email)
+    expect((await download(payload, link)).status).toBe(200)
+  })
+
+  it('takes JSON only at POST /api/account/export', async () => {
+    const { POST } = await import('@/app/api/account/export/route')
+    const response = await POST(
+      new Request('http://localhost/api/account/export', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: 'a=1',
+      }),
+    )
+    expect(response.status).toBe(415)
   })
 
   it('lets an account ask again a day after its last request', async () => {
