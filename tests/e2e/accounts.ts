@@ -152,3 +152,26 @@ export async function createVerifiedAccount(
   await markVerified(email)
   return email
 }
+
+/**
+ * A verified account of the test's own (`<prefix>-<time>@metsavahti.test`), signed in through
+ * the REST login, which also sets the browser context's session cookie; returns its JWT for
+ * REST calls as the account. For specs that change or delete what they see, so they leave the
+ * shared e2e user alone.
+ */
+export async function signInOwnAccount(page: Page, prefix: string): Promise<string> {
+  const email = `${prefix}-${Date.now()}@metsavahti.test`
+  const { api } = await adminApi()
+  try {
+    const created = await api.post('/api/users', { data: { email, password: ACCOUNT_PASSWORD } })
+    expect(created.ok(), await created.text()).toBeTruthy()
+  } finally {
+    await api.dispose()
+  }
+  await markVerified(email)
+  const login = await page.request.post('/api/users/login', {
+    data: { email, password: ACCOUNT_PASSWORD },
+  })
+  expect(login.ok(), await login.text()).toBeTruthy()
+  return ((await login.json()) as { token: string }).token
+}

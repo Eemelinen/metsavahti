@@ -5,7 +5,7 @@ import { bbox as turfBbox } from '@turf/turf'
 import { cn } from 'cn'
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 import { getVersion, setWorkerUrl } from 'maplibre-gl'
-import { type KeyboardEvent, useMemo, useRef, useState } from 'react'
+import { type KeyboardEvent, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import {
   AttributionControl,
   type FillLayerSpecification,
@@ -58,6 +58,15 @@ export type MapViewProps = {
    * polygons; a feature's `detailHref` is the target of "Näytä tiedot".
    */
   declarationsGeoJSON?: FeatureCollection<AreaGeometry, MapDeclarationProperties>
+  /**
+   * Controlled selection: the declaration whose popover is open. When it changes from outside
+   * (a list of the page's own), the map moves to that polygon; a polygon click reports through
+   * `onSelectedDeclarationChange`. Left out, the map keeps the selection itself.
+   */
+  selectedDeclarationId?: MapDeclaration['id'] | null
+  onSelectedDeclarationChange?: (id: MapDeclaration['id'] | null) => void
+  /** `false` leaves out the list under the map, for a page that renders its own (R37). */
+  declarationList?: boolean
   /**
    * Placement mode: the pin can be dragged or moved with the arrow keys, a map click moves it
    * (declarations then open no popover; the list still selects them).
@@ -143,6 +152,9 @@ export function MapViewCanvas({
   radiusM,
   watchAreaGeoJSON,
   declarationsGeoJSON,
+  selectedDeclarationId,
+  onSelectedDeclarationChange,
+  declarationList = true,
   interactive = false,
   onCenterChange,
   zoom = DEFAULT_ZOOM,
@@ -153,7 +165,11 @@ export function MapViewCanvas({
   const [ready, setReady] = useState(false)
   const [wmsOn, setWmsOn] = useState(false)
   const [currentZoom, setCurrentZoom] = useState<number | null>(null)
-  const [selectedId, setSelectedId] = useState<MapDeclaration['id'] | null>(null)
+  const [ownSelectedId, setOwnSelectedId] = useState<MapDeclaration['id'] | null>(null)
+  const controlled = selectedDeclarationId !== undefined
+  const selectedId = controlled ? selectedDeclarationId : ownSelectedId
+  /** The id a polygon click just reported, so the controlled update it causes does not fit. */
+  const clickedId = useRef<MapDeclaration['id'] | null | undefined>(undefined)
   const [overDeclaration, setOverDeclaration] = useState(false)
 
   const mapStyle = useMemo(() => baseStyle(sources.baseTiles), [sources.baseTiles])
@@ -187,6 +203,26 @@ export function MapViewCanvas({
 
   const selected = declarations?.features.find((f) => f.id === selectedId) ?? null
 
+  function setSelectedId(id: MapDeclaration['id'] | null) {
+    if (!controlled) setOwnSelectedId(id)
+    onSelectedDeclarationChange?.(id)
+  }
+
+  function fitDeclaration(id: MapDeclaration['id']) {
+    const feature = declarations?.features.find((f) => f.id === id)
+    const bounds = feature && boundsOf({ type: 'FeatureCollection', features: [feature] })
+    if (bounds) mapRef.current?.fitBounds(bounds, { padding: FIT_PADDING, maxZoom: 15 })
+  }
+
+  // A controlled selection made outside the map ("Näytä kartalla" of the page's list).
+  const fitSelected = useEffectEvent(fitDeclaration)
+  useEffect(() => {
+    if (!controlled) return
+    const fromClick = clickedId.current === selectedDeclarationId
+    clickedId.current = undefined
+    if (selectedDeclarationId != null && !fromClick) fitSelected(selectedDeclarationId)
+  }, [controlled, selectedDeclarationId])
+
   const areaBounds = useMemo(() => boundsOf(watchArea), [watchArea])
   // Captured once: later prop changes move the overlays, not the camera.
   const [initialViewState] = useState(() =>
@@ -216,14 +252,16 @@ export function MapViewCanvas({
       return
     }
     // `features` holds the hit `declarations-fill` polygons; a click beside them closes the popover.
-    setSelectedId(event.features?.[0]?.id ?? null)
+    const id = event.features?.[0]?.id ?? null
+    clickedId.current = id
+    setSelectedId(id)
   }
 
   function showDeclaration(declaration: MapDeclaration) {
+    // Fitted here; the controlled update this causes must not fit a second time.
+    clickedId.current = declaration.id
     setSelectedId(declaration.id)
-    const feature = declarations?.features.find((f) => f.id === declaration.id)
-    const bounds = feature && boundsOf({ type: 'FeatureCollection', features: [feature] })
-    if (bounds) mapRef.current?.fitBounds(bounds, { padding: FIT_PADDING, maxZoom: 15 })
+    fitDeclaration(declaration.id)
   }
 
   function movePin(event: KeyboardEvent<HTMLButtonElement>) {
@@ -394,7 +432,7 @@ export function MapViewCanvas({
           />
         ) : null}
       </div>
-      {declarations ? (
+      {declarations && declarationList ? (
         <DeclarationList
           className="mt-3"
           declarations={declarations.features}

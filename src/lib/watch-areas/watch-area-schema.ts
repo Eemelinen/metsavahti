@@ -50,3 +50,9 @@ export type WatchAreaFieldErrors = Partial<Record<WatchAreaField, string>>
 
 /** The id of one of the account's watch areas, as `updateWatchArea` / `deleteWatchArea` get it. */
 export const watchAreaIdSchema = z.number().int().positive()
+
+/** The `[id]` of the page and the endpoint as a row id; anything else (`abc`, `01`, `-1`) is null. */
+export function watchAreaIdParam(param: string): number | null {
+  // Nine digits stay inside Postgres `integer`.
+  return /^[1-9]\d{0,8}$/.test(param) ? Number(param) : null
+}

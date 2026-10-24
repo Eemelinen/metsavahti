@@ -1237,7 +1237,7 @@
       "area": "watch-areas",
       "title": "Watch-area detail /vahtialueat/[id] and declarations.geojson endpoint",
       "user_visible_behavior": "Route `/vahtialueet/[id]`: map (60 vh mobile) + declaration list with filters (type, only-new, date range in searchParams), expandable rows with Finnish attribute labels and the intention disclaimer, actions (edit/notifications/delete with ConfirmDialog). `GET /api/watch-areas/[id]/declarations.geojson` owner-only, WGS84, includes `isNew` per alert state.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-037", "F-061", "F-066"],
       "ticket": "MV-067",
       "epic": "E05",
@@ -1248,7 +1248,11 @@
         "L2: pnpm test:integration tests/integration/watch-area-detail-vahtialueat-id-and-dec.int.test.ts (integration endpoint 403 for non-owner; E2E filter + delete.)",
         "L3: pnpm test:e2e tests/e2e/watch-area-detail-vahtialueat-id-and-dec.spec.ts (integration endpoint 403 for non-owner; E2E filter + delete.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on c6f30e1)",
+        "2026-10-24 pnpm test:integration tests/integration/watch-area-detail-vahtialueat-id-and-dec.int.test.ts → pass (working tree on c6f30e1, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/watch-area-detail-vahtialueat-id-and-dec.spec.ts → pass (working tree on c6f30e1, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Was F-007 (matched declarations overlay; 3067 → 4326 conversion; spatial SQL only in spatial-queries.ts). Tests (ticket): integration endpoint 403 for non-owner; E2E filter + delete."
     },

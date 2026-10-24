@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { AlertDialog, DropdownMenu } from 'radix-ui'
+import { DropdownMenu } from 'radix-ui'
 import { cn } from 'cn'
 
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { FormError } from '@/components/forms/form-error'
 import { FormSuccess } from '@/components/forms/form-success'
 import { useHydrated } from '@/components/forms/use-hydrated'
@@ -153,36 +154,16 @@ export function WatchAreaCards({ areas }: { areas: WatchAreaCard[] }) {
         ))}
       </ul>
 
-      <AlertDialog.Root
-        onOpenChange={(open) => !open && !deleting && setConfirming(null)}
+      <ConfirmDialog
+        cancelLabel={copy.cancel}
+        confirmLabel={copy.confirmOk}
+        description={confirming ? copy.confirmBody(confirming.name) : null}
+        onCancel={() => setConfirming(null)}
+        onConfirm={() => confirming && remove(confirming)}
         open={confirming !== null}
-      >
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay className="fixed inset-0 z-50 flex items-center justify-center bg-ink/45 p-4">
-            <AlertDialog.Content className="flex w-full max-w-110 flex-col gap-4 rounded-xl bg-paper-raised p-6 text-ink shadow-pop">
-              <AlertDialog.Title className="text-xl font-bold text-forest-700">
-                {copy.confirmTitle}
-              </AlertDialog.Title>
-              <AlertDialog.Description className="text-ink-muted">
-                {confirming ? copy.confirmBody(confirming.name) : null}
-              </AlertDialog.Description>
-              <div className="flex flex-wrap justify-end gap-2.5">
-                <AlertDialog.Cancel className="min-h-11 cursor-pointer rounded-lg border border-line bg-paper-raised px-4.5 py-3 font-semibold text-forest-700 hover:bg-forest-50">
-                  {copy.cancel}
-                </AlertDialog.Cancel>
-                <button
-                  className="min-h-11 cursor-pointer rounded-lg bg-ember-700 px-4.5 py-3 font-semibold text-white hover:bg-ember-700/90 disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={deleting}
-                  onClick={() => confirming && remove(confirming)}
-                  type="button"
-                >
-                  {copy.confirmOk}
-                </button>
-              </div>
-            </AlertDialog.Content>
-          </AlertDialog.Overlay>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+        pending={deleting}
+        title={copy.confirmTitle}
+      />
     </>
   )
 }
