@@ -45,7 +45,7 @@ export const DECLARATION_NUMBER_FIELD = 'FORESTUSEDECLARATIONNUMBER'
  */
 export const VALID_NOW_FIELD = 'VALID_NOW'
 
-/** Cutting method (hakkuutapa), code list 1014; see `hakkuutapa.ts`. */
+/** Cutting method (hakkuutapa), code list 1014; labels in `src/config/cutting-types.ts`. */
 export const CUTTING_TYPE_FIELD = 'CUTTINGREALIZATIONPRACTICE'
 
 /** Stand area in hectares. */

@@ -143,7 +143,7 @@ describe('declarations + declaration_revisions', () => {
       data: {
         sourceId: 'forestusedeclaration.2',
         declarationNumber: '1-2026-3',
-        cuttingTypeCode: 4,
+        cuttingTypeCode: 5,
         receivedAt: '2026-03-01T00:00:00.000Z',
         geomHash: 'g2',
         attrHash: 'a2',
@@ -159,10 +159,10 @@ describe('declarations + declaration_revisions', () => {
     const updated = await payload.update({
       collection: 'declarations',
       id: doc.id,
-      data: { cuttingTypeCode: 2, receivedAt: '2026-04-01T00:00:00.000Z' },
+      data: { cuttingTypeCode: 3, receivedAt: '2026-04-01T00:00:00.000Z' },
       overrideAccess: true,
     })
-    expect(updated.cuttingTypeLabel).toBe('Harvennus')
+    expect(updated.cuttingTypeLabel).toBe('Harvennushakkuu')
     expect(updated.validUntil).toBe('2029-04-01T00:00:00.000Z')
   })
 

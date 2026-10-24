@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseFeatureCollection, toDeclarationRecords } from '@/lib/wfs/parse'
+import { parseFeatureCollection } from '@/lib/wfs/parse'
 import { loadWfsFixture } from '../../helpers/wfs-fixture'
 
 describe('wfs parse', () => {
@@ -19,10 +19,5 @@ describe('wfs parse', () => {
     }
     expect(() => parseFeatureCollection(broken)).toThrow()
     expect(() => parseFeatureCollection({ type: 'Nope' })).toThrow()
-  })
-
-  it('normalises features into declaration records', () => {
-    const records = toDeclarationRecords(parseFeatureCollection(fixture))
-    expect(records.map(({ geometry: _g, rawAttributes: _p, ...rest }) => rest)).toMatchSnapshot()
   })
 })

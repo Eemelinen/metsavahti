@@ -88,7 +88,7 @@ Data source: Suomen metsäkeskus open data, WFS 2.0.0 at `https://avoin.metsakes
 - `vitest` + `@vitest/coverage-v8`, environment `node` by default, `jsdom` for component tests.
 - `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`.
 - `msw` (Mock Service Worker) for mocking WFS / geocoder HTTP in unit tests.
-- Targets: CRS transforms, buffer/intersect helpers, hakkuutapa code → label mapping, WFS response parsing (Zod schemas against recorded fixtures), change detection logic, email template rendering.
+- Targets: CRS transforms, buffer/intersect helpers, cutting-type code → label mapping (`config/cutting-types.ts`), WFS response parsing (Zod schemas against recorded fixtures), change detection logic, email template rendering.
 - Fixtures: `tests/fixtures/wfs/*.json` recorded from the real WFS (`pnpm fixtures:record`; `--set` rebuilds the named set of `05-conventions.md` around `SAMPLE_WATCH_AREA`), plus the discovery XML from `pnpm wfs:describe --write`. Snapshot tests on parsed output.
 
 ### 4.2 Feature / integration tests — Vitest + Testcontainers

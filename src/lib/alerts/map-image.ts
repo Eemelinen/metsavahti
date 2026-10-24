@@ -9,7 +9,7 @@ import { Forbidden, NotFound, Unauthorized, toErrorResponse } from '@/lib/errors
 import type { EastNorth } from '@/lib/geo/crs'
 import { type AlertMapGeometry, findAlertMapGeometry } from '@/lib/geo/spatial-queries'
 import { signToken, verifyToken } from '@/lib/tokens'
-import { hakkuutapaCategory } from '@/lib/wfs/hakkuutapa'
+import { cuttingColourToken } from '@/lib/wfs/codes'
 
 /**
  * The static map image of an alert email (`01 §4.3`, `01 §6`, MV-077): the watch circle and
@@ -64,7 +64,7 @@ export function composeMapImageSvg(geometry: AlertMapGeometry): string {
   const x = (e: number) => round(MAP_IMAGE_WIDTH / 2 + (e - midE) * scale)
   const y = (n: number) => round(MAP_IMAGE_HEIGHT / 2 - (n - midN) * scale)
 
-  const category = hakkuutapaCategory(geometry.cuttingTypeCode)
+  const category = cuttingColourToken(geometry.cuttingTypeCode)
   const paths = polygons.map((polygon) => {
     const d = polygon
       .map((ring) => `M${ring.map(([e, n]) => `${x(e)} ${y(n)}`).join('L')}Z`)
