@@ -1575,7 +1575,10 @@
       "evidence": [
         "2026-10-24 pnpm check → pass (commit 00c30e8)",
         "2026-10-24 pnpm test:integration tests/integration/data-export.int.test.ts → pass (commit 00c30e8, Docker available)",
-        "2026-10-24 pnpm test:e2e tests/e2e/data-export.spec.ts → pass (commit 00c30e8, Docker available)"
+        "2026-10-24 pnpm test:e2e tests/e2e/data-export.spec.ts → pass (commit 00c30e8, Docker available)",
+        "2026-10-24 pnpm check → pass (commit 961b9c1)",
+        "2026-10-24 pnpm test:integration tests/integration/data-export.int.test.ts → pass (commit 961b9c1, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/data-export.spec.ts → pass (commit 961b9c1, Docker available)"
       ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: zip contains 5 files, geojson valid WGS84; expired token 410; E2E: page renders consent history; request → Mailpit link → 200. Status (ticket): absorbs MV-056 (merged 2026-09-20, ledger P11)."
