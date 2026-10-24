@@ -456,7 +456,7 @@ export interface JobRun {
   runId?: string | null;
   startedAt: string;
   finishedAt?: string | null;
-  status: 'running' | 'succeeded' | 'failed';
+  status: 'running' | 'succeeded' | 'partial' | 'failed';
   stats?:
     | {
         [k: string]: unknown;
@@ -1127,10 +1127,13 @@ export interface TaskFetchDeclarations {
   input?: unknown;
   output: {
     watchAreas: number;
-    fetched: number;
-    created: number;
+    bboxes: number;
+    failedBboxes: number;
+    requests: number;
+    features: number;
+    inserted: number;
     updated: number;
-    revisions: number;
+    removed: number;
   };
 }
 /**

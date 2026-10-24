@@ -3,10 +3,13 @@ import type { JobRun } from '@/payload-types'
 
 export type JobRunTask = JobRun['task']
 
+/** How a step that returned ended: `partial` when part of its work failed (MV-071). */
+export type JobRunOutcome = Extract<JobRun['status'], 'succeeded' | 'partial'>
+
 /**
  * Run one pipeline step and record it in `job_runs` (`01 §3.9`, MV-070): a `running` row
- * before `fn` starts, then `succeeded` with `fn`'s result as `stats`, or `failed` with the
- * error message. The error is rethrown so Payload's retries still apply; every attempt
+ * before `fn` starts, then `succeeded` (or what `statusOf` makes of the result, e.g.
+ * `partial`) with `fn`'s result as `stats`, or `failed` with the error message. The error is rethrown so Payload's retries still apply; every attempt
  * gets its own row. The rows are written outside the task's transaction, so a failed
  * attempt stays recorded.
  */
@@ -14,6 +17,7 @@ export async function withJobRun<T extends Record<string, unknown>>(
   ctx: JobContext,
   task: JobRunTask,
   fn: () => Promise<T>,
+  statusOf: (stats: T) => JobRunOutcome = () => 'succeeded',
 ): Promise<T> {
   const { payload, logger, now, runId } = ctx
   const run = await payload.create({
@@ -43,7 +47,7 @@ export async function withJobRun<T extends Record<string, unknown>>(
   await payload.update({
     collection: 'job-runs',
     id: run.id,
-    data: { status: 'succeeded', finishedAt: now().toISOString(), stats },
+    data: { status: statusOf(stats), finishedAt: now().toISOString(), stats },
     overrideAccess: true,
   })
   return stats

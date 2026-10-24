@@ -28,21 +28,6 @@ async function run<T>(label: string, query: () => Promise<T>): Promise<T> {
   }
 }
 
-/** Store a GeoJSON geometry (already in EPSG:3067) into `declarations.geom`. */
-export async function setDeclarationGeometry(
-  payload: Payload,
-  declarationId: number,
-  geometry: DeclarationGeometry,
-): Promise<void> {
-  await run('setDeclarationGeometry', () =>
-    drizzle(payload).execute(sql`
-      UPDATE declarations
-      SET geom = ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(${JSON.stringify(geometry)}), 3067))
-      WHERE id = ${declarationId}
-    `),
-  )
-}
-
 export type UpsertDeclarationsResult = {
   /** Rows that did not exist before. */
   inserted: number

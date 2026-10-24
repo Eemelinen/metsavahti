@@ -1306,7 +1306,7 @@
       "area": "pipeline",
       "title": "fetch-declarations task",
       "user_visible_behavior": "Per `01 §4.1`: load active areas → `clusterBboxes` → paged `WfsClient` fetch → normalise → `upsertDeclarations` (batches of 500, revisions on hash change) → per-bbox seen-set → `markMissing` (3 consecutive misses → `removedAt`). Per-bbox error isolation; status `partial`. Stats: requests, features, inserted, updated, removed.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-023", "F-026", "F-037", "F-070"],
       "ticket": "MV-071",
       "epic": "E06",
@@ -1315,7 +1315,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/fetch-declarations-task.int.test.ts (integration with MSW WFS fixtures: inserts; changed-geometry fixture → revision row; missing 3× → removed; one failing bbox → others succee…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on eca20ed)",
+        "2026-10-24 pnpm test:integration tests/integration/fetch-declarations-task.int.test.ts → pass (working tree on eca20ed, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration with MSW WFS fixtures: inserts; changed-geometry fixture → revision row; missing 3× → removed; one failing bbox → others succeed, status partial."
     },

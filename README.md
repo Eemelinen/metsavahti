@@ -20,7 +20,7 @@ emails you when a **new or changed declaration** lands inside that circle.
  user draws a watch area ──► watch-areas (PostGIS: buffered polygon in EPSG:3067)
                                                  │
  cron 09:30 / 21:30 ──► POST /api/jobs/run ──► sync-declarations workflow
-                                                 ├─ fetch-declarations   WFS bbox query per area → declarations (+ geom, hashes, revisions)
+                                                 ├─ fetch-declarations   clustered WFS boxes, every page → declarations (+ geom, hashes, revisions, missing runs)
                                                  ├─ match-watch-areas    ST_Intersects(declarations.geom, watch_areas.geom_3067) → watch-area-declarations (seen hashes) → alerts
                                                  └─ send-alerts          one email per (user, area) → notification-log
 ```
