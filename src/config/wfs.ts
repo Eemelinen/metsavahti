@@ -30,4 +30,12 @@ export const wfs = {
    * ~2.9 MB on 2026-10-24 (D-012); the server's `CountDefault` caps it at 10 000.
    */
   pageSize: 1_000,
+  /**
+   * Consecutive runs a stored declaration may be missing from its bbox's results before
+   * it gets `removedAt` (`01 §3.3`, `§4.1` step 5; `markMissing()` in
+   * `src/lib/geo/spatial-queries.ts`).
+   */
+  missingRunsBeforeRemoval: 3,
+  /** Rows per `upsertDeclarations()` statement (`01 §4.1` step 4: transactions of 500). */
+  upsertBatchSize: 500,
 } as const

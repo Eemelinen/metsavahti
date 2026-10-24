@@ -691,7 +691,7 @@
       "area": "data-model",
       "title": "Spatial query module",
       "user_visible_behavior": "`src/lib/geo/spatial-queries.ts`: `upsertDeclarations(batch)`, `markMissing(bboxId, seenIds)`, `matchWatchAreas()` (the SQL in `01 §4.2`, returning inserted/changed rows), `declarationsForWatchArea(id)` → GeoJSON WGS84, `previewCount(center, radius)`. All Drizzle `sql` tags, parameterised.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-024", "F-025", "F-034"],
       "ticket": "MV-037",
       "epic": "E02",
@@ -700,7 +700,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/spatial-query-module.int.test.ts (integration with factories: inside/outside/borderline fixtures → expected matches; distance for outside-but-intersecting polygon = 0; idemp…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on b123847)",
+        "2026-10-24 pnpm test:integration tests/integration/spatial-query-module.int.test.ts → pass (working tree on b123847, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration with factories: inside/outside/borderline fixtures → expected matches; distance for outside-but-intersecting polygon = 0; idempotent re-run inserts nothing."
     },

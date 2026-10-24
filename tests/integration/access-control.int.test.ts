@@ -70,8 +70,11 @@ describe('access control', () => {
 
   it('populates the generated PostGIS polygon for a watch area', async () => {
     const payload = await getTestPayload()
-    const { findDeclarationsForWatchArea } = await import('@/lib/geo/spatial-queries')
+    const { declarationsForWatchArea } = await import('@/lib/geo/spatial-queries')
     // No declarations yet → empty, but the query exercises geom_3067.
-    expect(await findDeclarationsForWatchArea(payload, aliceAreaId)).toEqual([])
+    expect(await declarationsForWatchArea(payload, aliceAreaId)).toEqual({
+      type: 'FeatureCollection',
+      features: [],
+    })
   })
 })
