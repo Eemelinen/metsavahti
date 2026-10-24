@@ -1,3 +1,4 @@
+import { type MigrateUpArgs, type PostgresAdapter, sql } from '@payloadcms/db-postgres'
 import { HttpResponse, http } from 'msw'
 import type { Payload } from 'payload'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,6 +12,7 @@ import { isBboxFetched } from '@/lib/geo/spatial-queries'
 import { previewFetchRateLimiter, watchAreaPreview } from '@/lib/watch-areas/preview'
 import { MetsakeskusWfsClient } from '@/lib/wfs/client'
 import type { DeclarationFeatureCollection } from '@/lib/wfs/schemas'
+import * as migration from '@/payload/migrations/20261024_160502_wfs_bbox_fetches'
 import type { User } from '@/payload-types'
 import { SAMPLE_WATCH_AREA } from '../fixtures/sample-area'
 import manifest from '../fixtures/wfs/manifest.json'
@@ -225,5 +227,23 @@ describe('preview endpoint (MV-063)', () => {
       expect(await res.json()).toEqual({ ok: false, error: 'invalid_query' })
       expect(wfsCalls).toHaveLength(0)
     })
+  })
+
+  it('migration round-trip drops and recreates the table (runs last)', async () => {
+    const db = (payload.db as unknown as PostgresAdapter).drizzle
+    const args = { db } as unknown as MigrateUpArgs
+    const tables = async () =>
+      (
+        await db.execute<{ n: number }>(sql`
+          SELECT count(*)::int AS n FROM pg_tables WHERE tablename = 'wfs_bbox_fetches'
+        `)
+      ).rows[0]!.n
+
+    await migration.down(args)
+    expect(await tables()).toBe(0)
+    await migration.up(args)
+    expect(await tables()).toBe(1)
+    await preview()
+    expect(wfsCalls).toHaveLength(1)
   })
 })

@@ -24,10 +24,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "wfs_bbox_fetches" DISABLE ROW LEVEL SECURITY;
-  DROP TABLE "wfs_bbox_fetches" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_wfs_bbox_fetches_fk";
-  
-  DROP INDEX "payload_locked_documents_rels_wfs_bbox_fetches_id_idx";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "wfs_bbox_fetches_id";`)
+   -- Hand-ordered like 20261023_121838_rate_limit_buckets: the generated down dropped the table
+  -- (and with CASCADE its FK) before dropping the constraint by name, which fails.
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_wfs_bbox_fetches_fk";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_wfs_bbox_fetches_id_idx";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "wfs_bbox_fetches_id";
+  DROP TABLE IF EXISTS "wfs_bbox_fetches" CASCADE;`)
 }
