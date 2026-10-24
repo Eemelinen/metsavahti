@@ -13,6 +13,8 @@ const logLevels = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    /** Set by Next.js itself (`phase-production-build` during `next build`); never configured. */
+    NEXT_PHASE: z.string().min(1).optional(),
     DATABASE_URL: z.url().startsWith('postgres'),
     PAYLOAD_SECRET: z.string().min(16),
     /** HS256 key of the app's signed links (`lib/tokens.ts`, `01 §9`); unset = derived from `PAYLOAD_SECRET`. */
