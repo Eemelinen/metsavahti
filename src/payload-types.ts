@@ -1182,11 +1182,15 @@ export interface TaskMatchWatchAreas {
  * via the `definition` "TaskSend-alerts".
  */
 export interface TaskSendAlerts {
-  input?: unknown;
+  input: {
+    scheduledDigest?: ('daily' | 'weekly') | null;
+  };
   output: {
     emailsSent: number;
     emailsFailed: number;
     alertsHandled: number;
+    alertsDeferred: number;
+    alertsGivenUp: number;
   };
 }
 /**
@@ -1242,7 +1246,9 @@ export interface TaskDeleteAccount {
  * via the `definition` "WorkflowSync-declarations".
  */
 export interface WorkflowSyncDeclarations {
-  input?: unknown;
+  input: {
+    scheduledDigest?: ('daily' | 'weekly') | null;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1377,7 +1377,7 @@
       "area": "pipeline",
       "title": "send-notifications task",
       "user_visible_behavior": "Per `01 §4.3`: group un-notified alerts per user; honour global prefs, per-area `notificationsEnabled`, digest schedule (run receives `{ scheduledDigest: 'daily'|'weekly'|null }` computed from Europe/Helsinki time); send; write `notification_log`; set `notifiedAt`; retry ≤5.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-072", "F-073"],
       "ticket": "MV-074",
       "epic": "E06",
@@ -1386,7 +1386,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/send-notifications-task.int.test.ts (integration: immediate → 1 email per area per run Mailpit assert; daily mode → nothing on 21:30 run, one digest on 09:30 run; disabled area…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 0c70556)",
+        "2026-10-24 pnpm test:integration tests/integration/send-notifications-task.int.test.ts → pass (working tree on 0c70556, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: immediate → 1 email per area per run (Mailpit assert); daily mode → nothing on 21:30 run, one digest on 09:30 run; disabled area → none; failed provider (MSW 500) → alert stays un-notified, log `failed`."
     },

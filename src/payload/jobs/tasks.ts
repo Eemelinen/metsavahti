@@ -1,4 +1,4 @@
-import type { TaskConfig } from 'payload'
+import type { Field, TaskConfig } from 'payload'
 
 import { retention } from '@/config/retention'
 import { cleanup } from '@/lib/jobs/cleanup'
@@ -11,6 +11,13 @@ import { matchWatchAreas } from '@/lib/jobs/match-watch-areas'
 import { sendAlerts } from '@/lib/jobs/send-alerts'
 
 const count = (name: string) => ({ name, type: 'number' as const, required: true })
+
+/** The digest a pipeline run sends (`01 §4.3`); empty = immediate emails only. */
+export const scheduledDigestField: Field = {
+  name: 'scheduledDigest',
+  type: 'select',
+  options: ['daily', 'weekly'],
+}
 
 export const fetchDeclarationsTask: TaskConfig<'fetch-declarations'> = {
   slug: 'fetch-declarations',
@@ -56,13 +63,23 @@ export const matchWatchAreasTask: TaskConfig<'match-watch-areas'> = {
   },
 }
 
+/** `scheduledDigest` comes from the workflow input (`scheduledDigestFor()` at queue time). */
 export const sendAlertsTask: TaskConfig<'send-alerts'> = {
   slug: 'send-alerts',
   retries: 1,
-  outputSchema: [count('emailsSent'), count('emailsFailed'), count('alertsHandled')],
-  handler: async ({ job, req }) => {
+  inputSchema: [scheduledDigestField],
+  outputSchema: [
+    count('emailsSent'),
+    count('emailsFailed'),
+    count('alertsHandled'),
+    count('alertsDeferred'),
+    count('alertsGivenUp'),
+  ],
+  handler: async ({ input, job, req }) => {
     const ctx = createJobContext(req.payload, job.id)
-    const output = await withJobRun(ctx, 'send-alerts', () => sendAlerts(ctx, ctx.runId))
+    const output = await withJobRun(ctx, 'send-alerts', () =>
+      sendAlerts(ctx, ctx.runId, { scheduledDigest: input.scheduledDigest ?? null }),
+    )
     return { output }
   },
 }

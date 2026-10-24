@@ -22,7 +22,7 @@ emails you when a **new or changed declaration** lands inside that circle.
  cron 09:30 / 21:30 ──► POST /api/jobs/run ──► sync-declarations workflow
                                                  ├─ fetch-declarations   clustered WFS boxes, every page → declarations (+ geom, hashes, revisions, missing runs)
                                                  ├─ match-watch-areas    ST_Intersects(declarations.geom, watch_areas.geom_3067) → watch-area-declarations (seen hashes) → alerts
-                                                 └─ send-alerts          one email per (user, area) → notification-log
+                                                 └─ send-alerts          per account: one email per area (immediate) or a 09:30 digest (daily / Monday weekly) → notification-log
 ```
 
 Change detection compares hashes: `watch-area-declarations` stores the `geom_hash` and `attr_hash`
