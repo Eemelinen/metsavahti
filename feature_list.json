@@ -1358,7 +1358,7 @@
       "area": "pipeline",
       "title": "Static map image endpoint (flagged)",
       "user_visible_behavior": "`GET /api/alerts/[id]/map-image.png` (owner session or signed token): SVG composed from watch circle + polygon (3067 → local pixel space, no tiles) rendered with `@resvg/resvg-js`, cached 7 d. Behind `ENABLE_MAP_IMAGES`.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-034", "F-046"],
       "ticket": "MV-077",
       "epic": "E06",
@@ -1367,7 +1367,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/static-map-image-endpoint-flagged.int.test.ts (integration: returns PNG, 403 for non-owner, token OK.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 4501466)",
+        "2026-10-24 pnpm test:integration tests/integration/static-map-image-endpoint-flagged.int.test.ts → pass (working tree on 4501466, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: returns PNG, 403 for non-owner, token OK."
     },
