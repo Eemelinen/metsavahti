@@ -424,7 +424,7 @@
       "area": "wfs",
       "title": "Normalisation, cutting-type codes and Finnish labels",
       "user_visible_behavior": "`normalise.ts`: `WfsFeature` → `NormalisedDeclaration` (sourceId, cuttingTypeCode/Label, areaHa, receivedAt, validUntil, municipalityCode, rawAttributes, geometry MultiPolygon 3067). `codes.ts`: code → `{ label_fi, colourToken, severity }` from `config/cutting-types.ts`, unknown → `muu`. Populate `config/cutting-types.ts` with the real Metsäkeskus codes discovered in MV-021 and plain-Finnish labels + one-line explanations for UI (\"Harvennushakkuu — osa puista poistetaan…\").",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-021"],
       "ticket": "MV-024",
       "epic": "E01",
@@ -433,7 +433,10 @@
         "L1: pnpm check",
         "L1: pnpm test:unit tests/unit/wfs/normalisation.test.ts (unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on e80867d)",
+        "2026-10-24 pnpm test:unit tests/unit/wfs/normalisation.test.ts → pass (working tree on e80867d)"
+      ],
       "attempts": 0,
       "notes": "Was F-009 (hakkuutapa labels verified against the Metsäkeskus code list; link the code list in the config). Tests (ticket): unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label. Status (ticket): absorbs MV-028 (merged 2026-09-20, ledger P11)."
     },
