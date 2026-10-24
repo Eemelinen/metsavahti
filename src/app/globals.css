@@ -94,6 +94,10 @@
   /* Named layout sizes instead of arbitrary values. */
   --grid-template-columns-card-header: 1fr auto;
   --grid-template-rows-card-header: auto auto;
+  /* Declaration attributes on `/vahtialueet/[id]`: label column, value column. */
+  --grid-template-columns-attributes: minmax(120px, auto) 1fr;
+  /* The watch-area map of `/vahtialueet/[id]` (App artboard `alue`): ~60 % of a phone screen. */
+  --height-map-detail: min(60vh, 520px);
 }
 
 /* shadcn semantic aliases, mapped onto the design tokens. */

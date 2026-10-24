@@ -113,6 +113,9 @@ database or points at port 5432.
   for the grid-snapped box and records it, a warm box (same circle, smaller radius, nudged pin, or covered
   by two earlier boxes) none; the sixth live fetch in a minute is 429 without a WFS call; a failed fetch
   records nothing; the route answers `{ count, geojson }`, 401 to a guest, 400 to a bad query),
+  the watch-area declarations endpoint (`watch-area-detail-vahtialueat-id-and-dec.int.test.ts`, MV-067: the owner
+  gets the declarations in WGS 84, newest first, `isNew` from the unread alerts of that area only; 403 for another
+  account and an admin, 401 without a session, 404 for an unknown or malformed id),
   the `notification-log` + `consent-events` + `data-export-requests` + `job-runs` + `exports`
   collections (`01 §3.6–3.9` columns and indexes, consent events rejecting update/delete through
   access control and through the hooks even with `overrideAccess`, IP stored as a /24 prefix, owner-only
@@ -274,7 +277,12 @@ vahtialue` points at `/aloita` → login succeeds → the same link is `used`; a
   `/dashboard` lands on `/kirjaudu?next=%2Fvahtialueet`; `@smoke` the seeded area's card (radius, "N voimassa",
   "Uusia: 1" from the seeded alert, last check, switch), the status strip, the overview map, axe; an own account:
   empty state → `/aloita`, two areas → "Uusi vahtialue" `aria-disabled` with the limit tooltip, the e-mail switch
-  persists, kebab → Poista → cancel keeps / confirm deletes the area, axe), MapView on `/vahtialueet` of an own account (`mapview-component.spec.ts`,
+  persists, kebab → Poista → cancel keeps / confirm deletes the area, axe), watch-area page
+  (`watch-area-detail-vahtialueat-id-and-dec.spec.ts`, MV-067: a guest goes to the login; an own account's area with
+  three SQL-seeded declarations and one unread alert: the endpoint through a same-origin `fetch`, the type pills,
+  "Vain uudet", "Tyhjennä suodattimet" and the date range change the URL and the rows, a filtered URL restores the
+  view, a row opens its attributes and the disclaimer, "Näytä kartalla" opens the popover, axe; "Poista" →
+  cancel keeps / confirm deletes and lands on `/vahtialueet`, then the endpoint and the page answer 404), MapView on `/vahtialueet` of an own account (`mapview-component.spec.ts`,
   MV-060: a base tile from the mock, `data-map-ready`, legend, Finnish zoom buttons, OSM + Metsäkeskus attribution,
   the WMS toggle by keyboard → a `GetMap` request, the zoom hint after zooming out and "Keskitä" bringing the area
   back, no CSP violation, axe; `@visual` baseline of the map), marketing layout + system pages (header/footer, 404 status,

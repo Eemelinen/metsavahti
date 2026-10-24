@@ -308,6 +308,57 @@ describe('MapView declarations', () => {
     expect(screen.queryByTestId('declaration-popover')).not.toBeInTheDocument()
   })
 
+  it('leaves the list out for a page with its own and follows a controlled selection', () => {
+    const onSelectedDeclarationChange = vi.fn()
+    const view = renderMap({
+      declarationList: false,
+      selectedDeclarationId: null,
+      onSelectedDeclarationChange,
+    })
+    expect(screen.queryByTestId('declaration-list')).not.toBeInTheDocument()
+
+    // A polygon click only reports; the page decides the selection.
+    clickMap([12])
+    expect(onSelectedDeclarationChange).toHaveBeenLastCalledWith(12)
+    expect(screen.queryByTestId('declaration-popover')).not.toBeInTheDocument()
+
+    // The page's own list selects 12 after the click: the popover opens, the map stays put.
+    view.rerender(
+      createElement(MapViewCanvas, {
+        sources: SOURCES,
+        center: CENTER,
+        radiusM: 2000,
+        declarationsGeoJSON: DECLARATIONS,
+        declarationList: false,
+        selectedDeclarationId: 12,
+        onSelectedDeclarationChange,
+      }),
+    )
+    expect(screen.getByTestId('declaration-popover')).toHaveTextContent('Harvennushakkuu')
+    expect(maplibre.fitBounds).not.toHaveBeenCalled()
+
+    // A selection from outside the map ("Näytä kartalla" of the page's list) moves the map.
+    view.rerender(
+      createElement(MapViewCanvas, {
+        sources: SOURCES,
+        center: CENTER,
+        radiusM: 2000,
+        declarationsGeoJSON: DECLARATIONS,
+        declarationList: false,
+        selectedDeclarationId: 11,
+        onSelectedDeclarationChange,
+      }),
+    )
+    expect(screen.getByTestId('declaration-popover')).toHaveTextContent('Kaistalehakkuu')
+    const [[west], [east]] = maplibre.fitBounds.mock.lastCall?.[0] as [LonLat, LonLat]
+    expect(west).toBeCloseTo(CENTER[0] + 0.01, 6)
+    expect(east).toBeCloseTo(CENTER[0] + 0.012, 6)
+
+    // "Sulje" reports the cleared selection.
+    act(() => screen.getByRole('button', { name: 'Sulje' }).click())
+    expect(onSelectedDeclarationChange).toHaveBeenLastCalledWith(null)
+  })
+
   it('renders no list without declarations', () => {
     renderMap({ declarationsGeoJSON: undefined })
     expect(screen.queryByTestId('declaration-list')).not.toBeInTheDocument()

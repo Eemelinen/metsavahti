@@ -1,31 +1,9 @@
 import type { Page } from '@playwright/test'
 
 import { AUTH_STATE } from '../../playwright.config'
-import { ACCOUNT_PASSWORD, adminApi, markVerified } from './accounts'
+import { adminApi, signInOwnAccount } from './accounts'
 import { expectNoA11yViolations } from './a11y'
 import { E2E_WATCH_AREA, expect, test } from './fixtures'
-
-/**
- * A verified account of this test's own, signed in through the REST login (which also sets the
- * browser context's session cookie); returns its JWT for creating areas. Not the shared e2e
- * user: this spec deletes areas and flips switches.
- */
-async function signInOwnAccount(page: Page, projectName: string): Promise<string> {
-  const email = `vahtialueet-${projectName}-${Date.now()}@metsavahti.test`
-  const { api } = await adminApi()
-  try {
-    const created = await api.post('/api/users', { data: { email, password: ACCOUNT_PASSWORD } })
-    expect(created.ok(), await created.text()).toBeTruthy()
-  } finally {
-    await api.dispose()
-  }
-  await markVerified(email)
-  const login = await page.request.post('/api/users/login', {
-    data: { email, password: ACCOUNT_PASSWORD },
-  })
-  expect(login.ok(), await login.text()).toBeTruthy()
-  return ((await login.json()) as { token: string }).token
-}
 
 /** `lastCheckedAt` stands in for the pipeline's match, which nothing writes yet (MV-072). */
 async function createArea(page: Page, token: string, name: string, lastCheckedAt?: string) {
@@ -112,7 +90,7 @@ test.describe('/vahtialueet (own account)', () => {
   test('empty state, plan limit, e-mail switch and deletion', async ({ page }, testInfo) => {
     // Many steps and four page loads; a cold `next dev` alone can take most of the 30 s.
     test.slow()
-    const token = await signInOwnAccount(page, testInfo.project.name)
+    const token = await signInOwnAccount(page, `vahtialueet-${testInfo.project.name}`)
 
     await page.goto('/vahtialueet')
     const empty = page.getByTestId('no-watch-areas')
