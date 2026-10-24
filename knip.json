@@ -11,6 +11,6 @@
   "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts", "tests/**/*.{ts,tsx}"],
   "ignore": ["src/payload-types.ts", "src/components/ui/**", "src/lib/utils.ts"],
   "ignoreExportsUsedInFile": true,
-  "ignoreDependencies": ["pino-pretty", "clsx", "tailwind-merge", "lucide-react"],
+  "ignoreDependencies": ["pino-pretty", "clsx", "tailwind-merge"],
   "payload": false
 }
