@@ -12,12 +12,12 @@ import {
 import {
   sendTestAlertEmail,
   setMarketingConsent as saveMarketingConsent,
-  setWatchAreaNotifications as saveWatchAreaNotifications,
   updateNotificationPrefs as savePrefs,
 } from '@/lib/account/notification-settings'
 import { requireUser } from '@/lib/auth/guards'
 import { RateLimited, actionResult } from '@/lib/errors'
 import { clientIp } from '@/lib/privacy/ip'
+import { setWatchAreaNotifications as saveWatchAreaNotifications } from '@/lib/watch-areas/watch-areas'
 
 /**
  * Server Actions of `/tili/ilmoitukset` (E04 MV-054). Every switch saves on its own; the

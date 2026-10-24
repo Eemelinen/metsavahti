@@ -9,6 +9,7 @@ import * as migration_20260920_180549_users_verification_sent_at from './2026092
 import * as migration_20261023_121838_rate_limit_buckets from './20261023_121838_rate_limit_buckets';
 import * as migration_20261023_214734_user_sessions from './20261023_214734_user_sessions';
 import * as migration_20261023_223512_users_pending_email from './20261023_223512_users_pending_email';
+import * as migration_20261024_000522_alerts_watch_area_cascade from './20261024_000522_alerts_watch_area_cascade';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261023_223512_users_pending_email.up,
     down: migration_20261023_223512_users_pending_email.down,
-    name: '20261023_223512_users_pending_email'
+    name: '20261023_223512_users_pending_email',
+  },
+  {
+    up: migration_20261024_000522_alerts_watch_area_cascade.up,
+    down: migration_20261024_000522_alerts_watch_area_cascade.down,
+    name: '20261024_000522_alerts_watch_area_cascade'
   },
 ];

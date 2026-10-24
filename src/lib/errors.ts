@@ -13,7 +13,13 @@ import { type Logger, logger as defaultLogger } from '@/lib/logger'
  */
 
 export type ErrorCode =
-  'unauthorized' | 'not_found' | 'forbidden' | 'rate_limited' | 'external_service' | 'internal'
+  | 'unauthorized'
+  | 'not_found'
+  | 'forbidden'
+  | 'rate_limited'
+  | 'plan_limit'
+  | 'external_service'
+  | 'internal'
 
 /** The error shape a client receives. `message` is Finnish UI copy. */
 export interface ActionError {
@@ -31,6 +37,7 @@ export const publicMessages: Record<ErrorCode, string> = {
   not_found: 'Kohdetta ei löytynyt.',
   forbidden: 'Ei käyttöoikeutta.',
   rate_limited: 'Liikaa pyyntöjä. Yritä hetken kuluttua uudelleen.',
+  plan_limit: 'Tilauksesi raja on täynnä.',
   external_service: 'Ulkoinen palvelu ei vastannut. Yritä myöhemmin uudelleen.',
   internal: 'Jotain meni pieleen. Yritä myöhemmin uudelleen.',
 }
@@ -102,6 +109,17 @@ export class RateLimited extends AppError {
 
   override toActionError(): ActionError {
     return { ...super.toActionError(), retryAfterSeconds: this.retryAfterSeconds }
+  }
+}
+
+/**
+ * The account's plan does not allow another one of something (`config/plans.ts`), such as a
+ * third watch area on the free plan. 409: the request is fine, the account's state refuses it.
+ */
+export class PlanLimitReached extends AppError {
+  constructor(message?: string, options: AppErrorOptions = {}) {
+    super('plan_limit', 409, message, { expose: true, ...options })
+    this.name = 'PlanLimitReached'
   }
 }
 

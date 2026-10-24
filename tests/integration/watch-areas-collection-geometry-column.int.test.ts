@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import type { User } from '@/payload-types'
 import { plans } from '@/config/plans'
-import { MAX_RADIUS_M, MIN_RADIUS_M } from '@/payload/collections/WatchAreas'
+import { MAX_RADIUS_M, MIN_RADIUS_M } from '@/lib/watch-areas/watch-area-schema'
 import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payload'
 
 const HELSINKI: [number, number] = [24.94, 60.17]

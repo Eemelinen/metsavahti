@@ -2,10 +2,8 @@ import type { CollectionConfig } from 'payload'
 import { ValidationError } from 'payload'
 
 import { planLimits } from '@/config/plans'
+import { MAX_RADIUS_M, MIN_RADIUS_M } from '@/lib/watch-areas/watch-area-schema'
 import { isAdminOrOwner, isAdminUser, isAuthenticated } from '@/payload/access'
-
-export const MIN_RADIUS_M = 100
-export const MAX_RADIUS_M = 5_000
 
 const ownerId = (owner: unknown): number | undefined => {
   if (typeof owner === 'number') return owner

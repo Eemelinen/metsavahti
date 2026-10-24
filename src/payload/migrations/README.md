@@ -66,6 +66,11 @@ Recipe for a schema change that mixes Payload fields and PostGIS:
 5. Runtime spatial SQL never lives in a migration or a collection hook; it belongs in
    `src/lib/geo/spatial-queries.ts`.
 
+A foreign key that must `ON DELETE cascade` (Payload makes every single relationship `set null`)
+is not hand-edited either: list the column in `src/payload/schema/foreign-keys.ts` and run
+`pnpm db:migrate:create <name>`, which generates the key change and keeps it in the snapshot
+(D-025, `20261024_000522_alerts_watch_area_cascade`).
+
 Renaming a field: when one table both gains and loses a column in the same diff, Drizzle asks
 interactively whether the new column is a rename, and in a non-interactive session (loop driver,
 no TTY) the command hangs. Generate two diffs instead — first add the new field while keeping the

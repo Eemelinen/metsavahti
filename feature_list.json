@@ -1,6 +1,6 @@
 {
   "project": "metsavahti",
-  "last_updated": "2026-10-23",
+  "last_updated": "2026-10-24",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1130,7 +1130,7 @@
       "area": "watch-areas",
       "title": "Watch-area Server Actions",
       "user_visible_behavior": "`createWatchArea`, `updateWatchArea`, `deleteWatchArea`, `toggleWatchAreaNotifications`; Zod schemas; plan-limit error mapped to UI; `update` nulls `lastCheckedAt`; delete cascades join rows/alerts (DB FK `ON DELETE CASCADE` via migration `0006`).",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-032", "F-046"],
       "ticket": "MV-064",
       "epic": "E05",

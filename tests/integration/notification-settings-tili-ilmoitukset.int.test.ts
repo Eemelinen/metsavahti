@@ -5,11 +5,11 @@ import {
   notificationSettingsOf,
   sendTestAlertEmail,
   setMarketingConsent,
-  setWatchAreaNotifications,
   testEmailLimiter,
   updateNotificationPrefs,
 } from '@/lib/account/notification-settings'
 import { PLACEHOLDER_VERSION, seedLegalDocuments } from '@/lib/legal/documents'
+import { setWatchAreaNotifications } from '@/lib/watch-areas/watch-areas'
 import type { User } from '@/payload-types'
 import { createMailpitClient } from '../helpers/mailpit'
 import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payload'
