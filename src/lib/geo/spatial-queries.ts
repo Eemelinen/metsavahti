@@ -427,45 +427,23 @@ export type DeclarationMapProperties = {
 /** Coordinate decimals of the map GeoJSON: 1e-6° is ~0.1 m. */
 const MAP_GEOJSON_DECIMALS = 6
 
-/**
- * The declarations a watch area's map shows, as a GeoJSON FeatureCollection in WGS 84:
- * every declaration intersecting the area that is not removed and still valid at `now`,
- * newest first. Feature `id` is the declaration id. Does not check ownership; the caller
- * must (`assertOwner()`, D-020).
- */
-export async function declarationsForWatchArea(
-  payload: Payload,
-  watchAreaId: number,
-  now: Date = new Date(),
-): Promise<FeatureCollection<MultiPolygon, DeclarationMapProperties>> {
-  const { rows } = await run('declarationsForWatchArea', () =>
-    drizzle(payload).execute<{
-      id: number
-      source_id: string
-      declaration_number: string
-      cutting_type_code: string | number | null
-      cutting_type_label: string | null
-      area_ha: string | number | null
-      received_at: string | Date | null
-      valid_until: string | Date | null
-      distance_m: string | number
-      geojson: string
-    }>(sql`
-    SELECT
-      d.id, d.source_id, d.declaration_number, d.cutting_type_code, d.cutting_type_label,
-      d.area_ha, d.received_at, d.valid_until,
-      ST_Distance(ST_Transform(ST_SetSRID(wa.center, 4326), 3067), d.geom) AS distance_m,
-      ST_AsGeoJSON(ST_Transform(d.geom, 4326), ${MAP_GEOJSON_DECIMALS}::int) AS geojson
-    FROM watch_areas wa
-    JOIN declarations d ON ST_Intersects(d.geom, wa.geom_3067)
-    WHERE wa.id = ${watchAreaId}
-      AND d.removed_at IS NULL
-      AND d.valid_until > ${now.toISOString()}::timestamptz
-    ORDER BY d.received_at DESC NULLS LAST, d.id
-  `),
-  )
+/** A `declarations` row as the map queries select it (`toMapFeature()` turns it into a feature). */
+type DeclarationMapRow = {
+  id: number
+  source_id: string
+  declaration_number: string
+  cutting_type_code: string | number | null
+  cutting_type_label: string | null
+  area_ha: string | number | null
+  received_at: string | Date | null
+  valid_until: string | Date | null
+  distance_m: string | number
+  geojson: string
+}
+
+function toMapFeature(r: DeclarationMapRow): Feature<MultiPolygon, DeclarationMapProperties> {
   const iso = (v: string | Date | null) => (v == null ? null : new Date(v).toISOString())
-  const features = rows.map((r): Feature<MultiPolygon, DeclarationMapProperties> => ({
+  return {
     type: 'Feature',
     id: Number(r.id),
     geometry: JSON.parse(r.geojson) as MultiPolygon,
@@ -479,8 +457,36 @@ export async function declarationsForWatchArea(
       validUntil: iso(r.valid_until),
       distanceM: Number(r.distance_m),
     },
-  }))
-  return { type: 'FeatureCollection', features }
+  }
+}
+
+/**
+ * The declarations a watch area's map shows, as a GeoJSON FeatureCollection in WGS 84:
+ * every declaration intersecting the area that is not removed and still valid at `now`,
+ * newest first. Feature `id` is the declaration id. Does not check ownership; the caller
+ * must (`assertOwner()`, D-020).
+ */
+export async function declarationsForWatchArea(
+  payload: Payload,
+  watchAreaId: number,
+  now: Date = new Date(),
+): Promise<FeatureCollection<MultiPolygon, DeclarationMapProperties>> {
+  const { rows } = await run('declarationsForWatchArea', () =>
+    drizzle(payload).execute<DeclarationMapRow>(sql`
+    SELECT
+      d.id, d.source_id, d.declaration_number, d.cutting_type_code, d.cutting_type_label,
+      d.area_ha, d.received_at, d.valid_until,
+      ST_Distance(ST_Transform(ST_SetSRID(wa.center, 4326), 3067), d.geom) AS distance_m,
+      ST_AsGeoJSON(ST_Transform(d.geom, 4326), ${MAP_GEOJSON_DECIMALS}::int) AS geojson
+    FROM watch_areas wa
+    JOIN declarations d ON ST_Intersects(d.geom, wa.geom_3067)
+    WHERE wa.id = ${watchAreaId}
+      AND d.removed_at IS NULL
+      AND d.valid_until > ${now.toISOString()}::timestamptz
+    ORDER BY d.received_at DESC NULLS LAST, d.id
+  `),
+  )
+  return { type: 'FeatureCollection', features: rows.map(toMapFeature) }
 }
 
 /**
@@ -494,23 +500,84 @@ export async function previewCount(
   radiusM: number,
   now: Date = new Date(),
 ): Promise<number> {
-  const [lng, lat] = center
   const { rows } = await run('previewCount', () =>
     drizzle(payload).execute<{ n: string | number }>(sql`
     SELECT count(*) AS n
     FROM declarations d
     WHERE d.removed_at IS NULL
       AND d.valid_until > ${now.toISOString()}::timestamptz
-      AND ST_Intersects(
-        d.geom,
-        ST_Buffer(
-          ST_Transform(ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326), 3067),
-          ${radiusM}::double precision
-        )
-      )
+      AND ST_Intersects(d.geom, ST_Buffer(${point3067(center)}, ${radiusM}::double precision))
   `),
   )
   return Number(rows[0]?.n ?? 0)
+}
+
+/** A WGS 84 point as an EPSG:3067 geometry expression. */
+function point3067([lng, lat]: LonLat) {
+  return sql`ST_Transform(ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326), 3067)`
+}
+
+/**
+ * The declarations `previewCount()` counts, as the map GeoJSON of `declarationsForWatchArea()`
+ * (WGS 84, newest first, `distanceM` from `center`), for the preview endpoint (MV-063).
+ */
+export async function previewDeclarations(
+  payload: Payload,
+  center: LonLat,
+  radiusM: number,
+  now: Date = new Date(),
+): Promise<FeatureCollection<MultiPolygon, DeclarationMapProperties>> {
+  const { rows } = await run('previewDeclarations', () =>
+    drizzle(payload).execute<DeclarationMapRow>(sql`
+    SELECT
+      d.id, d.source_id, d.declaration_number, d.cutting_type_code, d.cutting_type_label,
+      d.area_ha, d.received_at, d.valid_until,
+      ST_Distance(${point3067(center)}, d.geom) AS distance_m,
+      ST_AsGeoJSON(ST_Transform(d.geom, 4326), ${MAP_GEOJSON_DECIMALS}::int) AS geojson
+    FROM declarations d
+    WHERE d.removed_at IS NULL
+      AND d.valid_until > ${now.toISOString()}::timestamptz
+      AND ST_Intersects(d.geom, ST_Buffer(${point3067(center)}, ${radiusM}::double precision))
+    ORDER BY d.received_at DESC NULLS LAST, d.id
+  `),
+  )
+  return { type: 'FeatureCollection', features: rows.map(toMapFeature) }
+}
+
+/**
+ * Whether the boxes in `wfs_bbox_fetches` (EPSG:3067) together cover `bbox`, i.e. the preview
+ * endpoint has fetched every declaration that can touch it from the WFS before (MV-063).
+ */
+export async function isBboxFetched(payload: Payload, bbox: Bbox): Promise<boolean> {
+  const [minE, minN, maxE, maxN] = bbox
+  const { rows } = await run('isBboxFetched', () =>
+    drizzle(payload).execute<{ covered: boolean | null }>(sql`
+    WITH wanted AS (SELECT ST_MakeEnvelope(${minE}, ${minN}, ${maxE}, ${maxN}, 3067) AS box)
+    SELECT ST_Covers(ST_Union(ST_MakeEnvelope(f.min_e, f.min_n, f.max_e, f.max_n, 3067)), w.box) AS covered
+    FROM wanted w
+    JOIN wfs_bbox_fetches f
+      ON f.min_e < ${maxE} AND f.max_e > ${minE} AND f.min_n < ${maxN} AND f.max_n > ${minN}
+    GROUP BY w.box
+  `),
+  )
+  return rows[0]?.covered === true
+}
+
+/** Record that every page of `bbox` (EPSG:3067) arrived from the WFS at `now` (MV-063). */
+export async function recordBboxFetch(
+  payload: Payload,
+  bbox: Bbox,
+  featureCount: number,
+  now: Date = new Date(),
+): Promise<void> {
+  const [minE, minN, maxE, maxN] = bbox
+  const at = now.toISOString()
+  await run('recordBboxFetch', () =>
+    drizzle(payload).execute(sql`
+    INSERT INTO wfs_bbox_fetches (min_e, min_n, max_e, max_n, feature_count, fetched_at, updated_at, created_at)
+    VALUES (${minE}, ${minN}, ${maxE}, ${maxN}, ${featureCount}, ${at}::timestamptz, ${at}::timestamptz, ${at}::timestamptz)
+  `),
+  )
 }
 
 export type AlertMapGeometry = {

@@ -42,6 +42,17 @@ export function bboxForWatchArea(
   return [e - half, n - half, e + half, n + half]
 }
 
+/**
+ * `bbox` grown outwards to the nearest multiples of `cellM` (EPSG:3067 metres), so nearby
+ * boxes snap to the same grid cells (the preview endpoint's live fetch, MV-063).
+ */
+export function snapBboxToGrid(bbox: Bbox, cellM: number): Bbox {
+  assertFinite('cellM', cellM, 0, false)
+  const down = (v: number) => Math.floor(v / cellM) * cellM
+  const up = (v: number) => Math.ceil(v / cellM) * cellM
+  return [down(bbox[0]), down(bbox[1]), up(bbox[2]), up(bbox[3])]
+}
+
 function union(a: Bbox, b: Bbox): Bbox {
   return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]
 }
