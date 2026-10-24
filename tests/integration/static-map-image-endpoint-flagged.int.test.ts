@@ -94,7 +94,7 @@ describe('static map image endpoint (MV-077)', () => {
 
     const declarationId = await insertDeclarationRaw(payload, {
       sourceId: 'forestusedeclaration.77',
-      cuttingTypeCode: 4,
+      cuttingTypeCode: 5,
     })
     const bare = await payload.create({
       collection: 'declarations',
