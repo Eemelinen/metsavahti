@@ -24,7 +24,7 @@ describe('countUnreadAlerts', () => {
       data: {
         sourceId: 'forestusedeclaration.50',
         declarationNumber: '1-2026-50',
-        cuttingTypeCode: 4,
+        cuttingTypeCode: 5,
         areaHa: 1.5,
         geomHash: 'g50',
         attrHash: 'a50',

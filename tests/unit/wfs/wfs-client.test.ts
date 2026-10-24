@@ -11,7 +11,8 @@ import {
 } from '@/lib/wfs/client'
 import { gmlToFeatureCollection } from '@/lib/wfs/gml'
 import { LAYER_COUNT_DEFAULT } from '@/lib/wfs/layer'
-import { parseFeatureCollection, toDeclarationRecords } from '@/lib/wfs/parse'
+import { normaliseFeatures } from '@/lib/wfs/normalise'
+import { parseFeatureCollection } from '@/lib/wfs/parse'
 import type { DeclarationFeatureCollection } from '@/lib/wfs/schemas'
 import manifest from '../../fixtures/wfs/manifest.json'
 import { server } from '../../helpers/msw'
@@ -290,7 +291,7 @@ describe('wfs client GML fallback', () => {
       const gml = parseFeatureCollection(gmlToFeatureCollection(toGml(json)))
       expect(gml.features).toEqual(json.features)
       // Same attrHash / geomHash, so switching formats does not look like changed declarations.
-      expect(toDeclarationRecords(gml)).toEqual(toDeclarationRecords(json))
+      expect(normaliseFeatures(gml)).toEqual(normaliseFeatures(json))
       expect(gml.crs?.properties.name).toBe('urn:ogc:def:crs:EPSG::3067')
     }
   })

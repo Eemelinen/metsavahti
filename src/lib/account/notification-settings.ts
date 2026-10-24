@@ -165,14 +165,14 @@ export async function setMarketingConsent(
 export const TEST_ALERT_DECLARATIONS: AlertEmailDeclaration[] = [
   {
     declarationNumber: '2026-TESTI-0001',
-    hakkuutapa: 4,
+    hakkuutapa: 5,
     areaHa: 2.4,
     distanceM: 320,
     changeType: 'new',
   },
   {
     declarationNumber: '2026-TESTI-0002',
-    hakkuutapa: 2,
+    hakkuutapa: 3,
     areaHa: 5.1,
     distanceM: 780,
     changeType: 'geometry_changed',

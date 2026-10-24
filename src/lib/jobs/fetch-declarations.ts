@@ -1,7 +1,7 @@
 import { watchAreaBbox3067 } from '@/lib/geo/buffer'
 import { setDeclarationGeometry } from '@/lib/geo/spatial-queries'
 import type { JobContext } from '@/lib/jobs/context'
-import { type DeclarationRecord, toDeclarationRecords } from '@/lib/wfs/parse'
+import { type NormalisedDeclaration, normaliseFeatures } from '@/lib/wfs/normalise'
 
 export type FetchDeclarationsResult = {
   watchAreas: number
@@ -13,7 +13,7 @@ export type FetchDeclarationsResult = {
 
 /**
  * For every watch area, fetch the declarations inside its bbox from the WFS (every page)
- * and upsert them into the `declarations` collection (attributes via Payload,
+ * normalise them (`lib/wfs/normalise.ts`) and upsert them into the `declarations` collection (attributes via Payload,
  * geometry via PostGIS). Declarations seen through several areas are handled once.
  * Upsert semantics per `01 §3.3`: an unchanged feature only bumps `lastSeenAt`; a
  * changed `geomHash` or `attrHash` updates the row and keeps the previous hashes and
@@ -28,11 +28,11 @@ export async function fetchDeclarations(ctx: JobContext): Promise<FetchDeclarati
     overrideAccess: true,
   })
 
-  const byId = new Map<string, DeclarationRecord>()
+  const byId = new Map<string, NormalisedDeclaration>()
   for (const area of areas) {
     const bbox = watchAreaBbox3067(area.center as [number, number], area.radiusM)
     for await (const page of wfs.getFeaturesByBbox(bbox)) {
-      for (const record of toDeclarationRecords(page)) byId.set(record.sourceId, record)
+      for (const record of normaliseFeatures(page)) byId.set(record.sourceId, record)
       logger.debug({ watchAreaId: area.id, features: page.features.length }, 'wfs page fetched')
     }
   }
@@ -54,6 +54,7 @@ export async function fetchDeclarations(ctx: JobContext): Promise<FetchDeclarati
       cuttingTypeCode: record.cuttingTypeCode,
       areaHa: record.areaHa,
       receivedAt: record.receivedAt,
+      municipalityCode: record.municipalityCode,
       geomHash: record.geomHash,
       attrHash: record.attrHash,
       rawAttributes: record.rawAttributes,

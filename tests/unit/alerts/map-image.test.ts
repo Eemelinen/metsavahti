@@ -29,7 +29,7 @@ const base: AlertMapGeometry = {
   center: [435050, 6900050],
   radiusM: 500,
   declaration: SQUARE,
-  cuttingTypeCode: 4,
+  cuttingTypeCode: 5,
 }
 
 const numbers = (svg: string, pattern: RegExp) => svg.match(pattern)!.slice(1).map(Number)

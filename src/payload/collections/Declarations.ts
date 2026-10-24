@@ -1,16 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '@/payload/access'
-import { hakkuutapaLabel } from '@/lib/wfs/hakkuutapa'
-
-/** A declaration stays valid for three years from the day Metsäkeskus received it (`01 §3.3`). */
-export const DECLARATION_VALIDITY_YEARS = 3
-
-export function validUntilFor(receivedAt: string | Date): string {
-  const d = new Date(receivedAt)
-  d.setUTCFullYear(d.getUTCFullYear() + DECLARATION_VALIDITY_YEARS)
-  return d.toISOString()
-}
+import { cuttingTypeLabel } from '@/lib/wfs/codes'
+import { validUntilFor } from '@/lib/wfs/normalise'
 
 const deny = () => false
 
@@ -43,7 +35,7 @@ export const Declarations: CollectionConfig = {
         if (!data) return data
         const next = { ...data }
         if ('cuttingTypeCode' in next) {
-          next.cuttingTypeLabel = hakkuutapaLabel(next.cuttingTypeCode)
+          next.cuttingTypeLabel = cuttingTypeLabel(next.cuttingTypeCode)
         }
         if (next.receivedAt) {
           next.validUntil = validUntilFor(next.receivedAt)
@@ -80,7 +72,7 @@ export const Declarations: CollectionConfig = {
       name: 'cuttingTypeLabel',
       type: 'text',
       label: 'Hakkuutapa',
-      admin: { readOnly: true, description: 'Johdettu koodista (lib/wfs/hakkuutapa.ts).' },
+      admin: { readOnly: true, description: 'Johdettu koodista (config/cutting-types.ts).' },
     },
     { name: 'areaHa', type: 'number', label: 'Pinta-ala (ha)' },
     { name: 'receivedAt', type: 'date', label: 'Saapumispäivä' },

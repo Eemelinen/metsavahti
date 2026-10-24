@@ -198,7 +198,8 @@ src/
   content/faq.ts          the landing-page FAQ (accordion + FAQPage structured data)
   lib/legal/legal-sections.ts  splits a document body into h2 sections for the TOC
   config/cookies.ts       the cookies the service sets (the /evasteet table)
-  lib/wfs                 client.ts (WfsClient, MetsakeskusWfsClient), gml.ts, schemas.ts, parse.ts, hakkuutapa.ts
+  config/cutting-types.ts Metsäkeskus cutting-method codes (list 1014) → Finnish label, explanation, colour token, severity
+  lib/wfs                 client.ts (WfsClient, MetsakeskusWfsClient), gml.ts, schemas.ts, parse.ts, normalise.ts (WfsFeature → NormalisedDeclaration), codes.ts
   lib/jobs                fetch-declarations, match-watch-areas, send-alerts, cleanup, withJobRun
   emails                  React Email templates: EmailLayout (shared frame), AlertEmail, renderEmail()
   lib/notifications       provider.ts (which email adapter is active)
@@ -236,8 +237,7 @@ into `feature_list.json`); routes will move to their Finnish names (`/kirjaudu`,
 `/vahtialueet`, `/ilmoitukset`) as those tickets land — see
 [docs/product/00-deviations.md](docs/product/00-deviations.md).
 
-- Attribute-level change detection (currently geometry only) and hakkuutapa
-  label verification against the Metsäkeskus code list.
+- Attribute-level change detection (currently geometry only).
 - Geocoding (MML), rate limiting for public endpoints, MML background map.
 - More component tests (`@testing-library/react`, started with the auth form components).
 

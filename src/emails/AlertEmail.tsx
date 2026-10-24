@@ -3,7 +3,7 @@ import { Section, Text } from '@react-email/components'
 import { EmailLayout, emailBodyCell } from '@/emails/EmailLayout'
 import { type RenderedEmail, renderEmail } from '@/emails/render'
 import { colors } from '@/lib/design-tokens'
-import { hakkuutapaLabel } from '@/lib/wfs/hakkuutapa'
+import { cuttingTypeLabel } from '@/lib/wfs/codes'
 import type { AlertChangeType } from '@/payload/collections/Alerts'
 
 const CHANGE_LABEL: Record<AlertChangeType, string> = {
@@ -57,7 +57,7 @@ export function AlertEmail({ watchAreaName, declarations, baseUrl, attribution }
               borderBottom: index < count - 1 ? `1px solid ${colors.paper.sunken}` : undefined,
             }}
           >
-            <strong>{d.declarationNumber}</strong> · {hakkuutapaLabel(d.hakkuutapa)}
+            <strong>{d.declarationNumber}</strong> · {cuttingTypeLabel(d.hakkuutapa)}
             {d.areaHa != null ? ` · ${d.areaHa.toFixed(2)} ha` : ''} · {Math.round(d.distanceM)} m
             vahtialueesta
             {CHANGE_LABEL[d.changeType]}

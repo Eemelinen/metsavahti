@@ -40,7 +40,7 @@ describe('watch_area_declarations + alerts', () => {
       data: {
         sourceId: 'forestusedeclaration.1',
         declarationNumber: '1-2026-1',
-        cuttingTypeCode: 4,
+        cuttingTypeCode: 5,
         areaHa: 1.5,
         geomHash: 'g1',
         attrHash: 'a1',

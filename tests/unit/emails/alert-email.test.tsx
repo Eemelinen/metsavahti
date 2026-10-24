@@ -12,7 +12,7 @@ describe('alert email', () => {
       declarations: [
         {
           declarationNumber: '1-2026-1',
-          hakkuutapa: 4,
+          hakkuutapa: 5,
           areaHa: 2.5,
           distanceM: 350,
           changeType: 'new',

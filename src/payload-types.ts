@@ -252,7 +252,7 @@ export interface Declaration {
   declarationNumber: string;
   cuttingTypeCode?: number | null;
   /**
-   * Johdettu koodista (lib/wfs/hakkuutapa.ts).
+   * Johdettu koodista (config/cutting-types.ts).
    */
   cuttingTypeLabel?: string | null;
   areaHa?: number | null;
