@@ -86,7 +86,7 @@ describe('jobs infrastructure (MV-070)', () => {
       expect(res.status).toBe(400)
     })
 
-    it('runs the sync workflow and records one job_runs row per step under its runId', async () => {
+    it('runs the sync workflow and records a summary row and one row per step under its runId', async () => {
       await payload.create({
         collection: 'watch-areas',
         data: { name: 'Koti', center: [25.75, 62.24], radiusM: 800, owner: member.id },
@@ -102,10 +102,11 @@ describe('jobs infrastructure (MV-070)', () => {
       const { docs } = await payload.find({
         collection: 'job-runs',
         where: { runId: { equals: body.runId } },
-        sort: 'startedAt',
+        sort: 'id',
         overrideAccess: true,
       })
       expect(docs.map((r) => r.task)).toEqual([
+        'pipeline',
         'fetch-declarations',
         'match-watch-areas',
         'send-alerts',
@@ -115,7 +116,8 @@ describe('jobs infrastructure (MV-070)', () => {
         expect(run.finishedAt).toBeTruthy()
         expect(run.error ?? null).toBeNull()
       }
-      expect(docs[0]!.stats).toMatchObject({ watchAreas: 1 })
+      expect(docs[0]!.stats).toMatchObject({ fetch: 'succeeded', match: 'succeeded' })
+      expect(docs[1]!.stats).toMatchObject({ watchAreas: 1 })
     })
 
     it('lets an admin run it with a session cookie (the admin button)', async () => {
@@ -138,13 +140,22 @@ describe('jobs infrastructure (MV-070)', () => {
       const { docs } = await payload.find({
         collection: 'job-runs',
         where: { runId: { equals: body.runId } },
+        sort: 'id',
         overrideAccess: true,
       })
-      // The row is written outside the task's transaction, so the failed attempt stays.
-      expect(docs).toHaveLength(1)
-      expect(docs[0]).toMatchObject({ task: 'fetch-declarations', status: 'failed' })
-      expect(docs[0]!.error).toMatch(/400/)
-      expect(docs[0]!.finishedAt).toBeTruthy()
+      // The row is written outside the task's transaction, so the failed attempt stays. A
+      // failed fetch does not stop the run (MV-075): match and send go on with the cache.
+      expect(docs.map((r) => r.task)).toEqual([
+        'pipeline',
+        'fetch-declarations',
+        'match-watch-areas',
+        'send-alerts',
+      ])
+      const fetchRun = docs[1]!
+      expect(fetchRun).toMatchObject({ task: 'fetch-declarations', status: 'failed' })
+      expect(fetchRun.error).toMatch(/400/)
+      expect(fetchRun.finishedAt).toBeTruthy()
+      expect(docs[0]).toMatchObject({ status: 'partial', stats: { fetch: 'failed' } })
     })
   })
 

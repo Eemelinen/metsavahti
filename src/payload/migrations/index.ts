@@ -18,6 +18,7 @@ import * as migration_20261024_134227_declarations_missing_runs from './20261024
 import * as migration_20261024_160502_wfs_bbox_fetches from './20261024_160502_wfs_bbox_fetches';
 import * as migration_20261024_193632_fetch_partial_status from './20261024_193632_fetch_partial_status';
 import * as migration_20261024_210651_used_tokens from './20261024_210651_used_tokens';
+import * as migration_20261024_222459_pipeline_job_run from './20261024_222459_pipeline_job_run';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20261024_210651_used_tokens.up,
     down: migration_20261024_210651_used_tokens.down,
-    name: '20261024_210651_used_tokens'
+    name: '20261024_210651_used_tokens',
+  },
+  {
+    up: migration_20261024_222459_pipeline_job_run.up,
+    down: migration_20261024_222459_pipeline_job_run.down,
+    name: '20261024_222459_pipeline_job_run'
   },
 ];

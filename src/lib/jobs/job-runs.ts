@@ -3,8 +3,11 @@ import type { JobRun } from '@/payload-types'
 
 export type JobRunTask = JobRun['task']
 
-/** How a step that returned ended: `partial` when part of its work failed (MV-071). */
-export type JobRunOutcome = Extract<JobRun['status'], 'succeeded' | 'partial'>
+/**
+ * How a step that returned ended: `partial` when part of its work failed (MV-071), `failed`
+ * for a `pipeline` summary whose match or notify step failed (MV-075).
+ */
+export type JobRunOutcome = Extract<JobRun['status'], 'succeeded' | 'partial' | 'failed'>
 
 /**
  * Run one pipeline step and record it in `job_runs` (`01 §3.9`, MV-070): a `running` row

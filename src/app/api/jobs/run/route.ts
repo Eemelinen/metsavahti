@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { PipelineAlreadyRunning } from '@/lib/jobs/pipeline-lock'
 import { runJobNow, runnableJobSchema } from '@/lib/jobs/run-now'
 import { logger } from '@/lib/logger'
 import { isAdminUser } from '@/payload/access'
@@ -12,7 +13,8 @@ export const maxDuration = 300
  * Job entrypoint (`01 §4`, MV-070). Cron sends `Authorization: Bearer $CRON_SECRET`; the admin
  * "Aja haku nyt" button sends the admin's session cookie. `?task=cleanup` runs the weekly
  * cleanup, no `task` the sync workflow. Queues the job, drains the queue in-process and
- * returns a summary with the `runId` that the run's `job_runs` rows carry.
+ * returns a summary with the `runId` that the run's `job_runs` rows carry. A sync trigger
+ * while another sync run holds the advisory lock gets 409 `already_running` (MV-075).
  */
 export async function POST(request: Request) {
   const payload = await getPayload({ config })
@@ -27,7 +29,14 @@ export async function POST(request: Request) {
   )
   if (!task.success) return Response.json({ ok: false, error: 'invalid_task' }, { status: 400 })
 
-  const summary = await runJobNow(payload, task.data)
+  let summary
+  try {
+    summary = await runJobNow(payload, task.data)
+  } catch (err) {
+    if (!(err instanceof PipelineAlreadyRunning)) throw err
+    logger.warn({ job: task.data }, 'jobs run refused: a sync run is already in progress')
+    return Response.json({ ok: false, error: 'already_running' }, { status: 409 })
+  }
   logger.info(summary, 'jobs run via /api/jobs/run')
   return Response.json(summary)
 }

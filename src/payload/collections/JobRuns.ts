@@ -13,7 +13,9 @@ const deny = () => false
  * admin's export or deletion of an account (MV-098, `lib/account/admin-gdpr.ts`): who, for
  * whom, which action, under the `runId` of the job it queued. `status` is `partial` when a step
  * finished but part of its work failed (`fetch-declarations` with a failed request box,
- * MV-071). The list view carries the admin "Aja haku nyt" button.
+ * MV-071). `pipeline` is the summary row of one `sync-declarations` run (MV-075,
+ * `lib/jobs/pipeline.ts`): the three steps' outcomes and headline counters, read by
+ * `/api/health`. The list view carries the admin "Aja haku nyt" button.
  */
 export const JobRuns: CollectionConfig = {
   slug: 'job-runs',
@@ -39,6 +41,7 @@ export const JobRuns: CollectionConfig = {
       required: true,
       label: 'Tehtävä',
       options: [
+        { label: 'pipeline', value: 'pipeline' },
         { label: 'fetch-declarations', value: 'fetch-declarations' },
         { label: 'match-watch-areas', value: 'match-watch-areas' },
         { label: 'send-alerts', value: 'send-alerts' },

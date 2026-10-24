@@ -19,7 +19,7 @@ emails you when a **new or changed declaration** lands inside that circle.
 ```
  user draws a watch area ──► watch-areas (PostGIS: buffered polygon in EPSG:3067)
                                                  │
- cron 09:30 / 21:30 ──► POST /api/jobs/run ──► sync-declarations workflow
+ cron 09:30 / 21:30 ──► POST /api/jobs/run ──► sync-declarations workflow   (advisory lock: a second trigger → 409; summary row `pipeline`)
                                                  ├─ fetch-declarations   clustered WFS boxes, every page → declarations (+ geom, hashes, revisions, missing runs)
                                                  ├─ match-watch-areas    ST_Intersects(declarations.geom, watch_areas.geom_3067) → watch-area-declarations (seen hashes) → alerts
                                                  └─ send-alerts          per account: one email per area (immediate) or a 09:30 digest (daily / Monday weekly) → notification-log
@@ -91,7 +91,9 @@ pnpm dev                        # http://localhost:3000
 - Run the pipeline by hand: `pnpm jobs:run` (`pnpm jobs:run cleanup` for the weekly cleanup), the
   "Aja haku nyt" button above Admin → Tehtäväajot, or
   `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`. Every step
-  writes a `job-runs` row; the response's `runId` finds them.
+  writes a `job-runs` row, plus one `pipeline` row summarising the run; the response's `runId` finds
+  them. A trigger while a run is in progress answers 409 `already_running`. A failed fetch still
+  matches and sends from the cache; a failed match skips sending.
 
 ## Environments and databases
 
@@ -177,7 +179,7 @@ See [tests/README.md](tests/README.md) for details. In short:
 src/
   app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing (hero, steps, explainer, FAQ, JSON-LD), miten-se-toimii, hinnoittelu (SHOW_PRICING), 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
   app/(payload)/          generated Payload admin + REST/GraphQL routes
-  app/api/health          liveness + PostGIS check
+  app/api/health          liveness + PostGIS check, last pipeline run + stale, ?deep=1 WFS check
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
   app/api/alerts/[id]/map-image.png  static map PNG for alert emails (owner session or signed token; ENABLE_MAP_IMAGES)
   app/maplibre-gl/[version]/[file]   MapLibre's web worker, served from the installed package (prerendered)
@@ -227,6 +229,10 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
 - Schedule `POST /api/jobs/run` with `Authorization: Bearer $CRON_SECRET` at
   09:30 and 21:30 Europe/Helsinki (≈30 min after Metsäkeskus updates), and
   `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
+- Uptime monitor: `GET /api/health` answers 503 only when the database is down; alert on
+  `"stale": true` (no pipeline run finished in the last 14 h) or `lastPipelineRun.status` other than
+  `succeeded` (`partial`: some WFS boxes or the whole fetch failed). `?deep=1` adds `wfsReachable`
+  (one GetCapabilities request to the WFS, no retry); poll it sparingly.
 - Migrations run automatically when the production server boots (`prodMigrations`), never during `next build`.
 - Pricing page: set `SHOW_PRICING=1` to serve `/hinnoittelu` and list it in the header and `sitemap.xml` (the sitemap is built at `next build`, so set it there too); off (the default), it is a 404 and nothing links to it.
 - Map tiles: OpenStreetMap's public tiles by default, which is fine for development only; in production set `MAP_TILE_URL` (an XYZ template) and `MAP_TILE_ATTRIBUTION` to your tile provider. The optional "Metsäkeskuksen karttataso" layer is the WMS of `WFS_BASE_URL`. Both origins are added to the CSP automatically.

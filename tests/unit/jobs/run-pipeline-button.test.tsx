@@ -80,6 +80,17 @@ describe('RunPipelineButton', () => {
     expect(screen.getByRole('button', { name: t.button })).toBeEnabled()
   })
 
+  it('says a run is already in progress on 409', async () => {
+    fetchMock.mockResolvedValue(
+      Response.json({ ok: false, error: 'already_running' }, { status: 409 }),
+    )
+    await clickButton()
+
+    expect(toast.error).toHaveBeenCalledWith(t.alreadyRunning)
+    expect(toast.success).not.toHaveBeenCalled()
+    expect(refresh).toHaveBeenCalledOnce()
+  })
+
   it.each([
     ['a failed run', () => Promise.resolve(Response.json({ ok: false, status: 'error' }))],
     ['a refusal', () => Promise.resolve(Response.json({ ok: false }, { status: 403 }))],
