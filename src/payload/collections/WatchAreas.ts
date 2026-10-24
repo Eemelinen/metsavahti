@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { ValidationError } from 'payload'
 
 import { planLimits } from '@/config/plans'
+import { fi } from '@/i18n/fi'
 import { MAX_RADIUS_M, MIN_RADIUS_M } from '@/lib/watch-areas/watch-area-schema'
 import { isAdminOrOwner, isAdminUser, isAuthenticated } from '@/payload/access'
 
@@ -67,7 +68,7 @@ export const WatchAreas: CollectionConfig = {
             errors: [
               {
                 path: 'owner',
-                message: `Tilaukseen kuuluu enintään ${maxWatchAreas} vahtialuetta.`,
+                message: fi.watchAreas.errors.planLimit(maxWatchAreas),
               },
             ],
             req,

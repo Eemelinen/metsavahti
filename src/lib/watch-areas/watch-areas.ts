@@ -41,8 +41,8 @@ function toPoint({ lng, lat }: WatchAreaFormValues['center']): [number, number] 
 /**
  * Creates a watch area owned by the account. The plan limit lives in the collection's
  * `beforeValidate` hook (`config/plans.ts`), so it holds for every write path; its refusal
- * arrives here as a `ValidationError` on `owner` and leaves as `PlanLimitReached`, whose
- * message the forms show as it is.
+ * arrives here as a `ValidationError` on `owner` with `fi.watchAreas.errors.planLimit` and leaves
+ * as `PlanLimitReached`, whose message the forms show as it is (the admin UI shows the same).
  */
 export async function createWatchArea(
   payload: Payload,
@@ -65,9 +65,13 @@ export async function createWatchArea(
       user,
     })
   } catch (error) {
-    if (error instanceof ValidationError && error.data.errors.some((e) => e.path === 'owner')) {
-      const { maxWatchAreas } = planLimits(user.plan)
-      throw new PlanLimitReached(fi.watchAreas.errors.planLimit(maxWatchAreas), { cause: error })
+    // Only the hook's own refusal: another `owner` error must not read as the plan limit.
+    const message = fi.watchAreas.errors.planLimit(planLimits(user.plan).maxWatchAreas)
+    if (
+      error instanceof ValidationError &&
+      error.data.errors.some((e) => e.path === 'owner' && e.message === message)
+    ) {
+      throw new PlanLimitReached(message, { cause: error })
     }
     throw error
   }
