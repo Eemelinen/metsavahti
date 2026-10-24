@@ -10,7 +10,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { parseArgs } from 'node:util'
 
-import { createWfsClient } from '../src/lib/wfs/client'
+import { MetsakeskusWfsClient } from '../src/lib/wfs/client'
 import {
   attributeDrift,
   capabilitiesConstraint,
@@ -31,7 +31,11 @@ const { values } = parseArgs({
 })
 
 async function main() {
-  const client = createWfsClient({ baseUrl: values.url, layer: values.layer, timeoutMs: 60_000 })
+  const client = new MetsakeskusWfsClient({
+    baseUrl: values.url,
+    layer: values.layer,
+    timeoutMs: 60_000,
+  })
   const [capabilities, describe] = await Promise.all([
     client.getCapabilitiesXml(),
     client.describeFeatureTypeXml(),

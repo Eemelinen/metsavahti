@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createWfsClient } from '@/lib/wfs/client'
+import { MetsakeskusWfsClient } from '@/lib/wfs/client'
 import { attributeDrift, findLayer, parseDescribeFeatureType } from '@/lib/wfs/describe'
 import { LAYER_DEFAULT_CRS, LAYER_NAME, VALID_NOW_FIELD } from '@/lib/wfs/layer'
 
@@ -13,7 +13,7 @@ const baseUrl = process.env.WFS_BASE_URL ?? 'https://avoin.metsakeskus.fi/rajapi
 const layer = process.env.WFS_LAYER ?? LAYER_NAME
 
 describe('Metsäkeskus WFS contract', () => {
-  const client = createWfsClient({ baseUrl, layer, timeoutMs: 60_000 })
+  const client = new MetsakeskusWfsClient({ baseUrl, layer, timeoutMs: 60_000 })
 
   it('GetCapabilities advertises the layer, JSON output and EPSG:3067', async () => {
     const xml = await client.getCapabilitiesXml()
@@ -28,9 +28,8 @@ describe('Metsäkeskus WFS contract', () => {
 
   it('GetFeature with a bbox returns stands in force matching the schema', async () => {
     // ~20 km box north-east of Helsinki
-    const fc = await client.getDeclarations({
-      bbox: [380_000, 6_670_000, 400_000, 6_690_000],
-      count: 5,
+    const fc = await client.getFeaturePage([380_000, 6_670_000, 400_000, 6_690_000], {
+      pageSize: 5,
     })
     expect(fc.features.length).toBeGreaterThan(0)
     expect(fc.crs?.properties.name).toBe('urn:ogc:def:crs:EPSG::3067')

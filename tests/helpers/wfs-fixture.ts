@@ -141,3 +141,58 @@ export function wfsResponseForBbox(
   const features = hit ? fc.features : []
   return { ...fc, features, numberReturned: features.length }
 }
+
+function escapeXml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+function posList(ring: number[][]): string {
+  return ring.map((position) => position.join(' ')).join(' ')
+}
+
+function gmlPolygon(rings: number[][][], id?: string): string {
+  const [exterior, ...interiors] = rings
+  const attrs = id ? ` gml:id="${id}" srsName="urn:ogc:def:crs:EPSG::3067" srsDimension="2"` : ''
+  return [
+    `<gml:Polygon${attrs}>`,
+    `<gml:exterior><gml:LinearRing><gml:posList>${posList(exterior!)}</gml:posList></gml:LinearRing></gml:exterior>`,
+    ...interiors.map(
+      (ring) =>
+        `<gml:interior><gml:LinearRing><gml:posList>${posList(ring)}</gml:posList></gml:LinearRing></gml:interior>`,
+    ),
+    '</gml:Polygon>',
+  ].join('')
+}
+
+function gmlGeometry(geometry: DeclarationGeometry, id: string): string {
+  if (geometry.type === 'Polygon') return gmlPolygon(geometry.coordinates, id)
+  const members = geometry.coordinates
+    .map((polygon) => `<gml:surfaceMember>${gmlPolygon(polygon)}</gml:surfaceMember>`)
+    .join('')
+  return `<gml:MultiSurface gml:id="${id}" srsName="urn:ogc:def:crs:EPSG::3067" srsDimension="2">${members}</gml:MultiSurface>`
+}
+
+/**
+ * A fixture as GeoServer's WFS 2.0 GML 3.2 output encodes it (`outputFormat=gml32`):
+ * `wfs:member` per stand, the geometry first as in `describe.xml`, `null` attributes left
+ * out (`minOccurs="0"`). Used to test the client's GML fallback against the recorded data.
+ */
+export function toGml(fc: DeclarationFeatureCollection): string {
+  const members = fc.features.map((feature) => {
+    const attributes = Object.entries(feature.properties)
+      .filter(([, value]) => value !== null && value !== undefined)
+      .map(([name, value]) => `<v1:${name}>${escapeXml(String(value))}</v1:${name}>`)
+      .join('')
+    const geometry = gmlGeometry(feature.geometry, `${feature.id}.GEOMETRY`)
+    return `<wfs:member><v1:forestusedeclaration gml:id="${feature.id}"><v1:GEOMETRY>${geometry}</v1:GEOMETRY>${attributes}</v1:forestusedeclaration></wfs:member>`
+  })
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<wfs:FeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+    ' xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2"',
+    ' xmlns:v1="https://avoin.metsakeskus.fi/rajapinnat/v1"',
+    ` numberMatched="unknown" numberReturned="${fc.features.length}" timeStamp="${fc.timeStamp ?? ''}">`,
+    ...members,
+    '</wfs:FeatureCollection>',
+  ].join('\n')
+}

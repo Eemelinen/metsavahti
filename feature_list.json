@@ -402,7 +402,7 @@
       "area": "wfs",
       "title": "WFS client",
       "user_visible_behavior": "`WfsClient` interface + `MetsakeskusWfsClient` (`client.ts`): `getFeaturesByBbox(bbox3067, { pageSize, startIndex })` async iterator over pages; timeouts, `p-retry` (3, exponential), JSON output with GML fallback via `fast-xml-parser`; `ExternalServiceError` on failure.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-021"],
       "ticket": "MV-023",
       "epic": "E01",
@@ -411,7 +411,10 @@
         "L1: pnpm check",
         "L1: pnpm test:unit tests/unit/wfs/wfs-client.test.ts (unit with MSW: paging, retry on 502, timeout, GML fallback path.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 48c5d1b)",
+        "2026-10-24 pnpm test:unit tests/unit/wfs/wfs-client.test.ts → pass (working tree on 48c5d1b)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit with MSW: paging, retry on 502, timeout, GML fallback path."
     },
