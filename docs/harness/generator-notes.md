@@ -7,3 +7,7 @@
 - Never launch the `harness:evaluator` agent yourself, and never wait for one: the driver runs the
   evaluator in its own session after yours ends and hands its findings to the next attempt. A
   self-run review duplicates that cost and keeps the session idle.
+- Run `pnpm test:integration` before you clock out, whatever the feature's verification steps
+  list. CI runs it on every PR, and a change to shared code (a code list, a collection hook, a
+  migration) can break another feature's integration test that `pnpm check` does not run. Fix such
+  a break inside the feature's scope; never skip or weaken the test.

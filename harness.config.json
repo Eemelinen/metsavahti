@@ -14,7 +14,8 @@
     }
   },
   "verify": {
-    "ciNotes": { "L3": "CI=1: next start on the last build, retries 2" }
+    "ciNotes": { "L3": "CI=1: next start on the last build, retries 2" },
+    "regression": ["pnpm test:integration"]
   },
   "services": {
     "check": "docker info",
