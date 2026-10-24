@@ -1589,7 +1589,7 @@
       "area": "gdpr",
       "title": "Delete account page /tili/poista and account deletion",
       "user_visible_behavior": "`/tili/poista`: explanation from `retention.ts`, `POISTA` + password confirmation form; `/tili-poistettu` public page. `POST /api/account/delete` (password re-check) → `delete-account` job per `01 §4.6`; `AccountDeleted` email sent first; consent events anonymised (user null, email sha256); session revoked; redirect `/tili-poistettu`.",
-      "status": "in_progress",
+      "status": "passing",
       "depends_on": ["F-050", "F-070"],
       "ticket": "MV-094",
       "epic": "E08",
@@ -1601,7 +1601,12 @@
         "L2: pnpm test:integration tests/integration/account-deletion.int.test.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)",
         "L3: pnpm test:e2e tests/e2e/account-deletion.spec.ts (unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page render…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (commit 2ff49c2)",
+        "2026-10-24 pnpm test:unit tests/unit/gdpr/account-deletion.test.ts → pass (commit 2ff49c2)",
+        "2026-10-24 pnpm test:integration tests/integration/account-deletion.int.test.ts → pass (commit 2ff49c2, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/account-deletion.spec.ts → pass (commit 2ff49c2, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit form validation; integration: no rows remain for user in any collection except anonymised consent events; login fails; E2E page renders, validates and deletes. Status (ticket): absorbs MV-057 (merged 2026-09-20, ledger P11)."
     },
