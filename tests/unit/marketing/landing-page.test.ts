@@ -67,15 +67,7 @@ describe('robots.txt', () => {
     expect(robots.rules).toEqual({
       userAgent: '*',
       allow: '/',
-      disallow: [
-        '/admin',
-        '/api/',
-        '/aloita',
-        '/dashboard',
-        '/vahtialueet',
-        '/ilmoitukset',
-        '/tili',
-      ],
+      disallow: ['/admin', '/api/', '/aloita', '/vahtialueet', '/ilmoitukset', '/tili'],
     })
   })
 })

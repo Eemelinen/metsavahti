@@ -4,8 +4,8 @@ import { fi } from '@/i18n/fi'
 
 const copy = fi.auth.login.errors
 
-/** Where a login lands when `?next=` is missing or unsafe (the app home; `/vahtialueet` after MV-05x). */
-export const DEFAULT_AFTER_LOGIN = '/dashboard'
+/** Where a login lands when `?next=` is missing or unsafe: the app home. */
+export const DEFAULT_AFTER_LOGIN = '/vahtialueet'
 
 /** The login page; `loginPath()` adds the return address. */
 export const LOGIN_PATH = '/kirjaudu'

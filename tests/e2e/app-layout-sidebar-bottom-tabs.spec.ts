@@ -39,7 +39,7 @@ test.describe('app layout (logged in)', () => {
     page,
     isMobile,
   }) => {
-    await page.goto('/dashboard')
+    await page.goto('/vahtialueet')
     const visible = page.getByTestId(isMobile ? 'app-nav-tabs' : 'app-nav-sidebar')
     const hidden = page.getByTestId(isMobile ? 'app-nav-sidebar' : 'app-nav-tabs')
     await expect(visible).toBeVisible()
@@ -70,13 +70,13 @@ test.describe('app layout (logged in)', () => {
     await expect(current).toHaveText('Tili')
 
     await visible.getByRole('link', { name: 'Vahtialueet' }).click()
-    await expect(page).toHaveURL('/dashboard')
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueesi')
+    await expect(page).toHaveURL('/vahtialueet')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueet')
     await expect(current).toHaveText('Vahtialueet')
   })
 
   test('the account menu shows the address and links to Tili and Asetukset', async ({ page }) => {
-    await page.goto('/dashboard')
+    await page.goto('/vahtialueet')
     const trigger = page.getByRole('button', { name: `Tilivalikko: ${E2E_USER.email}` })
     await expect(trigger).toHaveText('ET')
     await trigger.click()
@@ -108,7 +108,7 @@ test.describe('app layout (own account)', () => {
     await page.getByLabel('Sähköposti').fill(email)
     await page.getByLabel('Salasana', { exact: true }).fill(ACCOUNT_PASSWORD)
     await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/vahtialueet')
     await expect(page.getByTestId('unread-badge')).toHaveCount(0)
 
     await logOut(page)

@@ -24,7 +24,7 @@ export type AlertEmailDeclaration = {
 export type AlertEmailProps = {
   watchAreaName: string
   declarations: AlertEmailDeclaration[]
-  /** `env.NEXT_PUBLIC_SERVER_URL`; the CTA opens the dashboard and the footer links derive from it. */
+  /** `env.NEXT_PUBLIC_SERVER_URL`; the CTA opens `/vahtialueet` and the footer links derive from it. */
   baseUrl: string
   attribution: string
 }
@@ -38,7 +38,7 @@ export function AlertEmail({ watchAreaName, declarations, baseUrl, attribution }
       badge={{ label: 'Uusi ilmoitus', tone: 'ember' }}
       heading={`Uusia metsänkäyttöilmoituksia vahtialueellasi ${watchAreaName}`}
       lead={`Vahtialueesi läheltä löytyi ${count} metsänkäyttöilmoitusta, jotka ovat uusia tai muuttuneet edellisen tarkistuksen jälkeen.`}
-      cta={{ label: 'Avaa Metsävahti', href: `${baseUrl}/dashboard` }}
+      cta={{ label: 'Avaa Metsävahti', href: `${baseUrl}/vahtialueet` }}
       note="Metsänkäyttöilmoitus on hakkuuaikomus, ei velvoite hakata. Hakkuu voi alkaa aikaisintaan 10 päivää ilmoituksesta, ja ilmoitus on voimassa kolme vuotta."
       footerWhy={`Saat tämän viestin, koska seuraat aluetta ”${watchAreaName}”.`}
       baseUrl={baseUrl}

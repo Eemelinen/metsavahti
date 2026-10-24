@@ -1200,7 +1200,7 @@
       "area": "watch-areas",
       "title": "Dashboard /vahtialueet",
       "user_visible_behavior": "List/table of areas (name, address label, radius, active declaration count, last checked, \"Uusia: N\" badge, notification switch, kebab), overview MapView, \"Uusi vahtialue\" button with limit tooltip, empty state, status strip from latest `job_runs`, `ReacceptanceBanner` slot.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-050", "F-060", "F-064"],
       "ticket": "MV-066",
       "epic": "E05",
@@ -1211,7 +1211,11 @@
         "L2: pnpm test:integration tests/integration/dashboard-vahtialueet.int.test.ts (integration: other users' areas not listed; E2E `@smoke`.)",
         "L3: pnpm test:e2e tests/e2e/dashboard-vahtialueet.spec.ts (integration: other users' areas not listed; E2E `@smoke`.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 6e42dea)",
+        "2026-10-24 pnpm test:integration tests/integration/dashboard-vahtialueet.int.test.ts → pass (working tree on 6e42dea, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/dashboard-vahtialueet.spec.ts → pass (working tree on 6e42dea, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Was F-004/F-006 (dashboard list; alert list moved to /ilmoitukset, 00-deviations R4). Tests (ticket): integration: other users' areas not listed; E2E `@smoke`."
     },

@@ -6,11 +6,10 @@ import { E2E_WATCH_AREA, expect, test } from './fixtures'
 
 /**
  * A verified account of this test's own with one watch area (the seeded one's centre and
- * radius), signed in, on `/dashboard`. Not the shared e2e user: it is an admin, and the
- * dashboard lists every account's areas for an admin, so areas other specs create would move
- * the map. The account comes from the admin REST API: registration is not under test here.
+ * radius), signed in, on `/vahtialueet`. Not the shared e2e user, whose areas other specs may
+ * change. The account comes from the admin REST API: registration is not under test here.
  */
-async function openOwnDashboard(page: Page, projectName: string) {
+async function openOwnWatchAreas(page: Page, projectName: string) {
   const email = `map-${projectName}-${Date.now()}@metsavahti.test`
   const { api } = await adminApi()
   try {
@@ -31,12 +30,12 @@ async function openOwnDashboard(page: Page, projectName: string) {
     data: { ...E2E_WATCH_AREA },
   })
   expect(area.ok(), await area.text()).toBeTruthy()
-  await page.goto('/dashboard')
+  await page.goto('/vahtialueet')
   return page.getByTestId('map-view')
 }
 
 /**
- * MV-060: the `MapView` component on the dashboard of an account with one 800 m watch area.
+ * MV-060: the `MapView` component on `/vahtialueet` of an account with one 800 m watch area.
  * The base map comes from `MAP_TILE_URL`, which `.env.test` points at the WFS mock's fixed
  * tiles, so the visual baseline never depends on OpenStreetMap; the mock answers WMS `GetMap`
  * with a blank tile.
@@ -53,7 +52,7 @@ test.describe('MapView', () => {
     })
     const baseTile = page.waitForResponse((r) => /:3200\/tiles\/\d+\/\d+\/\d+\.png$/.test(r.url()))
 
-    const map = await openOwnDashboard(page, testInfo.project.name)
+    const map = await openOwnWatchAreas(page, testInfo.project.name)
     expect((await baseTile).status()).toBe(200)
     await expect(map).toHaveAttribute('data-map-ready', 'true')
 
@@ -99,7 +98,7 @@ test.describe('MapView', () => {
     test.use({ reducedMotion: 'reduce' })
 
     test('the map matches its baseline on the fixed style @visual', async ({ page }, testInfo) => {
-      const map = await openOwnDashboard(page, testInfo.project.name)
+      const map = await openOwnWatchAreas(page, testInfo.project.name)
       await expect(map).toHaveAttribute('data-map-ready', 'true')
       await page.evaluate(() => document.fonts.ready)
       await expect(map).toHaveScreenshot('mapview.png')

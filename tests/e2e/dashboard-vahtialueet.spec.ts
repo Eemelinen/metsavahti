@@ -1,0 +1,166 @@
+import type { Page } from '@playwright/test'
+
+import { AUTH_STATE } from '../../playwright.config'
+import { ACCOUNT_PASSWORD, adminApi, markVerified } from './accounts'
+import { expectNoA11yViolations } from './a11y'
+import { E2E_WATCH_AREA, expect, test } from './fixtures'
+
+/**
+ * A verified account of this test's own, signed in through the REST login (which also sets the
+ * browser context's session cookie); returns its JWT for creating areas. Not the shared e2e
+ * user: this spec deletes areas and flips switches.
+ */
+async function signInOwnAccount(page: Page, projectName: string): Promise<string> {
+  const email = `vahtialueet-${projectName}-${Date.now()}@metsavahti.test`
+  const { api } = await adminApi()
+  try {
+    const created = await api.post('/api/users', { data: { email, password: ACCOUNT_PASSWORD } })
+    expect(created.ok(), await created.text()).toBeTruthy()
+  } finally {
+    await api.dispose()
+  }
+  await markVerified(email)
+  const login = await page.request.post('/api/users/login', {
+    data: { email, password: ACCOUNT_PASSWORD },
+  })
+  expect(login.ok(), await login.text()).toBeTruthy()
+  return ((await login.json()) as { token: string }).token
+}
+
+async function createArea(page: Page, token: string, name: string) {
+  const area = await page.request.post('/api/watch-areas', {
+    headers: { authorization: `JWT ${token}` },
+    data: { ...E2E_WATCH_AREA, name, addressLabel: `${name}, Jyväskylä` },
+  })
+  expect(area.ok(), await area.text()).toBeTruthy()
+}
+
+/**
+ * MV-066: `/vahtialueet`, the app home. The shared e2e user sees its seeded area with the
+ * seeded unread alert (`@smoke`); an account of the test's own walks the empty state, the plan
+ * limit, the e-mail switch and deletion through the kebab.
+ */
+test.describe('/vahtialueet (anonymous)', () => {
+  test('sends a guest to the login, also from the old /dashboard address', async ({ page }) => {
+    await page.goto('/vahtialueet')
+    await expect(page).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
+    await page.goto('/dashboard')
+    await expect(page).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
+  })
+})
+
+test.describe('/vahtialueet (shared e2e user)', () => {
+  test.use({ storageState: AUTH_STATE })
+
+  test('lists the seeded area with its unread alert and the overview map @smoke', async ({
+    page,
+  }) => {
+    await page.goto('/vahtialueet')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueet')
+    await expect(page.getByTestId('data-status')).toHaveText(
+      /^(Tiedot päivitetty viimeksi .+ \(Metsäkeskus\)|Metsäkeskuksen tietoja ei ole vielä haettu\.)$/,
+    )
+    const card = page.getByTestId('watch-area-card').filter({ hasText: E2E_WATCH_AREA.name })
+    await expect(card.getByRole('link', { name: E2E_WATCH_AREA.name })).toHaveAttribute(
+      'href',
+      /^\/vahtialueet\/\d+$/,
+    )
+    await expect(card).toContainText('Säde 800 m')
+    await expect(card).toContainText(/\d+ voimassa/)
+    await expect(card).toContainText('Uusia: 1')
+    await expect(card).toContainText(/Ei vielä tarkistettu|Tarkistettu /)
+    await expect(
+      card.getByRole('switch', { name: `Sähköposti-ilmoitukset: ${E2E_WATCH_AREA.name}` }),
+    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Kaikki vahtialueet' })).toBeVisible()
+    await expect(page.getByTestId('map-view')).toBeVisible()
+    await expect(
+      page.getByRole('navigation', { name: 'Päävalikko' }).first().getByRole('link', {
+        name: 'Vahtialueet',
+      }),
+    ).toHaveAttribute('aria-current', 'page')
+    await expectNoA11yViolations(page)
+  })
+})
+
+test.describe('/vahtialueet (own account)', () => {
+  test.use({ storageState: { cookies: [], origins: [] } })
+
+  test('empty state, plan limit, e-mail switch and deletion', async ({ page }, testInfo) => {
+    const token = await signInOwnAccount(page, testInfo.project.name)
+
+    await page.goto('/vahtialueet')
+    const empty = page.getByTestId('no-watch-areas')
+    await expect(empty.getByRole('heading', { name: 'Ei vielä vahtialueita' })).toBeVisible()
+    await expect(empty.getByRole('link', { name: 'Luo vahtialue' })).toHaveAttribute(
+      'href',
+      '/aloita',
+    )
+    await expect(page.getByRole('link', { name: 'Uusi vahtialue' })).toHaveAttribute(
+      'href',
+      '/vahtialueet/uusi',
+    )
+    await expect(page.getByTestId('map-view')).toHaveCount(0)
+    await expectNoA11yViolations(page)
+
+    // The free plan's two areas: the button stays, disabled, and says why.
+    await createArea(page, token, 'Mökki')
+    await createArea(page, token, 'Kotitalo')
+    await page.reload()
+    await expect(page.getByTestId('watch-area-card')).toHaveCount(2)
+    const limited = page.getByRole('button', { name: 'Uusi vahtialue' })
+    await expect(limited).toHaveAttribute('aria-disabled', 'true')
+    await expect(limited).toHaveAccessibleDescription('Ilmaisella tasolla enintään 2 vahtialuetta')
+    // Playwright refuses to click an `aria-disabled` button; focus opens the tooltip as well.
+    await limited.focus()
+    await expect(page.getByTestId('watch-area-limit')).toHaveText(
+      'Ilmaisella tasolla enintään 2 vahtialuetta',
+    )
+    await expect(page).toHaveURL('/vahtialueet')
+
+    // The e-mail switch saves at once and survives a reload.
+    const mokki = page.getByTestId('watch-area-card').filter({ hasText: 'Mökki' })
+    const mokkiSwitch = mokki.getByRole('switch', { name: 'Sähköposti-ilmoitukset: Mökki' })
+    await expect(mokki).toContainText('Mökki, Jyväskylä · säde 800 m')
+    await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'true')
+    await mokkiSwitch.click()
+    await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'false')
+    await expect
+      .poll(async () => {
+        const res = await page.request.get('/api/watch-areas?where[name][equals]=Mökki', {
+          headers: { authorization: `JWT ${token}` },
+        })
+        const { docs } = (await res.json()) as { docs: Array<{ notificationsEnabled: boolean }> }
+        return docs[0]?.notificationsEnabled
+      })
+      .toBe(false)
+    await page.reload()
+    await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'false')
+
+    // Kebab → Poista asks first; cancelling keeps the area, confirming deletes it.
+    const kotitalo = page.getByTestId('watch-area-card').filter({ hasText: 'Kotitalo' })
+    const actions = kotitalo.getByRole('button', { name: 'Lisää toimintoja: Kotitalo' })
+    await expect(async () => {
+      if (!(await page.getByRole('menuitem', { name: 'Poista' }).isVisible())) await actions.click()
+      await expect(page.getByRole('menuitem', { name: 'Poista' })).toBeVisible({ timeout: 2_000 })
+    }).toPass()
+    await expect(page.getByRole('menuitem', { name: 'Muokkaa' })).toHaveAttribute(
+      'href',
+      /^\/vahtialueet\/\d+\/muokkaa$/,
+    )
+    await page.getByRole('menuitem', { name: 'Poista' }).click()
+    const dialog = page.getByRole('alertdialog', { name: 'Poistetaanko vahtialue?' })
+    await expect(dialog).toContainText('”Kotitalo” ja sen ilmoitushistoria poistetaan.')
+    await dialog.getByRole('button', { name: 'Peruuta' }).click()
+    await expect(dialog).toBeHidden()
+    await expect(page.getByTestId('watch-area-card')).toHaveCount(2)
+
+    await actions.click()
+    await page.getByRole('menuitem', { name: 'Poista' }).click()
+    await dialog.getByRole('button', { name: 'Poista' }).click()
+    await expect(page.getByText('Vahtialue ”Kotitalo” poistettu.')).toBeVisible()
+    await expect(page.getByTestId('watch-area-card')).toHaveCount(1)
+    await expect(page.getByRole('link', { name: 'Uusi vahtialue' })).toBeVisible()
+    await expectNoA11yViolations(page)
+  })
+})

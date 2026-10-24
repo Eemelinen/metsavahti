@@ -16,7 +16,7 @@ export default function NotFound() {
           <Link className={systemAction.primary} href="/">
             Etusivulle
           </Link>
-          <Link className={systemAction.link} href="/dashboard">
+          <Link className={systemAction.link} href="/vahtialueet">
             Vahtialueisiin
           </Link>
         </>

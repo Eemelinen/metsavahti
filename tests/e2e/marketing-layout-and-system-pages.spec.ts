@@ -70,8 +70,8 @@ test.describe('marketing layout', () => {
     const context = await browser.newContext({ storageState: AUTH_STATE })
     await addConsentChoice(context)
     const page = await context.newPage()
-    await page.goto('/dashboard')
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueesi')
+    await page.goto('/vahtialueet')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueet')
     await expect(page.getByRole('contentinfo').getByTestId('attribution')).toContainText(
       attributionPattern,
     )
@@ -103,11 +103,11 @@ test.describe('system pages', () => {
   test('an unknown URL under an app route is a 404 once signed in (guests go to the login)', async ({
     browser,
   }) => {
-    // `src/proxy.ts` sends a guest from every `/dashboard/…` path to the login first (MV-046).
+    // `src/proxy.ts` sends a guest from every `/vahtialueet/…` path to the login first (MV-046).
     const context = await browser.newContext({ storageState: AUTH_STATE })
     await addConsentChoice(context)
     const page = await context.newPage()
-    const response = await page.goto('/dashboard/ei/ole')
+    const response = await page.goto('/vahtialueet/ei/ole')
     expect(response?.status()).toBe(404)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sivua ei löytynyt')
     await context.close()

@@ -4,9 +4,6 @@ import { fi } from '@/i18n/fi'
  * Sections of the logged-in app (03b-ui-design-brief.md "App pages": Vahtialueet · Ilmoitukset
  * · Tili; docs/design/App.dc.html `navItems`). Shared by the desktop sidebar and the mobile tab
  * bar so both always agree on targets, labels and the active section.
- *
- * Vahtialueet points at `/dashboard`, today's watch-area page, until MV-066 builds
- * `/vahtialueet` (00-deviations R19, R20); both paths mark the section active.
  */
 export type AppSection = 'vahtialueet' | 'ilmoitukset' | 'tili'
 
@@ -21,9 +18,9 @@ export interface AppNavItem {
 export const APP_NAV_ITEMS: readonly AppNavItem[] = [
   {
     section: 'vahtialueet',
-    href: '/dashboard',
+    href: '/vahtialueet',
     label: fi.app.nav.watchAreas,
-    prefixes: ['/dashboard', '/vahtialueet', '/aloita'],
+    prefixes: ['/vahtialueet', '/aloita'],
   },
   {
     section: 'ilmoitukset',

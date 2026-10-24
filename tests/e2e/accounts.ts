@@ -31,7 +31,7 @@ export async function waitForForm(page: Page): Promise<void> {
   await expect(page.locator('form[data-hydrated]')).toBeAttached()
 }
 
-/** Log in through the form straight to `landing` (an account page, not the map-heavy dashboard). */
+/** Log in through the form straight to `landing` (an account page, not the map-heavy `/vahtialueet`). */
 export async function logIn(page: Page, email: string, password: string, landing = '/tili') {
   await page.goto(`/kirjaudu?next=${encodeURIComponent(landing)}`)
   await waitForForm(page)

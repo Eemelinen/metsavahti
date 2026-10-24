@@ -205,13 +205,13 @@ database or points at port 5432.
   `e2e/<spec>-snapshots/<name>-<project>-linux.png`. They run on `chromium` (desktop) and `mobile-chrome`
   (mobile); `webkit` skips them by `grepInvert`. `playwright.config.ts` freezes animations, hides the caret
   and injects `e2e/visual.css` (hides the `next dev` tools indicator, which `next start` in CI does not
-  render); at most 100 pixels may differ beyond the per-pixel threshold. The spec masks the attribution and
+  render) and the mobile app's fixed bottom tab bar (it covers the lower edge of `/vahtialueet`'s map); at most 100 pixels may differ beyond the per-pixel threshold. The spec masks the attribution and
   copyright lines, which follow the calendar. After an intended visual change, regenerate and look at the
   images before committing: `pnpm test:e2e tests/e2e/marketing.spec.ts --grep @visual --update-snapshots=all`.
-  `mapview-component.spec.ts` (MV-060) shoots only the map element on `/dashboard` once it reports
+  `mapview-component.spec.ts` (MV-060) shoots only the map element on `/vahtialueet` once it reports
   `data-map-ready="true"` (first MapLibre `idle`): the mock's tiles, one watch circle, controls, legend. It uses
-  an account of its own (admin REST API) with one area: the seeded user is an admin, whose dashboard lists every
-  account's areas. Keep `useOwnAddress()` out of map tests: its header makes tile fetches CORS preflights.
+  an account of its own (admin REST API) with one area, so areas other specs give the seeded user never
+  move the map. Keep `useOwnAddress()` out of map tests: its header makes tile fetches CORS preflights.
   The baselines are Linux renders (WSL locally, `ubuntu-latest` in CI); on another OS the files are missing
   and the tests fail until that OS's baselines are written.
 - Specs: marketing pages (`marketing.spec.ts`, MV-101, needs `SHOW_PRICING=1` from `.env.test`: `@smoke`
@@ -242,14 +242,14 @@ database or points at port 5432.
   the header initials follow, axe; `/tili/turvallisuus` with a second Windows-Chrome context lists two sessions,
   refuses a wrong current password, changes it, the other context is sent to `/kirjaudu?next=`, the old
   password is refused and the new one works; "Kirjaa ulos muista laitteista" ends only the other session), landing page (`landing-page.spec.ts`, MV-100: `@smoke` hero, steps, map legend, the trust row (Tietolähde / Yksityisyys / Hinta with the plan's watch-area limit), attribution, Figtree, `#miten` anchor, "Luo vahtialue" → `/rekisteroidy`; the FAQ `<details>` open / close by click and Enter; axe; canonical, `og:locale` / `og:url` / `og:image` (the PNG answers 200) and the Organization + FAQPage JSON-LD; the canonicals of `/tietosuoja`, `/tietopyynto` and `/yhteystiedot`; `sitemap.xml` and `robots.txt`), login and logout (`login-logout.spec.ts`, guest, an own
-  verified account per test through `e2e/accounts.ts`: `@smoke` `/kirjaudu` → `/dashboard` (1-day cookie) →
+  verified account per test through `e2e/accounts.ts`: `@smoke` `/kirjaudu` → `/vahtialueet` (1-day cookie) →
   `Kirjaudu ulos` → `/kirjauduttu-ulos` → the session is gone server-side; remember-me gives a 30-day cookie and
   `?next=` follows same-origin paths only; invalid, unverified (+ inline resend → second Mailpit link) and locked
   after five wrong passwords; `/kirjaudu-ulos` is 405 on GET and a 303 for a guest; axe), forgot / reset password
   (`forgot-reset-password.spec.ts`, guest, own account and address per test: `@smoke` a second browser
   context logs in → `Unohditko salasanan?` → `/unohtunut-salasana` (inline validation, neutral status) →
   the Mailpit link → `/uusi-salasana` (length and match errors) → `/kirjaudu?reset=1` banner → the other
-  context is sent to `/kirjaudu?next=%2Fdashboard` → old password `invalid`, new one reaches the dashboard →
+  context is sent to `/kirjaudu?next=%2Fvahtialueet` → old password `invalid`, new one reaches `/vahtialueet` →
   the link is `invalid` afterwards; an unknown address gets the same status and no email; made-up and
   missing tokens show the expired-or-used state; axe on every state), registration (`registration.spec.ts`,
   runs as a guest with its own `x-forwarded-for` per test: inline validation + meter + axe; `@smoke`
@@ -261,13 +261,16 @@ database or points at port 5432.
 vahtialue` points at `/aloita` → login succeeds → the same link is `used`; an admin backdates
   `verificationSentAt` 25 h so the link is `expired` and its resend button issues a working one;
   `/vahvista` without or with an unknown token; an admin resets `_verified` on a logged-in account and
-  `/dashboard` redirects to `/vahvista-sahkoposti?email=…&required=1` with the `VAHVISTUS` interstitial; axe on every state), the
-  consolidated auth suite (`auth.spec.ts`, Chromium + Mobile Chrome only: `@smoke` register → verify → `/dashboard`
+  `/vahtialueet` redirects to `/vahvista-sahkoposti?email=…&required=1` with the `VAHVISTUS` interstitial; axe on every state), the
+  consolidated auth suite (`auth.spec.ts`, Chromium + Mobile Chrome only: `@smoke` register → verify → `/vahtialueet`
   via `/kirjaudu?next=` → the guest-only pages send the signed-in user on (a safe `?next=` too) → logout → reset →
   login; guests are sent from every app route with the full return address; an unverified session goes to the
   interstitial and may still open `/kirjaudu`; the security headers and a fresh nonce per request; no CSP violation
-  on `/` and on the map page; axe on every auth page and state), dashboard
-  redirect (`/kirjaudu?next=%2Fdashboard`)/map/pending-alert count, MapView on the dashboard of an own account (`mapview-component.spec.ts`,
+  on `/` and on the map page; axe on every auth page and state), watch-area list (`dashboard-vahtialueet.spec.ts`, MV-066: a guest from `/vahtialueet` and the old
+  `/dashboard` lands on `/kirjaudu?next=%2Fvahtialueet`; `@smoke` the seeded area's card (radius, "N voimassa",
+  "Uusia: 1" from the seeded alert, last check, switch), the status strip, the overview map, axe; an own account:
+  empty state → `/aloita`, two areas → "Uusi vahtialue" `aria-disabled` with the limit tooltip, the e-mail switch
+  persists, kebab → Poista → cancel keeps / confirm deletes the area, axe), MapView on `/vahtialueet` of an own account (`mapview-component.spec.ts`,
   MV-060: a base tile from the mock, `data-map-ready`, legend, Finnish zoom buttons, OSM + Metsäkeskus attribution,
   the WMS toggle by keyboard → a `GetMap` request, the zoom hint after zooming out and "Keskitä" bringing the area
   back, no CSP violation, axe; `@visual` baseline of the map), marketing layout + system pages (header/footer, 404 status,

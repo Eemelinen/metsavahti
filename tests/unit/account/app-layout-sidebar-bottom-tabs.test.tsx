@@ -6,7 +6,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { AppShell } from '@/components/app-shell/app-shell'
 import { activeSection, initials, pageTitle, unreadBadge } from '@/components/app-shell/nav'
 
-const navigation = vi.hoisted(() => ({ pathname: '/dashboard' }))
+const navigation = vi.hoisted(() => ({ pathname: '/vahtialueet' }))
 vi.mock('next/navigation', () => ({ usePathname: () => navigation.pathname }))
 
 beforeAll(() => {
@@ -20,7 +20,7 @@ beforeAll(() => {
 
 afterEach(() => {
   cleanup()
-  navigation.pathname = '/dashboard'
+  navigation.pathname = '/vahtialueet'
 })
 
 const USER = { email: 'anna.korhonen@example.fi', name: 'Anna Korhonen' }
@@ -43,7 +43,7 @@ function shownAt(el: HTMLElement, width: number): boolean {
   return true
 }
 
-function renderShell(unreadCount = 3, pathname = '/dashboard') {
+function renderShell(unreadCount = 3, pathname = '/vahtialueet') {
   navigation.pathname = pathname
   return render(
     <AppShell unreadCount={unreadCount} user={USER}>
@@ -104,7 +104,7 @@ describe('AppNav', () => {
       )
       expect(nav.getAllByRole('link')).toHaveLength(3)
       expect(links.map((l) => [l.textContent, l.getAttribute('href')])).toEqual([
-        ['Vahtialueet', '/dashboard'],
+        ['Vahtialueet', '/vahtialueet'],
         ['Ilmoitukset3 (3 lukematonta)', '/ilmoitukset'],
         ['Tili', '/tili'],
       ])
@@ -112,7 +112,7 @@ describe('AppNav', () => {
   })
 
   it.each([
-    ['/dashboard', 'Vahtialueet'],
+    ['/vahtialueet', 'Vahtialueet'],
     ['/vahtialueet/3/muokkaa', 'Vahtialueet'],
     ['/aloita', 'Vahtialueet'],
     ['/ilmoitukset/12', 'Ilmoitukset'],
@@ -171,7 +171,7 @@ describe('AccountMenu', () => {
 
 describe('nav helpers', () => {
   it('derives the section and the header title from the path', () => {
-    expect(activeSection('/dashboardx')).toBeNull()
+    expect(activeSection('/vahtialueetx')).toBeNull()
     expect(activeSection('/tili-poistettu')).toBeNull()
     expect(pageTitle('/aloita')).toBe('Uusi vahtialue')
     expect(pageTitle('/vahtialueet/7')).toBe('Vahtialueet')

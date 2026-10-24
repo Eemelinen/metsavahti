@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   },
   // Native (napi) renderer of the alert map image; it must be required at runtime, not bundled.
   serverExternalPackages: ['@resvg/resvg-js'],
+  // The watch-area list was `/dashboard` until MV-066 (00-deviations R3); keep old links working.
+  async redirects() {
+    return [{ source: '/dashboard', destination: '/vahtialueet', permanent: true }]
+  },
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })
