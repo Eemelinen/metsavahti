@@ -20,7 +20,7 @@ test.describe('dashboard (logged in)', () => {
     // The pending-alert count is a Payload count on `alerts.notifiedAt` (MV-034); the seed has none.
     await expect(page.getByText('odottavia hälytyksiä: 0')).toBeVisible()
     await expect(page.getByTestId('watch-area-list')).toContainText(E2E_WATCH_AREA.name)
-    await expect(page.getByTestId('watch-area-map')).toBeVisible()
+    await expect(page.getByTestId('map-view')).toBeVisible()
     await expectNoA11yViolations(page)
   })
 })

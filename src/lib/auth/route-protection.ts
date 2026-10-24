@@ -65,6 +65,8 @@ export interface ProxyOptions {
   dev: boolean
   https: boolean
   sentryDsn?: string
+  /** Map tile origins allowed in the CSP (`mapSourceOrigins()`). */
+  mapOrigins?: readonly string[]
   /** Injected in tests. */
   nonce?: () => string
   now?: () => number
@@ -97,6 +99,7 @@ export function handleRequest(request: NextRequest, options: ProxyOptions): Next
         dev: options.dev,
         https: options.https,
         sentryDsn: options.sentryDsn,
+        mapOrigins: options.mapOrigins,
       })
 
   if (options.maintenance && !isMaintenanceExempt(pathname)) {

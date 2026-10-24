@@ -56,10 +56,13 @@ async function watchCsp(page: Page): Promise<() => Promise<string[]>> {
   ]
 }
 
-/** Resolves once the first OpenStreetMap tile request has finished or failed. */
+/** Base-map tiles come from `MAP_TILE_URL` (the WFS mock's fixed tiles in `.env.test`, MV-060). */
+const TILE_URL = process.env.MAP_TILE_URL ?? 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+const TILE_URL_PREFIX = TILE_URL.slice(0, TILE_URL.indexOf('{z}'))
+
+/** Resolves once the first base-map tile request has finished or failed. */
 function firstTileSettled(page: Page): Promise<unknown> {
-  const isTile = (request: { url(): string }) =>
-    request.url().startsWith('https://tile.openstreetmap.org/')
+  const isTile = (request: { url(): string }) => request.url().startsWith(TILE_URL_PREFIX)
   return Promise.race([
     page.waitForEvent('requestfinished', { predicate: isTile }),
     page.waitForEvent('requestfailed', { predicate: isTile }),
@@ -217,8 +220,8 @@ test.describe('auth (E03, signed in)', () => {
   // `/vahtialueet` (MV-05x) does not exist yet; `/dashboard` is today's watch-area page.
   test('the watch-area page with its map renders with no CSP violation', async ({ page }) => {
     const violations = await watchCsp(page)
-    // The first map tile settling (loaded or not: the tile server is on the internet, so only a
-    // CSP refusal counts) shows the worker ran; no `networkidle`, MapLibre retries failed tiles.
+    // The first map tile settling (loaded or not: only a CSP refusal counts) shows the map ran;
+    // no `networkidle`, MapLibre retries failed tiles.
     const tileSettled = firstTileSettled(page)
     await page.goto('/dashboard')
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueesi')

@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { handleRequest } from '@/lib/auth/route-protection'
 import { payloadSecretKey } from '@/lib/auth/session'
 import { env } from '@/lib/env'
+import { mapSourceOrigins } from '@/lib/map-sources'
 
 /**
  * Next 16's middleware (ledger R6): maintenance mode, the login redirect for `(app)` routes
@@ -14,6 +15,7 @@ const options = {
   dev: env.NODE_ENV === 'development',
   https: env.NEXT_PUBLIC_SERVER_URL.startsWith('https:'),
   sentryDsn: env.NEXT_PUBLIC_SENTRY_DSN,
+  mapOrigins: mapSourceOrigins(),
 }
 
 export function proxy(request: NextRequest) {

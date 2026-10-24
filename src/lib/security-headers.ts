@@ -10,9 +10,6 @@
  * editor fields load code from a CDN, and its policy belongs to the security review pass (MV-130).
  */
 
-/** Map tile hosts (`components/map/watch-area-map.tsx`); MapLibre fetches tiles, so both lists. */
-export const MAP_TILE_ORIGINS = ['https://tile.openstreetmap.org'] as const
-
 export interface CspOptions {
   nonce: string
   /** `next dev`: React needs `eval` for its debugging stacks. Never in production. */
@@ -21,6 +18,8 @@ export interface CspOptions {
   https: boolean
   /** Client Sentry DSN; its origin is allowed in `connect-src`. */
   sentryDsn?: string
+  /** Base-map and WMS tile origins (`mapSourceOrigins()`); MapLibre fetches tiles, so both lists. */
+  mapOrigins?: readonly string[]
 }
 
 /** A fresh, unguessable nonce for one request (128 random bits, base64). */
@@ -40,7 +39,13 @@ function originOf(url: string | undefined): string | null {
 }
 
 /** The frontend's `Content-Security-Policy` value. */
-export function contentSecurityPolicy({ nonce, dev, https, sentryDsn }: CspOptions): string {
+export function contentSecurityPolicy({
+  nonce,
+  dev,
+  https,
+  sentryDsn,
+  mapOrigins = [],
+}: CspOptions): string {
   const sentry = originOf(sentryDsn)
   const directives: Array<[string, ...string[]]> = [
     ['default-src', "'self'"],
@@ -52,9 +57,9 @@ export function contentSecurityPolicy({ nonce, dev, https, sentryDsn }: CspOptio
       ...(dev ? ["'unsafe-eval'"] : []),
     ],
     ['style-src', "'self'", "'unsafe-inline'"],
-    ['img-src', "'self'", 'blob:', 'data:', ...MAP_TILE_ORIGINS],
+    ['img-src', "'self'", 'blob:', 'data:', ...mapOrigins],
     ['font-src', "'self'"],
-    ['connect-src', "'self'", ...MAP_TILE_ORIGINS, ...(sentry ? [sentry] : [])],
+    ['connect-src', "'self'", ...mapOrigins, ...(sentry ? [sentry] : [])],
     ['worker-src', "'self'", 'blob:'],
     ['object-src', "'none'"],
     ['base-uri', "'self'"],

@@ -1,14 +1,18 @@
 /**
  * Deterministic stand-in for the Metsäkeskus WFS used by the E2E suite.
  * Serves the recorded fixture for GetFeature requests whose bbox intersects it,
- * an empty collection otherwise, and a minimal GetCapabilities document.
+ * an empty collection otherwise, and a minimal GetCapabilities document. For the map
+ * (MV-060) it also serves fixed base-map tiles and blank WMS GetMap tiles, so map
+ * screenshots never depend on OpenStreetMap or Metsäkeskus.
  *
- *   WFS_BASE_URL=http://localhost:3200/ows/   (see .env.test)
+ *   WFS_BASE_URL=http://localhost:3200/ows/                     (see .env.test)
+ *   MAP_TILE_URL=http://localhost:3200/tiles/{z}/{x}/{y}.png
  */
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 
 import { loadWfsFixture, requestBbox, wfsResponseForBbox } from '../../helpers/wfs-fixture'
+import { png } from './png'
 
 const port = Number(process.env.WFS_MOCK_PORT ?? 3200)
 const fixture = loadWfsFixture()
@@ -16,8 +20,21 @@ const app = new Hono()
 
 app.get('/health', (c) => c.json({ ok: true, features: fixture.features.length }))
 
+// Every base tile is the same: paper-sunken with a line-coloured top and left edge (a grid),
+// so a screenshot shows where the tiles sit without any real map content.
+const BASE_TILE = png(256, (x, y) =>
+  x === 0 || y === 0 ? [221, 227, 222, 255] : [239, 236, 229, 255],
+)
+const BLANK_TILE = png(256, () => [0, 0, 0, 0])
+const pngResponse = (body: Buffer) =>
+  new Response(new Uint8Array(body), {
+    headers: { 'content-type': 'image/png', 'access-control-allow-origin': '*' },
+  })
+
+app.get('/tiles/:z/:x/:y', () => pngResponse(BASE_TILE))
+
 app.get('/ows/', (c) => {
-  const request = (c.req.query('request') ?? '').toLowerCase()
+  const request = (c.req.query('request') ?? c.req.query('REQUEST') ?? '').toLowerCase()
   if (request === 'getcapabilities') {
     return c.body(
       `<?xml version="1.0" encoding="UTF-8"?>
@@ -29,6 +46,7 @@ app.get('/ows/', (c) => {
       { 'content-type': 'application/xml' },
     )
   }
+  if (request === 'getmap') return pngResponse(BLANK_TILE)
   if (request === 'getfeature') {
     const bbox = requestBbox(new URL(c.req.url).searchParams)
     return c.json(wfsResponseForBbox(fixture, bbox))

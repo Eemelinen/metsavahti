@@ -1066,7 +1066,7 @@
       "area": "watch-areas",
       "title": "MapView component",
       "user_visible_behavior": "`src/components/map/MapView.tsx` (MapLibre + react-map-gl): base raster (OSM in dev, `MAP_TILE_URL` env), optional Metsäkeskus WMS toggle layer, declarations GeoJSON layer styled by `cuttingType` colour token, watch-area circle/polygon layer, legend, \"Keskitä\" control, keyboard-operable controls, attribution control, `onCenterChange` with draggable pin in interactive mode; SSR-safe dynamic import.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-016", "F-024", "F-027"],
       "ticket": "MV-060",
       "epic": "E05",
@@ -1077,7 +1077,11 @@
         "L1: pnpm test:unit tests/unit/watch-areas/mapview-component.test.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)",
         "L3: pnpm test:e2e tests/e2e/mapview-component.spec.ts (unit: renders legend and handles props without WebGL mock maplibre; E2E visual snapshot on fixed style `@visual` tag, not in smoke.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 720de3a)",
+        "2026-10-24 pnpm test:unit tests/unit/watch-areas/mapview-component.test.ts → pass (working tree on 720de3a)",
+        "2026-10-24 pnpm test:e2e tests/e2e/mapview-component.spec.ts → pass (working tree on 720de3a, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit: renders legend and handles props without WebGL (mock maplibre); E2E visual snapshot on fixed style (`@visual` tag, not in smoke)."
     },

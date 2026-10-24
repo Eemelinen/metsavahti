@@ -65,6 +65,11 @@ database or points at port 5432.
   legal pages (`legal/legaldocument-renderer.test.tsx`: `splitLegalSections()` slugs, suffixes and reserved
   ids; `LegalDocument` markup: date in Finnish time, version, numbered sections whose ids match the TOC links,
   lists and links, extra sections first, no TOC without sections; the `config/cookies.ts` lifetimes),
+  the map (`watch-areas/mapview-component.test.ts`, jsdom, MV-060: `react-map-gl/maplibre` and `maplibre-gl` mocked, so no
+  WebGL: legend, controls and attributions, the configured base raster, declaration colours by `cuttingColourToken()`, the
+  circle and its initial bounds, "Keskitä" → `fitBounds` / `flyTo`, the WMS toggle by keyboard with its zoom hint, the
+  pin's arrow keys / drag / map click → `onCenterChange` only in interactive mode, `data-map-ready`, the worker URL;
+  `watch-areas/map-sources.test.ts`: `mapSources()` from `.env.test`, the WMS `GetMap` template, the CSP origins),
 
 ## Integration — `pnpm test:integration`
 
@@ -181,7 +186,8 @@ database or points at port 5432.
 - Config: `playwright.config.ts`. Requires `pnpm db:up` (compose `db_test` on
   5433 + Mailpit) and `pnpm exec playwright install chromium webkit`.
 - Playwright starts two servers: the WFS mock (`e2e/mocks/wfs-server.ts`, Hono on 3200) and the app on **3100** (`next dev` locally, `next start` in CI, both with
-  `NEXT_DIST_DIR=.next-e2e`). `reuseExistingServer` is on locally, so keep them
+  `NEXT_DIST_DIR=.next-e2e`). The mock also serves the map's fixed base tiles (`/tiles/{z}/{x}/{y}.png`, `MAP_TILE_URL` in
+  `.env.test`) and blank WMS `GetMap` tiles (MV-060), drawn by `e2e/mocks/png.ts`. `reuseExistingServer` is on locally, so keep them
   running between iterations for fast reruns.
 - The auth forms carry `data-hydrated` once react-hook-form has mounted (`useHydrated()`); `waitForForm()` in
   `e2e/accounts.ts` waits for it before filling, because RHF resets the inputs on mount and a value typed
@@ -202,6 +208,10 @@ database or points at port 5432.
   render); at most 100 pixels may differ beyond the per-pixel threshold. The spec masks the attribution and
   copyright lines, which follow the calendar. After an intended visual change, regenerate and look at the
   images before committing: `pnpm test:e2e tests/e2e/marketing.spec.ts --grep @visual --update-snapshots=all`.
+  `mapview-component.spec.ts` (MV-060) shoots only the map element on `/dashboard` once it reports
+  `data-map-ready="true"` (first MapLibre `idle`): the mock's tiles, one watch circle, controls, legend. It uses
+  an account of its own (admin REST API) with one area: the seeded user is an admin, whose dashboard lists every
+  account's areas. Keep `useOwnAddress()` out of map tests: its header makes tile fetches CORS preflights.
   The baselines are Linux renders (WSL locally, `ubuntu-latest` in CI); on another OS the files are missing
   and the tests fail until that OS's baselines are written.
 - Specs: marketing pages (`marketing.spec.ts`, MV-101, needs `SHOW_PRICING=1` from `.env.test`: `@smoke`
@@ -257,7 +267,10 @@ vahtialue` points at `/aloita` → login succeeds → the same link is `used`; a
   login; guests are sent from every app route with the full return address; an unverified session goes to the
   interstitial and may still open `/kirjaudu`; the security headers and a fresh nonce per request; no CSP violation
   on `/` and on the map page; axe on every auth page and state), dashboard
-  redirect (`/kirjaudu?next=%2Fdashboard`)/map/pending-alert count, marketing layout + system pages (header/footer, 404 status,
+  redirect (`/kirjaudu?next=%2Fdashboard`)/map/pending-alert count, MapView on the dashboard of an own account (`mapview-component.spec.ts`,
+  MV-060: a base tile from the mock, `data-map-ready`, legend, Finnish zoom buttons, OSM + Metsäkeskus attribution,
+  the WMS toggle by keyboard → a `GetMap` request, the zoom hint after zooming out and "Keskitä" bringing the area
+  back, no CSP violation, axe; `@visual` baseline of the map), marketing layout + system pages (header/footer, 404 status,
   `/huolto`, `/liikaa-pyyntoja`, the error boundary through `/virhe`, axe), health and
   jobs API (runs the sync against the mock). `/virhe` throws only because `.env.test` sets
   `ENABLE_ERROR_TEST_ROUTE=1`; the unit test `infra/error-test-route.test.ts` checks that
