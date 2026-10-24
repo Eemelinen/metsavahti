@@ -8,7 +8,7 @@ import { submitDataRequest } from './actions'
 
 const copy = fi.publicForms.dataRequest
 
-export const metadata: Metadata = { title: copy.title }
+export const metadata: Metadata = { title: copy.title, alternates: { canonical: '/tietopyynto' } }
 
 /**
  * `/tietopyynto` (`03-pages.md` (legal), Yhteystiedot artboard `#tietopyynto`, MV-095): a data

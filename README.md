@@ -172,7 +172,7 @@ See [tests/README.md](tests/README.md) for details. In short:
 
 ```
 src/
-  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing, 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
+  app/(frontend)/         root document + error boundaries; (auth)/ kirjaudu (+ login action), kirjauduttu-ulos, rekisteroidy (+ register action), vahvista-sahkoposti (+ resend action, button), vahvista, unohtunut-salasana (+ requestPasswordReset action, form), uusi-salasana (+ resetPassword action, form, invalid state); (marketing)/ landing (hero, steps, explainer, FAQ, JSON-LD), 404, /huolto, /liikaa-pyyntoja, /virhe (test hook); kirjaudu-ulos/route.ts (POST logout); (app)/ app shell layout (sidebar / bottom tabs, account menu, unread badge), dashboard, stand-in ilmoitukset + tili
   app/(payload)/          generated Payload admin + REST/GraphQL routes
   app/api/health          liveness + PostGIS check
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
@@ -193,6 +193,8 @@ src/
   lib/errors.ts           typed AppError subclasses, actionResult() for Server Actions, toErrorResponse()
   lib/geo                 crs.ts, buffer.ts, bbox.ts, hash.ts, spatial-queries.ts
   lib/legal/documents.ts  legal document slugs, latest-published resolver, placeholder seed
+  lib/seo.ts              sitemap.xml / robots.txt entries, Open Graph defaults, Organization + FAQPage JSON-LD (app/sitemap.ts, app/robots.ts)
+  content/faq.ts          the landing-page FAQ (accordion + FAQPage structured data)
   lib/legal/legal-sections.ts  splits a document body into h2 sections for the TOC
   config/cookies.ts       the cookies the service sets (the /evasteet table)
   lib/wfs                 client.ts, schemas.ts, parse.ts, hakkuutapa.ts

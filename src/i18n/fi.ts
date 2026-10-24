@@ -125,6 +125,79 @@ export const fi = {
     mapCredit: 'Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.',
     copyright: (year: number) => `© ${year} Metsävahti`,
   },
+  /** Landing page `/` (MV-100, docs/design/Landing.dc.html, hero B); the FAQ is `src/content/faq.ts`. */
+  landing: {
+    meta: {
+      title: 'Metsävahti – tiedä, jos naapurimetsääsi ollaan hakkaamassa',
+      description:
+        'Metsävahti seuraa Suomen metsäkeskuksen metsänkäyttöilmoituksia tonttisi ympärillä ja lähettää sähköpostin, kun lähelle suunnitellaan hakkuuta. Ilmainen.',
+    },
+    hero: {
+      title: 'Tiedä, jos naapurimetsääsi ollaan hakkaamassa',
+      lead: 'Metsävahti seuraa virallisia metsänkäyttöilmoituksia tonttisi ympärillä ja lähettää sähköpostin, kun lähelle suunnitellaan hakkuuta.',
+      primaryCta: 'Luo vahtialue',
+      secondaryCta: 'Miten se toimii',
+    },
+    mapMock: {
+      label: 'Esimerkkikartta',
+      description:
+        'Kuvitteellinen kartta: katkoviivalla rajattu vahtialue tontin ympärillä ja sen sisään osuvia hakkuuilmoituksia.',
+      legend: {
+        uudistus: 'Uudistushakkuu',
+        harvennus: 'Harvennushakkuu',
+        watchArea: 'Vahtialueesi',
+      },
+      alertTitle: 'Uusi ilmoitus 420 m päässä',
+      alertBody: 'Uudistushakkuu · 3,4 ha · 5.9.2026',
+    },
+    steps: {
+      title: 'Miten se toimii',
+      items: (minRadiusM: number, maxRadiusKm: number) => [
+        {
+          title: 'Merkitse tontti kartalle',
+          body: 'Hae osoitteella tai napauta karttaa. Voit siirtää merkkiä vapaasti.',
+        },
+        {
+          title: 'Valitse säde',
+          body: `Kuinka läheltä haluat tietää: ${minRadiusM} metristä ${maxRadiusKm} kilometriin.`,
+        },
+        {
+          title: 'Saat sähköpostin',
+          body: 'Kun uusi metsänkäyttöilmoitus ilmestyy alueelle, kerromme siitä sähköpostilla.',
+        },
+      ],
+    },
+    explainer: {
+      title: 'Mitä metsänkäyttöilmoitus on?',
+      body: 'Metsänomistajan Metsäkeskukselle tekemä ilmoitus suunnitellusta hakkuusta. Se on aikomus, ei takuu siitä että hakkuu toteutuu.',
+      points: [
+        'Ilmoitus on tehtävä vähintään 10 päivää ennen hakkuun aloittamista.',
+        'Ilmoitus on voimassa kolme vuotta.',
+        'Pienet kotitarvehakkuut eivät vaadi ilmoitusta, eivätkä näy palvelussa.',
+      ],
+    },
+    trust: {
+      label: 'Luotettavuus',
+      source: {
+        title: 'Tietolähde',
+        body: 'Suomen metsäkeskuksen avoin Metsänkäyttöilmoitukset-aineisto. Päivitetään palveluun kaksi kertaa päivässä.',
+      },
+      privacy: {
+        title: 'Yksityisyys',
+        body: 'Palvelu ei näytä maanomistajien henkilötietoja. Näet vain hakkuualueen, tyypin ja ajankohdan.',
+      },
+      price: {
+        title: 'Hinta',
+        body: (maxWatchAreas: number) =>
+          `Ilmainen: enintään ${maxWatchAreas} vahtialuetta ja sähköposti-ilmoitukset. Laajempi taso tulossa myöhemmin.`,
+      },
+    },
+    faqTitle: 'Usein kysyttyä',
+    cta: {
+      title: 'Merkitse tontti kartalle. Me vahdimme loput.',
+      button: 'Luo vahtialue',
+    },
+  },
   consent: {
     banner: {
       label: 'Evästeet',

@@ -1709,7 +1709,7 @@
       "area": "marketing",
       "title": "Landing page /, FAQ content and SEO",
       "user_visible_behavior": "Hero, 3-step strip, explainer box, trust section, FAQ (from `src/content/faq.ts`: 8 Finnish Q&As — what is a declaration, exemptions, why alert may be late, is my data shared, cost, accuracy of radius, cancel account, source licence), CTAs; illustrative map mock as static SVG/PNG. SEO & metadata: Open Graph images (static), `sitemap.xml`, `robots.txt`, canonical, `fi` lang, structured data (Organization, FAQPage).",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-011"],
       "ticket": "MV-100",
       "epic": "E09",
@@ -1720,9 +1720,16 @@
         "L1: pnpm test:unit tests/unit/marketing/landing-page.test.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)",
         "L3: pnpm test:e2e tests/e2e/landing-page.spec.ts (unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget perf ≥ 90 in CI via `@lhci/cli`, non-blocking.)"
       ],
-      "evidence": [],
-      "attempts": 0,
-      "notes": "Tests (ticket): unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget (perf ≥ 90 in CI via `@lhci/cli`, non-blocking). Status (ticket): absorbs MV-103 and MV-104 (merged 2026-09-20, ledger P11)."
+      "evidence": [
+        "2026-10-24 pnpm check → pass (commit f80bcf2)",
+        "2026-10-24 pnpm test:unit tests/unit/marketing/landing-page.test.ts → pass (commit f80bcf2)",
+        "2026-10-24 pnpm test:e2e tests/e2e/landing-page.spec.ts → pass (commit f80bcf2, Docker available)",
+        "2026-10-24 pnpm check → pass (commit d7c7440)",
+        "2026-10-24 pnpm test:unit tests/unit/marketing/landing-page.test.ts → pass (commit d7c7440)",
+        "2026-10-24 pnpm test:e2e tests/e2e/landing-page.spec.ts → pass (commit d7c7440, Docker available)"
+      ],
+      "attempts": 1,
+      "notes": "Tests (ticket): unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget (perf ≥ 90 in CI via `@lhci/cli`, non-blocking). Status (ticket): absorbs MV-103 and MV-104 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-101",

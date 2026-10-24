@@ -87,6 +87,18 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium webkit
       - name: Build and run E2E against the production server
         run: pnpm test:e2e:ci
+      # MV-100: Lighthouse budget for `/` (performance, accessibility, SEO ≥ 0.9, lighthouserc.json)
+      # on the build above. Non-blocking: a miss shows as a warning and the report is uploaded.
+      - name: Lighthouse budget (non-blocking)
+        continue-on-error: true
+        run: pnpm dlx @lhci/cli@0.15.1 autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: .lighthouseci
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

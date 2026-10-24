@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Source of public/og-image.png (MV-100); colours from tokens.js. -->
+  <rect width="1200" height="630" fill="#F7F5F0"/>
+  <g transform="translate(700 0)">
+    <rect width="500" height="630" fill="#EFECE5"/>
+    <path fill="#D3E1D8" d="M0 0h220l-30 140 70 80-110 90L0 280Z M330 0h170v330l-90-30-60-120-40-60Z M0 470l130-30 110 70 30 120H0Z M300 630l40-120 160-40v160Z"/>
+    <path fill="#E9F0EB" d="M230 0h90l-10 90 40 60-110 10-30-60Z M120 330l90-20 60 60-50 60-110-20Z"/>
+    <path fill="none" stroke="#B7C4BC" stroke-width="14" stroke-linecap="round" d="M0 350C120 330 200 370 280 340S400 260 500 280 M260 630C240 520 300 440 280 330S220 100 260 0"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" d="M0 350C120 330 200 370 280 340S400 260 500 280 M260 630C240 520 300 440 280 330S220 100 260 0"/>
+    <path fill="#D9572B" fill-opacity="0.7" stroke="#A33E1A" stroke-width="2" d="M320 200l80-30 40 70-30 60-80 10-30-60Z"/>
+    <path fill="#F0B35A" fill-opacity="0.8" stroke="#9C6010" stroke-width="2" d="M150 360l80-20 50 50-20 70-90 10-40-50Z"/>
+    <circle cx="270" cy="315" r="190" fill="#2B6247" fill-opacity="0.1" stroke="#2B6247" stroke-width="4" stroke-dasharray="12 10"/>
+    <circle cx="270" cy="315" r="12" fill="#1E4A37" stroke="#FFFFFF" stroke-width="5"/>
+  </g>
+  <g font-family="Figtree, Ubuntu, 'Liberation Sans', sans-serif">
+    <rect x="72" y="72" width="48" height="48" rx="12" fill="#1E4A37"/>
+    <circle cx="96" cy="96" r="9" fill="#F0B35A"/>
+    <text x="136" y="108" font-size="34" font-weight="700" fill="#1E4A37">Metsävahti</text>
+    <text font-size="58" font-weight="700" fill="#1E4A37" letter-spacing="-1">
+      <tspan x="72" y="250">Tiedä, jos</tspan>
+      <tspan x="72" y="318">naapurimetsääsi</tspan>
+      <tspan x="72" y="386">ollaan hakkaamassa</tspan>
+    </text>
+    <text font-size="26" fill="#5C6B62">
+      <tspan x="72" y="470">Ilmoitus sähköpostiin, kun tonttisi lähelle</tspan>
+      <tspan x="72" y="506">tehdään metsänkäyttöilmoitus. Ilmainen.</tspan>
+    </text>
+  </g>
+</svg>

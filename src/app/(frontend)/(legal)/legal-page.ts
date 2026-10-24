@@ -4,15 +4,22 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import {
+  LEGAL_DOCUMENT_PATHS,
   LEGAL_DOCUMENT_TITLES,
   type LegalDocumentSlug,
   findLatestLegalDocument,
 } from '@/lib/legal/documents'
 import type { LegalDocument } from '@/payload-types'
 
-/** `<title>` of a legal page; the heading itself is the document's own `title`. */
+/**
+ * `<title>` and canonical URL of a legal page; the heading itself is the document's own
+ * `title`.
+ */
 export function legalMetadata(slug: LegalDocumentSlug): Metadata {
-  return { title: LEGAL_DOCUMENT_TITLES[slug] }
+  return {
+    title: LEGAL_DOCUMENT_TITLES[slug],
+    alternates: { canonical: LEGAL_DOCUMENT_PATHS[slug] },
+  }
 }
 
 /**

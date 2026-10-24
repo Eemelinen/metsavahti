@@ -22,6 +22,10 @@ exposes props; the route or template is selected with the pill navigation or the
 | `Legal.dc.html`         | `/tietosuoja`, `/kayttoehdot`, `/evasteet` (cookie table + "Avaa evästeasetukset"), `/saavutettavuus`; sticky TOC.                                                                                                                                                                  | `#tietosuoja`, `#kayttoehdot`, `#evasteet`, `#saavutettavuus`                       |
 | `Email.dc.html`         | Seven transactional emails as table-based HTML: 1 verify, 2 password reset, 3 new alert, 4 digest, 5 export ready, 6 account deleted, 7 email change.                                                                                                                                | `#template=<n>`, `#layout`                                                          |
 
+`og-image.svg` is the source of the static Open Graph image `public/og-image.png` (1200 × 630,
+MV-100; no artboard). Re-render it with sharp (`sharp('docs/design/og-image.svg').png().toFile(…)`);
+the text falls back to a system sans-serif because Figtree is not installed for librsvg.
+
 Decisions taken from the artboards: landing hero **B**; a dedicated "Kirjauduttu ulos" screen
 (`00-deviations` R2); no dark theme (R13).
 

@@ -144,4 +144,8 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-forest-600;
   }
+  /* `list-none` hides the disclosure triangle everywhere except Safari (FAQ accordion). */
+  summary::-webkit-details-marker {
+    display: none;
+  }
 }
