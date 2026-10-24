@@ -442,7 +442,8 @@ export interface Export {
  */
 export interface JobRun {
   id: number;
-  task: 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export' | 'delete-account';
+  task:
+    'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export' | 'delete-account' | 'admin-gdpr';
   /**
    * Payloadin jonotehtävän id; sama kaikilla saman ajon vaiheilla.
    */

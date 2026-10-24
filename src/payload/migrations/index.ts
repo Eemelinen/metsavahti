@@ -13,6 +13,7 @@ import * as migration_20261024_000522_alerts_watch_area_cascade from './20261024
 import * as migration_20261024_004131_jobs_cleanup from './20261024_004131_jobs_cleanup';
 import * as migration_20261024_033242_data_export_task from './20261024_033242_data_export_task';
 import * as migration_20261024_040826_account_deletion from './20261024_040826_account_deletion';
+import * as migration_20261024_053058_admin_gdpr_audit from './20261024_053058_admin_gdpr_audit';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20261024_040826_account_deletion.up,
     down: migration_20261024_040826_account_deletion.down,
-    name: '20261024_040826_account_deletion'
+    name: '20261024_040826_account_deletion',
+  },
+  {
+    up: migration_20261024_053058_admin_gdpr_audit.up,
+    down: migration_20261024_053058_admin_gdpr_audit.down,
+    name: '20261024_053058_admin_gdpr_audit'
   },
 ];

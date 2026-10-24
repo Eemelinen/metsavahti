@@ -28,11 +28,10 @@ export type AccountDeletionOutcome =
   | { status: 'limited'; retryAfterSeconds: number }
 
 /**
- * `POST /api/account/delete` (`01 §6`, E08 MV-094): re-check the password, then stamp
- * `deletedAt` (from here on the Users `beforeLogin` hook refuses every login), end every
- * session of the account so no device stays signed in, and queue the
- * `delete-account` job (`lib/jobs/delete-account.ts`). The caller runs the job; the cron's
- * queue drain (`POST /api/jobs/run`) picks it up if that fails.
+ * `POST /api/account/delete` (`01 §6`, E08 MV-094): re-check the password, then
+ * `startAccountDeletion()`. The caller runs the queued `delete-account` job
+ * (`lib/jobs/delete-account.ts`); the cron's queue drain (`POST /api/jobs/run`) picks it up
+ * if that fails.
  */
 export async function requestAccountDeletion(
   payload: Payload,
@@ -57,7 +56,21 @@ export async function requestAccountDeletion(
     }
   }
 
-  if (!stored.deletedAt) {
+  return { status: 'queued', jobId: await startAccountDeletion(payload, stored, now) }
+}
+
+/**
+ * The deletion itself, once the request is accepted (the account's password above, or an
+ * admin acting on a support request, `lib/account/admin-gdpr.ts`): stamp `deletedAt` (from
+ * here on the Users `beforeLogin` hook refuses every login), end every session of the account
+ * so no device stays signed in, and queue the `delete-account` job. Returns the job id.
+ */
+export async function startAccountDeletion(
+  payload: Payload,
+  user: Pick<User, 'id' | 'deletedAt'>,
+  now: Date = new Date(),
+): Promise<string> {
+  if (!user.deletedAt) {
     await payload.update({
       collection: 'users',
       id: user.id,
@@ -74,5 +87,5 @@ export async function requestAccountDeletion(
     returning: false,
   })
   const job = await payload.jobs.queue({ task: 'delete-account', input: { userId: user.id } })
-  return { status: 'queued', jobId: String(job.id) }
+  return String(job.id)
 }
