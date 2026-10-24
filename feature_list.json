@@ -1136,7 +1136,7 @@
       "area": "watch-areas",
       "title": "Preview endpoint",
       "user_visible_behavior": "`GET /api/watch-areas/preview?lng&lat&radius` → `{ count, geojson }` from local `declarations` via `previewCount`; if the bbox has never been fetched (tracked in `wfs_bbox_fetches` table, migration `0005`), perform one live bbox fetch through `WfsClient` (rate limit 5/min/user) then answer.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-023", "F-037", "F-048"],
       "ticket": "MV-063",
       "epic": "E05",
@@ -1145,7 +1145,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/preview-endpoint.int.test.ts (integration: cold bbox triggers exactly one mocked WFS call; warm bbox none.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 6e42dea)",
+        "2026-10-24 pnpm test:integration tests/integration/preview-endpoint.int.test.ts → pass (working tree on 6e42dea, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: cold bbox triggers exactly one mocked WFS call; warm bbox none."
     },

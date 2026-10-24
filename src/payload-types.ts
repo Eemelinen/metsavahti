@@ -81,6 +81,7 @@ export interface Config {
     'legal-documents': LegalDocument;
     'rate-limit-buckets': RateLimitBucket;
     'user-sessions': UserSession;
+    'wfs-bbox-fetches': WfsBboxFetch;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -103,6 +104,7 @@ export interface Config {
     'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     'rate-limit-buckets': RateLimitBucketsSelect<false> | RateLimitBucketsSelect<true>;
     'user-sessions': UserSessionsSelect<false> | UserSessionsSelect<true>;
+    'wfs-bbox-fetches': WfsBboxFetchesSelect<false> | WfsBboxFetchesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -539,6 +541,21 @@ export interface UserSession {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wfs-bbox-fetches".
+ */
+export interface WfsBboxFetch {
+  id: number;
+  minE: number;
+  minN: number;
+  maxE: number;
+  maxN: number;
+  featureCount: number;
+  fetchedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -718,6 +735,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-sessions';
         value: number | UserSession;
+      } | null)
+    | ({
+        relationTo: 'wfs-bbox-fetches';
+        value: number | WfsBboxFetch;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -999,6 +1020,20 @@ export interface UserSessionsSelect<T extends boolean = true> {
   sid?: T;
   userAgent?: T;
   lastSeenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wfs-bbox-fetches_select".
+ */
+export interface WfsBboxFetchesSelect<T extends boolean = true> {
+  minE?: T;
+  minN?: T;
+  maxE?: T;
+  maxN?: T;
+  featureCount?: T;
+  fetchedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
