@@ -8,13 +8,13 @@ import { fi } from '@/i18n/fi'
 
 /**
  * The account pages' tab row (App artboard `tiliTabs`). Only pages that exist are listed;
- * Tietosuoja ja tiedot and Poista tili join when MV-093 and MV-094 build them
- * (00-deviations R21).
+ * Poista tili joins when MV-094 builds it (00-deviations R21).
  */
 export const ACCOUNT_TABS = [
   { href: '/tili', label: fi.account.tabs.profile },
   { href: '/tili/turvallisuus', label: fi.account.tabs.security },
   { href: '/tili/ilmoitukset', label: fi.account.tabs.notifications },
+  { href: '/tili/tietosuoja', label: fi.account.tabs.privacy },
 ] as const
 
 export function AccountTabs() {

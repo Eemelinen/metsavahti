@@ -48,6 +48,11 @@ database or points at port 5432.
   the `Set-Cookie` attributes, the guest side of `POST /api/consent` with 415 / 400; `….ui.test.tsx`
   (jsdom): banner choices of equal size, "Mukauta" and the footer event open the modal, "Sulje" saves
   nothing, the analytics script only after consent, the error on a failed save),
+  data export (`gdpr/data-export.test.ts`: `checkToken()` tells an expired link from a forged or foreign one,
+  a pending / ready request past `expiresAt` counts as expired, `account.json` without credentials, the GeoJSON
+  shape, the zip round trip, `ExportReady` with link, contents, size, expiry and attribution; `….ui.test.tsx`
+  (jsdom): `ExportSection` posts JSON and shows "Valmistellaan…", the route's refusal, the ready link without a
+  button, the next-allowed note and the failed state),
   legal pages (`legal/legaldocument-renderer.test.tsx`: `splitLegalSections()` slugs, suffixes and reserved
   ids; `LegalDocument` markup: date in Finnish time, version, numbered sections whose ids match the TOC links,
   lists and links, extra sections first, no TOC without sections; the `config/cookies.ts` lifetimes),
@@ -122,7 +127,13 @@ database or points at port 5432.
   emails asserted through the Mailpit API), the cron endpoint, and cookie consent
   (`cookie-consent-banner-and-modal.int.test.ts`: `POST /api/consent` sets the 12-month cookie for a guest
   without an event, appends a `cookies` event per save at the seeded cookie-policy version with the truncated IP
-  for a session, treats a forged cookie as a guest, and answers 400 / 500 without a cookie).
+  for a session, treats a forged cookie as a guest, and answers 400 / 500 without a cookie), and the account
+  export (`data-export.int.test.ts`: request → `export` job → a zip of exactly the five files, WGS 84 GeoJSON,
+  no credentials in `account.json`, the `ExportReady` link from Mailpit downloads it, `notification-log` and
+  `job-runs` rows; an expired token or request is 410, a forged, missing or foreign token 403; a second
+  request the same day is refused, a failed export (SMTP down) keeps no file and can be retried, a failed log write
+  after the send keeps the export ready, the route takes JSON only (415), a lapsed pending request allows a
+  new one the next day; every test makes its own export).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 
@@ -143,7 +154,10 @@ database or points at port 5432.
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
   the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents, each with a lead and the `E2E_LEGAL_SECTIONS` of `fixtures.ts`, through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: legal pages (`legaldocument-renderer-and-pages.spec.ts`: the four routes show the seeded document's
+- Specs: privacy page and data export (`data-export.spec.ts`: a new account's `/tili/tietosuoja` shows the
+  terms and privacy consents, the policy and supervisory-authority links, opens the cookie modal, passes axe;
+  "Lataa tietoni" → "Valmistellaan…" → the Mailpit link answers 200 with a zip, a forged token 403, and after a
+  reload the ready state with its own download link), legal pages (`legaldocument-renderer-and-pages.spec.ts`: the four routes show the seeded document's
   date, version, lead and numbered sections, pass axe; at a desktop viewport the TOC links land on their
   sections, at a phone viewport the TOC is hidden; `/evasteet` lists the cookies from `config/cookies.ts` and
   "Avaa evästeasetukset" opens the consent modal; the footer reaches every page), app shell (`app-layout-sidebar-bottom-tabs.spec.ts`: sidebar on desktop, bottom tabs on Mobile Chrome,

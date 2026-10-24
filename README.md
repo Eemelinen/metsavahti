@@ -70,6 +70,9 @@ pnpm dev                        # http://localhost:3000
 - `/admin` — Payload admin. The **first account created becomes admin**; use
   `/admin/create-first-user` or `pnpm db:seed` (creates `admin@metsavahti.local`).
 - Mailpit UI: http://localhost:8025 — every email sent locally ends up here.
+- `/tili/tietosuoja` — consent history, cookie settings and "Lataa tietoni": the export job runs
+  right after the request and emails a 24 h download link (Mailpit locally); the zip holds
+  `account.json`, `watch-areas.geojson`, `alerts.json`, `consents.json`, `notifications.json`.
 - Run the pipeline by hand: `pnpm jobs:run` (`pnpm jobs:run cleanup` for the weekly cleanup), the
   "Aja haku nyt" button above Admin → Tehtäväajot, or
   `curl -X POST -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/jobs/run`. Every step
@@ -162,6 +165,7 @@ src/
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
   app/api/alerts/[id]/map-image.png  static map PNG for alert emails (owner session or signed token; ENABLE_MAP_IMAGES)
   app/api/consent         cookie consent: sets mv_consent (12 months), records a consent event for a signed-in user
+  app/api/account/export  account data export: POST queues the export job (1 / day); GET [id]?token= downloads the zip from the emailed link (24 h)
   payload.config.ts       Payload config (postgres adapter, email, jobs)
   payload/collections     Users, WatchAreas, Declarations, DeclarationRevisions, WatchAreaDeclarations, Alerts, NotificationLog, ConsentEvents, DataExportRequests, JobRuns, LegalDocuments, RateLimitBuckets, Exports (upload)
   payload/access          access-control helpers
