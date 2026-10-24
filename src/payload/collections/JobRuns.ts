@@ -11,8 +11,9 @@ const deny = () => false
  * the weekly cleanup purges rows older than 90 days. `task` uses the repository's task slugs
  * (`send-alerts`, 00-deviations D8). `admin-gdpr` is not a task but the audit entry of an
  * admin's export or deletion of an account (MV-098, `lib/account/admin-gdpr.ts`): who, for
- * whom, which action, under the `runId` of the job it queued. The list view carries the admin
- * "Aja haku nyt" button.
+ * whom, which action, under the `runId` of the job it queued. `status` is `partial` when a step
+ * finished but part of its work failed (`fetch-declarations` with a failed request box,
+ * MV-071). The list view carries the admin "Aja haku nyt" button.
  */
 export const JobRuns: CollectionConfig = {
   slug: 'job-runs',
@@ -65,6 +66,7 @@ export const JobRuns: CollectionConfig = {
       options: [
         { label: 'Käynnissä', value: 'running' },
         { label: 'Onnistui', value: 'succeeded' },
+        { label: 'Osittain', value: 'partial' },
         { label: 'Epäonnistui', value: 'failed' },
       ],
     },

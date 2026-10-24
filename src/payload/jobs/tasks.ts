@@ -5,7 +5,7 @@ import { cleanup } from '@/lib/jobs/cleanup'
 import { createJobContext } from '@/lib/jobs/context'
 import { runAccountDeletion } from '@/lib/jobs/delete-account'
 import { runDataExport } from '@/lib/jobs/export'
-import { fetchDeclarations } from '@/lib/jobs/fetch-declarations'
+import { fetchDeclarations, fetchDeclarationsStatus } from '@/lib/jobs/fetch-declarations'
 import { withJobRun } from '@/lib/jobs/job-runs'
 import { matchWatchAreas } from '@/lib/jobs/match-watch-areas'
 import { sendAlerts } from '@/lib/jobs/send-alerts'
@@ -17,14 +17,22 @@ export const fetchDeclarationsTask: TaskConfig<'fetch-declarations'> = {
   retries: 2,
   outputSchema: [
     count('watchAreas'),
-    count('fetched'),
-    count('created'),
+    count('bboxes'),
+    count('failedBboxes'),
+    count('requests'),
+    count('features'),
+    count('inserted'),
     count('updated'),
-    count('revisions'),
+    count('removed'),
   ],
   handler: async ({ job, req }) => {
     const ctx = createJobContext(req.payload, job.id)
-    const output = await withJobRun(ctx, 'fetch-declarations', () => fetchDeclarations(ctx))
+    const output = await withJobRun(
+      ctx,
+      'fetch-declarations',
+      () => fetchDeclarations(ctx),
+      fetchDeclarationsStatus,
+    )
     return { output }
   },
 }
