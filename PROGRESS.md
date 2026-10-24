@@ -74,6 +74,15 @@ Any coding agent can use it; nothing updates it automatically.
 
 ## Session Log
 
+### Session 046 — 2026-10-24 (driver-run: F-095 CI fix attempt 1)
+
+- What failed in CI: job "E2E (Playwright)", step `pnpm test:e2e:ci`. `next build` exited 1 while generating static pages: two build workers ran `20260906_125038_initial` at the same time against the empty `metsavahti_e2e` service database and the second hit `duplicate key value violates unique constraint "pg_type_typname_nsp_index"`.
+- Root cause: prerendering runs page bodies that read the database (`loadLegalDocument()`, the `(app)` session guard) before the root layout's `connection()` bails them out, so each worker boots Payload and, with `NODE_ENV=production`, runs `prodMigrations`. Main got away with it because only one worker reached Payload; this branch's two new routes reshuffled the pages across the workers. Classification: fixed (a latent race this branch exposed).
+- Fix (`265c50b`): `prodMigrations` stays unset while `NEXT_PHASE` is `phase-production-build` (`src/payload.config.ts`, `NEXT_PHASE` added to `src/lib/env.ts`); D-004 update and the README deployment note say migrations run on server boot only. The adapter's `CREATE EXTENSION IF NOT EXISTS postgis` can still race between workers; Payload only logs it and the build goes on.
+- Why local verification missed it: `pnpm test:e2e` runs `next dev` against an already migrated database, so no build and no first migration ever happened locally.
+- Verification: CI's build against a fresh scratch database on port 5433 failed 3/3 before the fix and passed 3/3 after; the full `CI=true pnpm test:e2e:ci` against a fresh database passed (196 tests); `pnpm harness:verify F-095` on `265c50b` passed L1–L3. Scratch databases dropped afterwards.
+- Next best step: unchanged (Next Steps 18).
+
 ### Session 045 — 2026-10-24 (driver-run: F-095 public data-request and contact forms)
 
 - Goal: F-095 / MV-095 (absorbs MV-096) — `/tietopyynto` (email, type, message, consent, rate-limited, `DataRequestReceived` to `DPO_EMAIL` + receipt to the requester) and `/yhteystiedot` (name, email, message, consent, honeypot + rate limit, `ContactReceived` to `CONTACT_EMAIL`). Driver-run (`HARNESS_LOOP=1`, attempt 1 of 2). Artboard: `Yhteystiedot.dc.html` (both forms, `#tietopyynto`).

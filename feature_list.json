@@ -1633,7 +1633,10 @@
       "evidence": [
         "2026-10-24 pnpm check → pass (commit 2e9cd2d)",
         "2026-10-24 pnpm test:integration tests/integration/public-forms.int.test.ts → pass (commit 2e9cd2d, Docker available)",
-        "2026-10-24 pnpm test:e2e tests/e2e/public-forms.spec.ts → pass (commit 2e9cd2d, Docker available)"
+        "2026-10-24 pnpm test:e2e tests/e2e/public-forms.spec.ts → pass (commit 2e9cd2d, Docker available)",
+        "2026-10-24 pnpm check → pass (commit 265c50b)",
+        "2026-10-24 pnpm test:integration tests/integration/public-forms.int.test.ts → pass (commit 265c50b, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/public-forms.spec.ts → pass (commit 265c50b, Docker available)"
       ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: both data-request emails, contact email; E2E both forms. Status (ticket): absorbs MV-096 (merged 2026-09-20, ledger P11)."
