@@ -139,8 +139,8 @@ importers:
         specifier: 21.2.2
         version: 21.2.2
       '@eemelinen/harness':
-        specifier: github:Eemelinen/harness#v0.3.3
-        version: https://codeload.github.com/Eemelinen/harness/tar.gz/67cb7be40e4e884d0ddd775dbc89c0897a01d605
+        specifier: github:Eemelinen/harness#v0.3.5
+        version: https://codeload.github.com/Eemelinen/harness/tar.gz/7a84c1a24e823673911155556cf9e69c39728a6b
       '@hono/node-server':
         specifier: 2.1.1
         version: 2.1.1(hono@4.13.7)
@@ -679,9 +679,9 @@ packages:
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
 
-  '@eemelinen/harness@https://codeload.github.com/Eemelinen/harness/tar.gz/67cb7be40e4e884d0ddd775dbc89c0897a01d605':
-    resolution: {tarball: https://codeload.github.com/Eemelinen/harness/tar.gz/67cb7be40e4e884d0ddd775dbc89c0897a01d605}
-    version: 0.3.3
+  '@eemelinen/harness@https://codeload.github.com/Eemelinen/harness/tar.gz/7a84c1a24e823673911155556cf9e69c39728a6b':
+    resolution: {tarball: https://codeload.github.com/Eemelinen/harness/tar.gz/7a84c1a24e823673911155556cf9e69c39728a6b}
+    version: 0.3.5
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -9711,7 +9711,7 @@ snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
 
-  '@eemelinen/harness@https://codeload.github.com/Eemelinen/harness/tar.gz/67cb7be40e4e884d0ddd775dbc89c0897a01d605':
+  '@eemelinen/harness@https://codeload.github.com/Eemelinen/harness/tar.gz/7a84c1a24e823673911155556cf9e69c39728a6b':
     dependencies:
       tsx: 4.23.13
       zod: 4.5.4
