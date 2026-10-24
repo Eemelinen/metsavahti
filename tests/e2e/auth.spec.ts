@@ -94,25 +94,27 @@ test.describe('auth (E03)', () => {
     await expect(page.getByTestId('verify-outcome')).toHaveAttribute('data-state', 'verified')
 
     // A guest asking for an app page is sent to the login and brought back after it.
-    await page.goto('/dashboard')
-    await expect(page).toHaveURL('/kirjaudu?next=%2Fdashboard')
+    await page.goto('/vahtialueet')
+    await expect(page).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
     await login(page, email, PASSWORD)
-    await expect(page).toHaveURL('/dashboard')
-    await expect(page.getByText(`Kirjautunut: ${email}`)).toBeVisible()
+    await expect(page).toHaveURL('/vahtialueet')
+    await expect(page.getByTestId('account-menu-trigger')).toHaveAccessibleName(
+      `Tilivalikko: ${email}`,
+    )
 
     // Guest-only pages send a signed-in user on; `/kirjaudu` follows a safe `?next=`.
     for (const path of ['/kirjaudu', '/rekisteroidy', '/unohtunut-salasana']) {
       await page.goto(path)
-      await expect(page).toHaveURL('/dashboard')
+      await expect(page).toHaveURL('/vahtialueet')
     }
-    await page.goto('/kirjaudu?next=%2Fdashboard%3Ftab%3Dalueet')
-    await expect(page).toHaveURL('/dashboard?tab=alueet')
+    await page.goto('/kirjaudu?next=%2Fvahtialueet%3Ftab%3Dalueet')
+    await expect(page).toHaveURL('/vahtialueet?tab=alueet')
     await page.goto('/kirjaudu?next=https%3A%2F%2Fexample.com%2F')
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/vahtialueet')
 
     await logOut(page)
-    await page.goto('/dashboard')
-    await expect(page).toHaveURL('/kirjaudu?next=%2Fdashboard')
+    await page.goto('/vahtialueet')
+    await expect(page).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
 
     await page.goto('/unohtunut-salasana')
     await waitForForm(page)
@@ -128,11 +130,11 @@ test.describe('auth (E03)', () => {
     await expect(page).toHaveURL('/kirjaudu?reset=1')
 
     await login(page, email, NEW_PASSWORD)
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/vahtialueet')
   })
 
   test('protects every app route for guests, with the full return address', async ({ page }) => {
-    for (const path of ['/dashboard', '/tili/turvallisuus', '/vahtialueet/3?tab=ilmoitukset']) {
+    for (const path of ['/vahtialueet', '/tili/turvallisuus', '/vahtialueet/3?tab=ilmoitukset']) {
       await page.goto(path)
       await expect(page).toHaveURL(`/kirjaudu?next=${encodeURIComponent(path)}`)
     }
@@ -149,7 +151,7 @@ test.describe('auth (E03)', () => {
     const email = await createVerifiedAccount(page, browserName, 'unverified-guard')
     await page.goto('/kirjaudu')
     await login(page, email, PASSWORD)
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/vahtialueet')
 
     const { api, patchUser } = await adminApi()
     try {
@@ -157,7 +159,7 @@ test.describe('auth (E03)', () => {
     } finally {
       await api.dispose()
     }
-    await page.goto('/dashboard')
+    await page.goto('/vahtialueet')
     await expect(page).toHaveURL(
       `/vahvista-sahkoposti?email=${encodeURIComponent(email)}&required=1`,
     )
@@ -217,14 +219,13 @@ test.describe('auth (E03)', () => {
 test.describe('auth (E03, signed in)', () => {
   test.use({ storageState: AUTH_STATE })
 
-  // `/vahtialueet` (MV-05x) does not exist yet; `/dashboard` is today's watch-area page.
   test('the watch-area page with its map renders with no CSP violation', async ({ page }) => {
     const violations = await watchCsp(page)
     // The first map tile settling (loaded or not: only a CSP refusal counts) shows the map ran;
     // no `networkidle`, MapLibre retries failed tiles.
     const tileSettled = firstTileSettled(page)
-    await page.goto('/dashboard')
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueesi')
+    await page.goto('/vahtialueet')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueet')
     await expect(page.locator('.maplibregl-canvas')).toBeVisible()
     await tileSettled
     expect(await violations()).toEqual([])

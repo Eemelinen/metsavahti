@@ -41,7 +41,7 @@ async function sessionCookieTtl(page: Page): Promise<number | null> {
 }
 
 /**
- * MV-044: `/kirjaudu` → `/dashboard` → "Kirjaudu ulos" → `/kirjauduttu-ulos` (`@smoke`);
+ * MV-044: `/kirjaudu` → `/vahtialueet` → "Kirjaudu ulos" → `/kirjauduttu-ulos` (`@smoke`);
  * `?next=` (same-origin only), remember-me, the invalid / unverified (+ resend) / locked
  * answers and the POST-only logout route. Every test registers its own account so the three
  * browser projects never log in to the same one at once.
@@ -49,7 +49,7 @@ async function sessionCookieTtl(page: Page): Promise<number | null> {
 test.describe('login and logout', () => {
   test.use({ storageState: { cookies: [], origins: [] } })
 
-  test('logs in through the form, lands on the dashboard and logs out again @smoke', async ({
+  test('logs in through the form, lands on the watch areas and logs out again @smoke', async ({
     page,
     browserName,
   }) => {
@@ -71,8 +71,10 @@ test.describe('login and logout', () => {
 
     await fillLogin(page, email, PASSWORD)
     await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
-    await expect(page).toHaveURL('/dashboard')
-    await expect(page.getByText(`Kirjautunut: ${email}`)).toBeVisible()
+    await expect(page).toHaveURL('/vahtialueet')
+    await expect(page.getByTestId('account-menu-trigger')).toHaveAccessibleName(
+      `Tilivalikko: ${email}`,
+    )
     // Without "Muista minut" the session lasts one day.
     const ttl = await sessionCookieTtl(page)
     expect(ttl).toBeGreaterThan(DAY - 120)
@@ -90,8 +92,8 @@ test.describe('login and logout', () => {
     expect(await sessionCookieTtl(page)).toBeNull()
 
     // The session is gone on the server too, not just the cookie.
-    await page.goto('/dashboard')
-    await expect(page).toHaveURL('/kirjaudu?next=%2Fdashboard')
+    await page.goto('/vahtialueet')
+    await expect(page).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
   })
 
   test('remember-me keeps the session for 30 days and ?next= is honoured for same-origin paths only', async ({
@@ -106,7 +108,7 @@ test.describe('login and logout', () => {
     await fillLogin(page, email, PASSWORD)
     await page.getByLabel('Muista minut').check()
     await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
-    await expect(page).toHaveURL('/dashboard')
+    await expect(page).toHaveURL('/vahtialueet')
     const ttl = await sessionCookieTtl(page)
     expect(ttl).toBeGreaterThan(30 * DAY - 120)
     expect(ttl).toBeLessThanOrEqual(30 * DAY)
@@ -114,11 +116,11 @@ test.describe('login and logout', () => {
     // The token still works after a logout elsewhere ended a different session: log out here.
     await logOut(page)
 
-    // A same-origin path is followed (the dashboard is the only app page today).
-    await page.goto('/kirjaudu?next=%2Fdashboard%3Ftab%3Dalueet')
+    // A same-origin path is followed.
+    await page.goto('/kirjaudu?next=%2Fvahtialueet%3Ftab%3Dalueet')
     await fillLogin(page, email, PASSWORD)
     await page.getByRole('button', { name: 'Kirjaudu', exact: true }).click()
-    await expect(page).toHaveURL('/dashboard?tab=alueet')
+    await expect(page).toHaveURL('/vahtialueet?tab=alueet')
   })
 
   test('refuses bad credentials without saying which part was wrong', async ({ page }) => {

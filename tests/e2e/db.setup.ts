@@ -40,7 +40,7 @@ setup('migrate, reset and seed the e2e database', async ({ request }) => {
   expect(area.ok(), await area.text()).toBeTruthy()
   const { doc: watchArea } = (await area.json()) as { doc: { id: number } }
 
-  // Already emailed (`notifiedAt`), so the dashboard's pending count stays 0; `readAt` unset.
+  // Already emailed (`notifiedAt`), `readAt` unset: the nav badge and the area's "Uusia: 1".
   const alert = await request.post('/api/alerts', {
     headers: { authorization: `JWT ${token}` },
     data: {

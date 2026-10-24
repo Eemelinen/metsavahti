@@ -30,7 +30,7 @@ describe('alert email', () => {
     expect(html).toContain('1-2026-1')
     expect(html).toContain('Avohakkuu')
     expect(html).toContain('(rajaus muuttunut)')
-    expect(html).toContain('https://metsavahti.test/dashboard')
+    expect(html).toContain('https://metsavahti.test/vahtialueet')
     expect(text).toContain('Metsänkäyttöilmoitukset-aineistoa 09/2026')
     expect(text).toContain('1200 m')
   })

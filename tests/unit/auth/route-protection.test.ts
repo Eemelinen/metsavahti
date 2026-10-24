@@ -65,14 +65,14 @@ function request(path: string, init: { cookie?: string } = {}) {
 
 describe('route table (03-pages.md Auth column)', () => {
   it('marks the (app) prefixes as user routes and nothing that merely starts like one', () => {
-    for (const path of ['/dashboard', '/aloita', '/vahtialueet', '/vahtialueet/3/muokkaa']) {
+    for (const path of ['/vahtialueet', '/aloita', '/vahtialueet/3', '/vahtialueet/3/muokkaa']) {
       expect(routeAccess(path)).toBe('user')
     }
     for (const path of ['/ilmoitukset/9', '/tili', '/tili/turvallisuus']) {
       expect(routeAccess(path)).toBe('user')
     }
     expect(routeAccess('/tili-poistettu')).toBe('public')
-    expect(routeAccess('/dashboardx')).toBe('public')
+    expect(routeAccess('/vahtialueetx')).toBe('public')
   })
 
   it('marks the guest-only auth pages and leaves the rest public', () => {
@@ -155,7 +155,7 @@ describe('proxy decision (handleRequest)', () => {
   it('lets a signed, unexpired users token through and refuses forged or expired ones', async () => {
     const valid = await signSession({ id: 1, collection: 'users', sid: 's' })
     const passed = handleRequest(
-      request('/dashboard', { cookie: `payload-token=${valid}` }),
+      request('/vahtialueet', { cookie: `payload-token=${valid}` }),
       options,
     )
     expect(passed.headers.get('x-middleware-next')).toBe('1')
@@ -168,9 +168,9 @@ describe('proxy decision (handleRequest)', () => {
       [`payload-token=${expired}`, later],
       ['payload-token=nonsense', options],
     ] as const) {
-      const response = handleRequest(request('/dashboard', { cookie }), opts)
+      const response = handleRequest(request('/vahtialueet', { cookie }), opts)
       expect(response.headers.get('location')).toBe(
-        'http://localhost:3100/kirjaudu?next=%2Fdashboard',
+        'http://localhost:3100/kirjaudu?next=%2Fvahtialueet',
       )
     }
   })
@@ -186,7 +186,7 @@ describe('proxy decision (handleRequest)', () => {
 
   it('in maintenance mode redirects pages, answers 503 on the API and spares the probe', () => {
     const maintenance = { ...options, maintenance: true }
-    for (const path of ['/', '/dashboard', '/kirjaudu', '/admin']) {
+    for (const path of ['/', '/vahtialueet', '/kirjaudu', '/admin']) {
       const response = handleRequest(request(path), maintenance)
       expect(response.status).toBe(307)
       expect(response.headers.get('location')).toBe('http://localhost:3100/huolto')
@@ -251,9 +251,9 @@ describe('pageDecision', () => {
     })
     expect(pageDecision('guest-only', user, '//evil.example')).toEqual({
       type: 'redirect',
-      to: '/dashboard',
+      to: '/vahtialueet',
     })
-    expect(pageDecision('guest-only', { status: 'guest' }, '/dashboard')).toEqual({
+    expect(pageDecision('guest-only', { status: 'guest' }, '/vahtialueet')).toEqual({
       type: 'allow',
     })
     // An unverified account may use the login page (to log in again, or to resend the link).

@@ -112,7 +112,7 @@ describe('route protection (MV-046)', () => {
   })
   const ok = { status: 200 }
 
-  const userRoutes = ['/dashboard', '/vahtialueet/3?tab=ilmoitukset', '/tili/turvallisuus']
+  const userRoutes = ['/vahtialueet', '/vahtialueet/3?tab=ilmoitukset', '/tili/turvallisuus']
   const guestOnly = ['/kirjaudu', '/rekisteroidy', '/unohtunut-salasana']
   const publicRoutes = ['/', '/vahvista-sahkoposti', '/uusi-salasana', '/huolto', '/tili-poistettu']
 

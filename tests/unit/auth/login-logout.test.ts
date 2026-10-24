@@ -45,7 +45,7 @@ const DAY = 24 * 60 * 60
 describe('?next= handling (same-origin only)', () => {
   it('keeps absolute paths on this origin, with query and hash', () => {
     expect(safeNextPath('/vahtialueet/3')).toBe('/vahtialueet/3')
-    expect(safeNextPath('/dashboard?tab=alueet#kartta')).toBe('/dashboard?tab=alueet#kartta')
+    expect(safeNextPath('/vahtialueet?tab=alueet#kartta')).toBe('/vahtialueet?tab=alueet#kartta')
     expect(safeNextPath('/')).toBe('/')
   })
 
@@ -63,10 +63,10 @@ describe('?next= handling (same-origin only)', () => {
       '/vahtialueet\u0000',
       'javascript:alert(1)',
       LOGIN_PATH,
-      `${LOGIN_PATH}?next=%2Fdashboard`,
+      `${LOGIN_PATH}?next=%2Fvahtialueet`,
       `${LOGIN_PATH}/x`,
       `/${'a'.repeat(2048)}`,
-      ['/dashboard'],
+      ['/vahtialueet'],
     ]) {
       expect(safeNextPath(bad)).toBe(DEFAULT_AFTER_LOGIN)
     }
@@ -75,7 +75,7 @@ describe('?next= handling (same-origin only)', () => {
 
   it('loginPath adds the encoded return address', () => {
     expect(loginPath()).toBe('/kirjaudu')
-    expect(loginPath(DEFAULT_AFTER_LOGIN)).toBe('/kirjaudu?next=%2Fdashboard')
+    expect(loginPath(DEFAULT_AFTER_LOGIN)).toBe('/kirjaudu?next=%2Fvahtialueet')
     expect(loginPath('/vahtialueet/3?x=1')).toBe('/kirjaudu?next=%2Fvahtialueet%2F3%3Fx%3D1')
   })
 })

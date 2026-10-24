@@ -512,6 +512,34 @@ export async function previewCount(
   return Number(rows[0]?.n ?? 0)
 }
 
+/**
+ * Per watch area, how many declarations its map shows now (`/vahtialueet` "N voimassa"): the
+ * same "intersects `geom_3067`, not removed, valid at `now`" rule as
+ * `declarationsForWatchArea()`. Every id in `watchAreaIds` gets an entry, 0 when nothing
+ * intersects. Does not check ownership; the caller passes only the account's own ids.
+ */
+export async function activeDeclarationCounts(
+  payload: Payload,
+  watchAreaIds: readonly number[],
+  now: Date = new Date(),
+): Promise<Map<number, number>> {
+  const counts = new Map(watchAreaIds.map((id) => [id, 0]))
+  if (watchAreaIds.length === 0) return counts
+  const { rows } = await run('activeDeclarationCounts', () =>
+    drizzle(payload).execute<{ id: number; n: string | number }>(sql`
+    SELECT wa.id, count(*) AS n
+    FROM watch_areas wa
+    JOIN declarations d ON ST_Intersects(d.geom, wa.geom_3067)
+    WHERE wa.id IN (SELECT jsonb_array_elements_text(${JSON.stringify(watchAreaIds)}::jsonb)::int)
+      AND d.removed_at IS NULL
+      AND d.valid_until > ${now.toISOString()}::timestamptz
+    GROUP BY wa.id
+  `),
+  )
+  for (const r of rows) counts.set(Number(r.id), Number(r.n))
+  return counts
+}
+
 /** A WGS 84 point as an EPSG:3067 geometry expression. */
 function point3067([lng, lat]: LonLat) {
   return sql`ST_Transform(ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326), 3067)`

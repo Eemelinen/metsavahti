@@ -127,8 +127,10 @@ test.describe('email verification pages', () => {
       data: { email, password: PASSWORD },
     })
     expect(login.ok(), await login.text()).toBeTruthy()
-    await page.goto('/dashboard')
-    await expect(page.getByText(`Kirjautunut: ${email}`)).toBeVisible()
+    await page.goto('/vahtialueet')
+    await expect(page.getByTestId('account-menu-trigger')).toHaveAccessibleName(
+      `Tilivalikko: ${email}`,
+    )
 
     const { api, patchUser } = await adminApi()
     try {
@@ -137,7 +139,7 @@ test.describe('email verification pages', () => {
       await api.dispose()
     }
 
-    await page.goto('/dashboard')
+    await page.goto('/vahtialueet')
     await expect(page).toHaveURL(
       `/vahvista-sahkoposti?email=${encodeURIComponent(email)}&required=1`,
     )

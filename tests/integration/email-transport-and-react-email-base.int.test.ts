@@ -36,7 +36,7 @@ describe('email transport + React Email base (MV-040)', () => {
           badge: { label: 'Testi', tone: 'neutral' },
           heading: 'Sähköpostikuljetus toimii',
           lead: 'Tämä viesti lähetettiin integraatiotestistä.',
-          cta: { label: 'Avaa Metsävahti', href: `${env.NEXT_PUBLIC_SERVER_URL}/dashboard` },
+          cta: { label: 'Avaa Metsävahti', href: `${env.NEXT_PUBLIC_SERVER_URL}/vahtialueet` },
           footerWhy: 'Saat tämän viestin, koska integraatiotesti lähetti sen.',
           baseUrl: env.NEXT_PUBLIC_SERVER_URL,
           attribution: ATTRIBUTION,

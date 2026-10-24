@@ -6,3 +6,11 @@
 nextjs-portal {
   display: none !important;
 }
+
+/*
+ * The mobile app's bottom tab bar is `position: fixed`; on `/vahtialueet` it covers the lower
+ * edge of the overview map, so an element screenshot of the map would capture the bar too.
+ */
+[data-testid='app-nav-tabs'] {
+  display: none !important;
+}

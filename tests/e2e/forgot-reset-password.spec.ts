@@ -55,7 +55,7 @@ test.describe('forgot / reset password', () => {
     const otherPage = await other.newPage()
     await otherPage.goto('/kirjaudu')
     await login(otherPage, email, PASSWORD)
-    await expect(otherPage).toHaveURL('/dashboard')
+    await expect(otherPage).toHaveURL('/vahtialueet')
 
     await page.goto('/kirjaudu')
     await page.getByRole('link', { name: 'Unohditko salasanan?' }).click()
@@ -104,16 +104,18 @@ test.describe('forgot / reset password', () => {
     await expectNoA11yViolations(page)
 
     // The other device's session is gone on the server.
-    await otherPage.goto('/dashboard')
-    await expect(otherPage).toHaveURL('/kirjaudu?next=%2Fdashboard')
+    await otherPage.goto('/vahtialueet')
+    await expect(otherPage).toHaveURL('/kirjaudu?next=%2Fvahtialueet')
     await other.close()
 
     // The old password no longer works, the new one does.
     await login(page, email, PASSWORD)
     await expect(page.getByTestId('login-denied')).toHaveAttribute('data-status', 'invalid')
     await login(page, email, NEW_PASSWORD)
-    await expect(page).toHaveURL('/dashboard')
-    await expect(page.getByText(`Kirjautunut: ${email}`)).toBeVisible()
+    await expect(page).toHaveURL('/vahtialueet')
+    await expect(page.getByTestId('account-menu-trigger')).toHaveAccessibleName(
+      `Tilivalikko: ${email}`,
+    )
 
     // The link worked once.
     await page.goto(link!)

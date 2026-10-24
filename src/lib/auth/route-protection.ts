@@ -23,13 +23,7 @@ import {
 export type RouteAccess = 'user' | 'guest-only' | 'public'
 
 /** Route prefixes that need a verified session (`03-pages.md` `(app)` group, `01 §7`). */
-export const USER_ROUTE_PREFIXES = [
-  '/aloita',
-  '/dashboard',
-  '/vahtialueet',
-  '/ilmoitukset',
-  '/tili',
-] as const
+export const USER_ROUTE_PREFIXES = ['/aloita', '/vahtialueet', '/ilmoitukset', '/tili'] as const
 
 /** Pages a signed-in user is sent away from (`03-pages.md`: guest-only). */
 export const GUEST_ONLY_PATHS = ['/kirjaudu', '/rekisteroidy', '/unohtunut-salasana'] as const
