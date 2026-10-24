@@ -12,6 +12,7 @@ import {
   Layer,
   type LngLatBoundsLike,
   Map as MapLibreMap,
+  type MapLayerMouseEvent,
   type MapRef,
   Marker,
   NavigationControl,
@@ -21,13 +22,18 @@ import {
 
 type FillColor = NonNullable<FillLayerSpecification['paint']>['fill-color']
 
+import { DeclarationList } from '@/components/map/declaration-list'
+import {
+  DeclarationPopover,
+  type MapDeclaration,
+  type MapDeclarationProperties,
+} from '@/components/map/declaration-popover'
 import { MapLegend } from '@/components/map/map-legend'
 import type { CuttingColourToken } from '@/config/cutting-types'
 import { metsakeskusAttribution } from '@/lib/attribution'
 import { mapColors } from '@/lib/design-tokens'
 import { previewCircle } from '@/lib/geo/buffer'
 import type { LonLat } from '@/lib/geo/crs'
-import type { DeclarationMapProperties } from '@/lib/geo/spatial-queries'
 import type { MapSources } from '@/lib/map-sources'
 import { maplibreWorkerUrl } from '@/lib/maplibre-worker'
 import { cuttingColourToken } from '@/lib/wfs/codes'
@@ -46,9 +52,16 @@ export type MapViewProps = {
   radiusM?: number
   /** Watch area(s) to draw instead of the circle; the pin is then left out unless interactive. */
   watchAreaGeoJSON?: Feature<AreaGeometry> | FeatureCollection<AreaGeometry>
-  /** Declarations layer, e.g. `declarationsForWatchArea()`; coloured by the `cut` tokens. */
-  declarationsGeoJSON?: FeatureCollection<AreaGeometry, DeclarationMapProperties>
-  /** Placement mode: the pin can be dragged or moved with the arrow keys, a map click moves it. */
+  /**
+   * Declarations layer, e.g. `declarationsForWatchArea()`; coloured by the `cut` tokens. A
+   * click on a polygon opens its `DeclarationPopover`, and a list under the map mirrors the
+   * polygons; a feature's `detailHref` is the target of "Näytä tiedot".
+   */
+  declarationsGeoJSON?: FeatureCollection<AreaGeometry, MapDeclarationProperties>
+  /**
+   * Placement mode: the pin can be dragged or moved with the arrow keys, a map click moves it
+   * (declarations then open no popover; the list still selects them).
+   */
   interactive?: boolean
   onCenterChange?: (center: LonLat) => void
   /** Zoom when there is no watch area to fit. */
@@ -140,6 +153,8 @@ export function MapViewCanvas({
   const [ready, setReady] = useState(false)
   const [wmsOn, setWmsOn] = useState(false)
   const [currentZoom, setCurrentZoom] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<MapDeclaration['id'] | null>(null)
+  const [overDeclaration, setOverDeclaration] = useState(false)
 
   const mapStyle = useMemo(() => baseStyle(sources.baseTiles), [sources.baseTiles])
 
@@ -157,8 +172,10 @@ export function MapViewCanvas({
     () =>
       declarationsGeoJSON && {
         ...declarationsGeoJSON,
-        features: declarationsGeoJSON.features.map((f) => ({
+        features: declarationsGeoJSON.features.map((f, i) => ({
           ...f,
+          // The popover and the list find a clicked polygon by its feature id.
+          id: f.id ?? i,
           properties: {
             ...f.properties,
             colourToken: cuttingColourToken(f.properties.cuttingTypeCode),
@@ -167,6 +184,8 @@ export function MapViewCanvas({
       },
     [declarationsGeoJSON],
   )
+
+  const selected = declarations?.features.find((f) => f.id === selectedId) ?? null
 
   const areaBounds = useMemo(() => boundsOf(watchArea), [watchArea])
   // Captured once: later prop changes move the overlays, not the camera.
@@ -189,6 +208,22 @@ export function MapViewCanvas({
     if (!map) return
     if (areaBounds) map.fitBounds(areaBounds, { padding: FIT_PADDING, maxZoom: 15 })
     else map.flyTo({ center, zoom })
+  }
+
+  function onMapClick(event: MapLayerMouseEvent) {
+    if (interactive) {
+      onCenterChange?.([event.lngLat.lng, event.lngLat.lat])
+      return
+    }
+    // `features` holds the hit `declarations-fill` polygons; a click beside them closes the popover.
+    setSelectedId(event.features?.[0]?.id ?? null)
+  }
+
+  function showDeclaration(declaration: MapDeclaration) {
+    setSelectedId(declaration.id)
+    const feature = declarations?.features.find((f) => f.id === declaration.id)
+    const bounds = feature && boundsOf({ type: 'FeatureCollection', features: [feature] })
+    if (bounds) mapRef.current?.fitBounds(bounds, { padding: FIT_PADDING, maxZoom: 15 })
   }
 
   function movePin(event: KeyboardEvent<HTMLButtonElement>) {
@@ -217,126 +252,156 @@ export function MapViewCanvas({
   }
 
   return (
-    <div
-      className={cn(
-        'relative h-105 w-full overflow-hidden rounded-xl border border-line bg-paper-sunken',
-        className,
-      )}
-      data-map-ready={ready ? 'true' : 'false'}
-      data-testid="map-view"
-      ref={containerRef}
-    >
-      <MapLibreMap
-        attributionControl={false}
-        initialViewState={initialViewState}
-        locale={MAP_LOCALE}
-        mapStyle={mapStyle}
-        onClick={interactive ? (e) => onCenterChange?.([e.lngLat.lng, e.lngLat.lat]) : undefined}
-        onIdle={onIdle}
-        onLoad={(e) => setCurrentZoom(e.target.getZoom())}
-        onZoomEnd={(e) => setCurrentZoom(e.viewState.zoom)}
-        ref={mapRef}
-        // eslint-disable-next-line react/forbid-component-props -- react-map-gl sizes the canvas through `style`
-        style={{ width: '100%', height: '100%' }}
+    <>
+      <div
+        className={cn(
+          'relative h-105 w-full overflow-hidden rounded-xl border border-line bg-paper-sunken',
+          className,
+        )}
+        data-map-ready={ready ? 'true' : 'false'}
+        data-testid="map-view"
+        ref={containerRef}
       >
-        {wmsOn ? (
-          <Source
-            id="metsakeskus-wms"
-            // 256 px tiles load one zoom level above the map zoom.
-            minzoom={sources.wms.minZoom + 1}
-            tileSize={256}
-            tiles={[sources.wms.url]}
-            type="raster"
-          >
-            <Layer beforeId={overlayBeforeId} id="metsakeskus-wms" type="raster" />
-          </Source>
-        ) : null}
-        {declarations ? (
-          <Source data={declarations} id="declarations" type="geojson">
-            <Layer
-              id="declarations-fill"
-              paint={{ 'fill-color': byColourToken(mapColors.cut), 'fill-opacity': 0.5 }}
-              type="fill"
-            />
-            <Layer
-              id="declarations-line"
-              paint={{ 'line-color': byColourToken(mapColors.cutLine), 'line-width': 1.5 }}
-              type="line"
-            />
-          </Source>
-        ) : null}
-        {watchArea ? (
-          <Source data={watchArea} id="watch-area" type="geojson">
-            <Layer
-              id="watch-area-fill"
-              paint={{ 'fill-color': mapColors.watchAreaFill, 'fill-opacity': 0.12 }}
-              type="fill"
-            />
-            <Layer
-              id="watch-area-line"
-              paint={{
-                'line-color': mapColors.watchAreaLine,
-                'line-width': 2,
-                'line-dasharray': [2, 1.5],
-              }}
-              type="line"
-            />
-          </Source>
-        ) : null}
-        {showPin ? (
-          <Marker
-            draggable={interactive}
-            latitude={center[1]}
-            longitude={center[0]}
-            onDragEnd={(e) => onCenterChange?.([e.lngLat.lng, e.lngLat.lat])}
-          >
-            {interactive ? (
-              <button
-                aria-label="Vahtialueen keskipiste: siirrä vetämällä tai nuolinäppäimillä"
-                className="block size-4 cursor-grab rounded-full border-3 border-paper-raised bg-forest-700 shadow-pop outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                data-testid="map-pin"
-                onKeyDown={movePin}
-                type="button"
-              />
-            ) : (
-              <span
-                aria-hidden="true"
-                className="block size-3.5 rounded-full border-3 border-paper-raised bg-forest-700 shadow-pop"
-                data-testid="map-pin"
-              />
-            )}
-          </Marker>
-        ) : null}
-        <NavigationControl position="top-right" showCompass={false} />
-        <AttributionControl
-          compact
-          customAttribution={metsakeskusAttribution()}
-          position="bottom-right"
-        />
-      </MapLibreMap>
-
-      <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
-        <button className={OVERLAY_BUTTON} onClick={recenter} type="button">
-          Keskitä vahtialueeseen
-        </button>
-        <button
-          aria-pressed={wmsOn}
-          className={OVERLAY_BUTTON}
-          onClick={() => setWmsOn((on) => !on)}
-          type="button"
+        <MapLibreMap
+          attributionControl={false}
+          cursor={overDeclaration ? 'pointer' : undefined}
+          initialViewState={initialViewState}
+          interactiveLayerIds={declarations && !interactive ? ['declarations-fill'] : undefined}
+          locale={MAP_LOCALE}
+          mapStyle={mapStyle}
+          onClick={interactive || declarations ? onMapClick : undefined}
+          onIdle={onIdle}
+          onLoad={(e) => setCurrentZoom(e.target.getZoom())}
+          onMouseEnter={() => setOverDeclaration(true)}
+          onMouseLeave={() => setOverDeclaration(false)}
+          onZoomEnd={(e) => setCurrentZoom(e.viewState.zoom)}
+          ref={mapRef}
+          // eslint-disable-next-line react/forbid-component-props -- react-map-gl sizes the canvas through `style`
+          style={{ width: '100%', height: '100%' }}
         >
-          Metsäkeskuksen karttataso
-        </button>
-        <p aria-live="polite" className="text-xs">
-          {wmsOn && currentZoom !== null && currentZoom < sources.wms.minZoom ? (
-            <span className="rounded-lg bg-paper-raised/95 px-3 py-1.5 text-ink-muted shadow-card">
-              Lähennä karttaa nähdäksesi tason
-            </span>
+          {wmsOn ? (
+            <Source
+              id="metsakeskus-wms"
+              // 256 px tiles load one zoom level above the map zoom.
+              minzoom={sources.wms.minZoom + 1}
+              tileSize={256}
+              tiles={[sources.wms.url]}
+              type="raster"
+            >
+              <Layer beforeId={overlayBeforeId} id="metsakeskus-wms" type="raster" />
+            </Source>
           ) : null}
-        </p>
-      </div>
+          {declarations ? (
+            <Source data={declarations} id="declarations" type="geojson">
+              <Layer
+                id="declarations-fill"
+                paint={{ 'fill-color': byColourToken(mapColors.cut), 'fill-opacity': 0.5 }}
+                type="fill"
+              />
+              <Layer
+                id="declarations-line"
+                paint={{ 'line-color': byColourToken(mapColors.cutLine), 'line-width': 1.5 }}
+                type="line"
+              />
+              {selected ? (
+                <Layer
+                  filter={['==', ['id'], selected.id]}
+                  id="declarations-selected"
+                  paint={{ 'line-color': mapColors.marker, 'line-width': 3 }}
+                  type="line"
+                />
+              ) : null}
+            </Source>
+          ) : null}
+          {watchArea ? (
+            <Source data={watchArea} id="watch-area" type="geojson">
+              <Layer
+                id="watch-area-fill"
+                paint={{ 'fill-color': mapColors.watchAreaFill, 'fill-opacity': 0.12 }}
+                type="fill"
+              />
+              <Layer
+                id="watch-area-line"
+                paint={{
+                  'line-color': mapColors.watchAreaLine,
+                  'line-width': 2,
+                  'line-dasharray': [2, 1.5],
+                }}
+                type="line"
+              />
+            </Source>
+          ) : null}
+          {showPin ? (
+            <Marker
+              draggable={interactive}
+              latitude={center[1]}
+              longitude={center[0]}
+              onDragEnd={(e) => onCenterChange?.([e.lngLat.lng, e.lngLat.lat])}
+            >
+              {interactive ? (
+                <button
+                  aria-label="Vahtialueen keskipiste: siirrä vetämällä tai nuolinäppäimillä"
+                  className="block size-4 cursor-grab rounded-full border-3 border-paper-raised bg-forest-700 shadow-pop outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                  data-testid="map-pin"
+                  onKeyDown={movePin}
+                  type="button"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="block size-3.5 rounded-full border-3 border-paper-raised bg-forest-700 shadow-pop"
+                  data-testid="map-pin"
+                />
+              )}
+            </Marker>
+          ) : null}
+          <NavigationControl position="top-right" showCompass={false} />
+          <AttributionControl
+            compact
+            customAttribution={metsakeskusAttribution()}
+            position="bottom-right"
+          />
+        </MapLibreMap>
 
-      <MapLegend className="absolute bottom-3 left-3" />
-    </div>
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
+          <button className={OVERLAY_BUTTON} onClick={recenter} type="button">
+            Keskitä vahtialueeseen
+          </button>
+          <button
+            aria-pressed={wmsOn}
+            className={OVERLAY_BUTTON}
+            onClick={() => setWmsOn((on) => !on)}
+            type="button"
+          >
+            Metsäkeskuksen karttataso
+          </button>
+          <p aria-live="polite" className="text-xs">
+            {wmsOn && currentZoom !== null && currentZoom < sources.wms.minZoom ? (
+              <span className="rounded-lg bg-paper-raised/95 px-3 py-1.5 text-ink-muted shadow-card">
+                Lähennä karttaa nähdäksesi tason
+              </span>
+            ) : null}
+          </p>
+        </div>
+
+        <MapLegend className="absolute bottom-3 left-3" />
+
+        {selected ? (
+          <DeclarationPopover
+            className="absolute right-3 bottom-11 left-3 sm:left-auto sm:w-70"
+            declaration={selected}
+            onClose={() => setSelectedId(null)}
+          />
+        ) : null}
+      </div>
+      {declarations ? (
+        <DeclarationList
+          className="mt-3"
+          declarations={declarations.features}
+          onShow={showDeclaration}
+          selectedId={selected?.id ?? null}
+        />
+      ) : null}
+    </>
   )
 }

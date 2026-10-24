@@ -1091,7 +1091,7 @@
       "area": "watch-areas",
       "title": "Declaration popover",
       "user_visible_behavior": "Click polygon → popover with cutting type chip, area ha, received date, distance, \"Näytä tiedot\" link. Accessible alternative: focusable list under the map mirrors polygons.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-060"],
       "ticket": "MV-061",
       "epic": "E05",
@@ -1101,7 +1101,10 @@
         "L1: pnpm check",
         "L1: pnpm test:unit tests/unit/watch-areas/declaration-popover.test.ts (unit.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on ae69841)",
+        "2026-10-24 pnpm test:unit tests/unit/watch-areas/declaration-popover.test.ts → pass (working tree on ae69841)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit."
     },
