@@ -154,6 +154,7 @@ export const fi = {
       label: 'Tilin osiot',
       profile: 'Tili',
       security: 'Turvallisuus',
+      notifications: 'Ilmoitusasetukset',
     },
     profile: {
       email: 'Sähköposti',
@@ -220,8 +221,34 @@ export const fi = {
       noOthers: 'Muita kirjautuneita laitteita ei ole.',
     },
     twoFactor: 'Kaksivaiheinen tunnistus — tulossa myöhemmin.',
+    notifications: {
+      email: 'Sähköposti-ilmoitukset',
+      emailHint: 'Koskee kaikkia vahtialueita',
+      mode: 'Lähetystapa',
+      modes: {
+        immediate: 'Heti',
+        daily: (hour: string) => `Päivittäin klo ${hour}`,
+        weekly: 'Viikoittain',
+      },
+      areas: 'Vahtialuekohtaiset asetukset',
+      areasOff:
+        'Sähköposti-ilmoitukset ovat pois päältä, joten alueiden asetukset eivät ole käytössä.',
+      areaSwitch: (name: string) => `Sähköposti-ilmoitukset: ${name}`,
+      noAreas: 'Sinulla ei ole vielä vahtialueita.',
+      createArea: 'Luo vahtialue',
+      marketing: 'Palvelun uutiset',
+      marketingHint: 'Harvoin lähetettäviä tiedotteita uusista ominaisuuksista',
+      sendTest: 'Lähetä testisähköposti',
+      testSent: (email: string) => `Testisähköposti lähetetty osoitteeseen ${email}.`,
+      saved: 'Asetukset tallennettu.',
+      failed: 'Yhteys palvelimeen katkesi. Yritä uudelleen.',
+    },
   },
   emails: {
+    testAlert: {
+      subject: 'Metsävahti: testisähköposti',
+      watchAreaName: 'Esimerkkialue',
+    },
     verify: {
       subject: 'Vahvista sähköpostiosoitteesi',
       preview: 'Vahvista sähköpostiosoitteesi, niin vahtialueet aukeavat',

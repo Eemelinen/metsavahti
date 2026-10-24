@@ -1020,7 +1020,7 @@
       "area": "account",
       "title": "Notification settings /tili/ilmoitukset",
       "user_visible_behavior": "Global enabled toggle, mode radio (immediate/daily/weekly), per-watch-area override table (reads watch areas; if none, empty state), marketing consent toggle writing `consent_events`, \"Lähetä testisähköposti\" (rate-limited 3/h) sending a sample `AlertImmediate` with fixture data.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-035", "F-040", "F-050"],
       "ticket": "MV-054",
       "epic": "E04",
@@ -1031,7 +1031,14 @@
         "L2: pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)",
         "L3: pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts (integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-23 pnpm check → pass (commit b5aba36)",
+        "2026-10-23 pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts → pass (commit b5aba36, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts → pass (commit b5aba36, Docker available)",
+        "2026-10-23 pnpm check → pass (commit b2e71aa)",
+        "2026-10-23 pnpm test:integration tests/integration/notification-settings-tili-ilmoitukset.int.test.ts → pass (commit b2e71aa, Docker available)",
+        "2026-10-23 pnpm test:e2e tests/e2e/notification-settings-tili-ilmoitukset.spec.ts → pass (commit b2e71aa, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: consent event written with `granted=false` on untick; E2E test email arrives in Mailpit."
     },
