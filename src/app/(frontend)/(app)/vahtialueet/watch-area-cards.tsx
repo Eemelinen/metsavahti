@@ -8,6 +8,7 @@ import { cn } from 'cn'
 
 import { FormError } from '@/components/forms/form-error'
 import { FormSuccess } from '@/components/forms/form-success'
+import { useHydrated } from '@/components/forms/use-hydrated'
 import { Switch } from '@/components/ui/switch'
 import { fi } from '@/i18n/fi'
 
@@ -36,10 +37,12 @@ type Status = { message: string } | { error: string } | null
  * The cards of `/vahtialueet` (App artboard `vahtialueet`). The name opens the area's page;
  * the e-mail switch saves at once through `toggleWatchAreaNotifications` and moves back if the
  * save fails; the kebab offers "Muokkaa" and "Poista", which asks first and then refreshes the
- * page (the actions do not revalidate, MV-064).
+ * page (the actions do not revalidate, MV-064). `data-hydrated` on the list tells the e2e
+ * tests when a click on the switch or the kebab is no longer lost.
  */
 export function WatchAreaCards({ areas }: { areas: WatchAreaCard[] }) {
   const router = useRouter()
+  const hydrated = useHydrated()
   const [enabled, setEnabled] = useState(
     () => new Map(areas.map((a) => [a.id, a.notificationsEnabled])),
   )
@@ -77,7 +80,11 @@ export function WatchAreaCards({ areas }: { areas: WatchAreaCard[] }) {
       {status && 'error' in status ? <FormError>{status.error}</FormError> : null}
       {status && 'message' in status ? <FormSuccess>{status.message}</FormSuccess> : null}
 
-      <ul className="grid gap-3.5 sm:grid-cols-2" data-testid="watch-area-list">
+      <ul
+        className="grid gap-3.5 sm:grid-cols-2"
+        data-hydrated={hydrated ? '' : undefined}
+        data-testid="watch-area-list"
+      >
         {areas.map((area) => (
           <li
             className="flex flex-col gap-3 rounded-xl border border-line bg-paper-raised p-4.5 transition-shadow hover:shadow-card"

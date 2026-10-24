@@ -27,10 +27,11 @@ async function signInOwnAccount(page: Page, projectName: string): Promise<string
   return ((await login.json()) as { token: string }).token
 }
 
-async function createArea(page: Page, token: string, name: string) {
+/** `lastCheckedAt` stands in for the pipeline's match, which nothing writes yet (MV-072). */
+async function createArea(page: Page, token: string, name: string, lastCheckedAt?: string) {
   const area = await page.request.post('/api/watch-areas', {
     headers: { authorization: `JWT ${token}` },
-    data: { ...E2E_WATCH_AREA, name, addressLabel: `${name}, Jyväskylä` },
+    data: { ...E2E_WATCH_AREA, name, addressLabel: `${name}, Jyväskylä`, lastCheckedAt },
   })
   expect(area.ok(), await area.text()).toBeTruthy()
 }
@@ -68,7 +69,8 @@ test.describe('/vahtialueet (shared e2e user)', () => {
     await expect(card).toContainText('Säde 800 m')
     await expect(card).toContainText(/\d+ voimassa/)
     await expect(card).toContainText('Uusia: 1')
-    await expect(card).toContainText(/Ei vielä tarkistettu|Tarkistettu /)
+    // No pipeline step writes `lastCheckedAt` yet (MV-072), so the seeded area is unchecked.
+    await expect(card).toContainText('Ei vielä tarkistettu')
     await expect(
       card.getByRole('switch', { name: `Sähköposti-ilmoitukset: ${E2E_WATCH_AREA.name}` }),
     ).toBeVisible()
@@ -87,6 +89,8 @@ test.describe('/vahtialueet (own account)', () => {
   test.use({ storageState: { cookies: [], origins: [] } })
 
   test('empty state, plan limit, e-mail switch and deletion', async ({ page }, testInfo) => {
+    // Many steps and four page loads; a cold `next dev` alone can take most of the 30 s.
+    test.slow()
     const token = await signInOwnAccount(page, testInfo.project.name)
 
     await page.goto('/vahtialueet')
@@ -104,10 +108,12 @@ test.describe('/vahtialueet (own account)', () => {
     await expectNoA11yViolations(page)
 
     // The free plan's two areas: the button stays, disabled, and says why.
-    await createArea(page, token, 'Mökki')
+    await createArea(page, token, 'Mökki', '2026-10-24T06:10:00.000Z')
     await createArea(page, token, 'Kotitalo')
     await page.reload()
     await expect(page.getByTestId('watch-area-card')).toHaveCount(2)
+    // A click on the switch or the kebab before hydration is lost (webkit under load).
+    await expect(page.locator('[data-testid="watch-area-list"][data-hydrated]')).toBeAttached()
     const limited = page.getByRole('button', { name: 'Uusi vahtialue' })
     await expect(limited).toHaveAttribute('aria-disabled', 'true')
     await expect(limited).toHaveAccessibleDescription('Ilmaisella tasolla enintään 2 vahtialuetta')
@@ -122,6 +128,11 @@ test.describe('/vahtialueet (own account)', () => {
     const mokki = page.getByTestId('watch-area-card').filter({ hasText: 'Mökki' })
     const mokkiSwitch = mokki.getByRole('switch', { name: 'Sähköposti-ilmoitukset: Mökki' })
     await expect(mokki).toContainText('Mökki, Jyväskylä · säde 800 m')
+    // The account's time zone (Europe/Helsinki, still summer time on 24.10.2026).
+    await expect(mokki).toContainText('Tarkistettu 24.10.2026 klo 09.10')
+    await expect(page.getByTestId('watch-area-card').filter({ hasText: 'Kotitalo' })).toContainText(
+      'Ei vielä tarkistettu',
+    )
     await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'true')
     await mokkiSwitch.click()
     await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'false')
@@ -136,14 +147,13 @@ test.describe('/vahtialueet (own account)', () => {
       .toBe(false)
     await page.reload()
     await expect(mokkiSwitch).toHaveAttribute('aria-checked', 'false')
+    await expect(page.locator('[data-testid="watch-area-list"][data-hydrated]')).toBeAttached()
 
     // Kebab → Poista asks first; cancelling keeps the area, confirming deletes it.
     const kotitalo = page.getByTestId('watch-area-card').filter({ hasText: 'Kotitalo' })
     const actions = kotitalo.getByRole('button', { name: 'Lisää toimintoja: Kotitalo' })
-    await expect(async () => {
-      if (!(await page.getByRole('menuitem', { name: 'Poista' }).isVisible())) await actions.click()
-      await expect(page.getByRole('menuitem', { name: 'Poista' })).toBeVisible({ timeout: 2_000 })
-    }).toPass()
+    await actions.click()
+    await expect(page.getByRole('menuitem', { name: 'Poista' })).toBeVisible()
     await expect(page.getByRole('menuitem', { name: 'Muokkaa' })).toHaveAttribute(
       'href',
       /^\/vahtialueet\/\d+\/muokkaa$/,

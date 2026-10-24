@@ -137,6 +137,21 @@ describe('/vahtialueet dashboard data (MV-066)', () => {
     expect(maxWatchAreas).toBe(plans.free.maxWatchAreas)
   })
 
+  it("hands over the area's last check once the pipeline has written one", async () => {
+    const payload = await getTestPayload()
+    await payload.update({
+      collection: 'watch-areas',
+      id: ids['Kotitalo']!,
+      data: { lastCheckedAt: '2026-10-24T06:10:00.000Z' },
+      overrideAccess: true,
+    })
+    const { areas } = await loadWatchAreaDashboard(payload, anna, NOW)
+    expect(areas.map((a) => [a.name, a.lastCheckedAt])).toEqual([
+      ['Mökki', null],
+      ['Kotitalo', '2026-10-24T06:10:00.000Z'],
+    ])
+  })
+
   it('activeDeclarationCounts() answers every id, also with nothing to count', async () => {
     const payload = await getTestPayload()
     expect(await activeDeclarationCounts(payload, [], NOW)).toEqual(new Map())
