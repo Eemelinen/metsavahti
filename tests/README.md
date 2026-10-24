@@ -15,7 +15,7 @@ database or points at port 5432.
 - No database, no network: `helpers/msw.ts` errors on any unhandled request.
 - Covers CRS transforms (5 control points, round-trip < 1 mm) and GeoJSON reprojection, buffers/bboxes, WFS URL building + retry policy, Zod
   schema against the recorded fixture (snapshot), geometry hashing, hakkuutapa
-  labels, attribution text, the landing page's sitemap / robots entries, FAQ content and JSON-LD (`marketing/landing-page.test.ts`), cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
+  labels, attribution text, the landing page's sitemap / robots entries, FAQ content and JSON-LD (`marketing/landing-page.test.ts`), the marketing header links and the `SHOW_PRICING` 404 of `/hinnoittelu` (`marketing/routes.test.ts`, `marketing/pricing-page.test.ts`), cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
   template, adapter selection by env), the auth layout and form components (`PasswordInput`
   toggle + zxcvbn meter, `FormError`, `FormSuccess`, `scorePassword` thresholds), registration
   (`auth/registration.test.ts`: form schema per field, `validateRegistration` with the zxcvbn
