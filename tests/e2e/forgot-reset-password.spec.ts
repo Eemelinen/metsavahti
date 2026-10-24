@@ -9,7 +9,7 @@ import {
   waitForForm,
 } from './accounts'
 import { expectNoA11yViolations } from './a11y'
-import { expect, test } from './fixtures'
+import { addConsentChoice, expect, test } from './fixtures'
 
 const NEW_PASSWORD = 'koivu-suo-lampi-2027'
 
@@ -51,6 +51,7 @@ test.describe('forgot / reset password', () => {
 
     // Another device is logged in before the reset.
     const other = await browser.newContext()
+    await addConsentChoice(other)
     const otherPage = await other.newPage()
     await otherPage.goto('/kirjaudu')
     await login(otherPage, email, PASSWORD)

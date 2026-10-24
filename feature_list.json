@@ -1481,7 +1481,7 @@
       "area": "gdpr",
       "title": "Cookie consent banner and modal",
       "user_visible_behavior": "`ConsentBanner` (equal-weight \"Hyväksy kaikki\"/\"Vain välttämättömät\", \"Mukauta\"), `ConsentModal` (categories necessary/analytics), `POST /api/consent` sets `mv_consent` cookie (12 m) and writes `consent_events` when logged in; footer \"Evästeasetukset\" reopens; analytics script loads only if granted.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-011", "F-035"],
       "ticket": "MV-090",
       "epic": "E08",
@@ -1493,7 +1493,12 @@
         "L2: pnpm test:integration tests/integration/cookie-consent-banner-and-modal.int.test.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)",
         "L3: pnpm test:e2e tests/e2e/cookie-consent-banner-and-modal.spec.ts (unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on d93eadb)",
+        "2026-10-24 pnpm test:unit tests/unit/gdpr/cookie-consent-banner-and-modal.test.ts → pass (working tree on d93eadb)",
+        "2026-10-24 pnpm test:integration tests/integration/cookie-consent-banner-and-modal.int.test.ts → pass (working tree on d93eadb, Docker available)",
+        "2026-10-24 pnpm test:e2e tests/e2e/cookie-consent-banner-and-modal.spec.ts → pass (working tree on d93eadb, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): unit; integration cookie + event; E2E: banner shown once, choice persists, no analytics request without consent."
     },

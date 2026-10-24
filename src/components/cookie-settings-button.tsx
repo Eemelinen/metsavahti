@@ -1,8 +1,8 @@
 'use client'
 
 /**
- * Fired on `window` when the user asks to open the cookie settings. The consent modal
- * (MV-090) listens for it; until then the button is wired but nothing opens.
+ * Fired on `window` when the user asks to open the cookie settings; `ConsentManager`
+ * (`components/consent/consent-manager.tsx`, mounted by the frontend layout) opens the modal.
  */
 export const COOKIE_SETTINGS_EVENT = 'metsavahti:open-cookie-settings'
 

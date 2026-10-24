@@ -44,6 +44,10 @@ database or points at port 5432.
   valid, forged and expired token and in maintenance mode, `pageDecision()`, `assertOwner()`, and the guards
   with a faked Payload: `actionResult()` maps a bare `requireUser()` to `unauthorized` and `assertOwner` to
   `forbidden`, pages are redirected to the login or the interstitial),
+  cookie consent (`gdpr/cookie-consent-banner-and-modal.test.ts`: the `mv_consent` shape, parse fallbacks,
+  the `Set-Cookie` attributes, the guest side of `POST /api/consent` with 415 / 400; `….ui.test.tsx`
+  (jsdom): banner choices of equal size, "Mukauta" and the footer event open the modal, "Sulje" saves
+  nothing, the analytics script only after consent, the error on a failed save),
 
 ## Integration — `pnpm test:integration`
 
@@ -112,7 +116,10 @@ database or points at port 5432.
   `requestPasswordReset` post redirects to `/liikaa-pyyntoja`, migration round-trip),
   the full `sync-declarations` pipeline (new → idempotent → changed
   geometry with a `declaration-revisions` row and an in-place `watch-area-declarations` update,
-  emails asserted through the Mailpit API), and the cron endpoint.
+  emails asserted through the Mailpit API), the cron endpoint, and cookie consent
+  (`cookie-consent-banner-and-modal.int.test.ts`: `POST /api/consent` sets the 12-month cookie for a guest
+  without an event, appends a `cookies` event per save at the seeded cookie-policy version with the truncated IP
+  for a session, treats a forged cookie as a guest, and answers 400 / 500 without a cookie).
 
 ## E2E — `pnpm test:e2e` (`test:e2e:ui` for the inspector)
 
@@ -124,6 +131,11 @@ database or points at port 5432.
 - The auth forms carry `data-hydrated` once react-hook-form has mounted (`useHydrated()`); `waitForForm()` in
   `e2e/accounts.ts` waits for it before filling, because RHF resets the inputs on mount and a value typed
   before hydration is lost (webkit under load).
+- The cookie banner (MV-090) is on every page: `test` from `e2e/fixtures.ts` stores a "Vain välttämättömät"
+  `mv_consent` cookie in each context (`addConsentChoice()` for contexts a spec opens itself), so the banner
+  never covers a click; `cookie-consent-banner-and-modal.spec.ts` turns it off with
+  `test.use({ consentChoice: false })` and intercepts `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL` (a host that never resolves)
+  to count analytics requests.
 - Project order: `db-setup` (guard → migrate → truncate → seed first user, a
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
   the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents through the REST API) → `auth-setup` (logs in once, stores cookies

@@ -161,6 +161,7 @@ src/
   app/api/health          liveness + PostGIS check
   app/api/jobs/run        job entrypoint (Bearer CRON_SECRET or admin session; ?task=cleanup)
   app/api/alerts/[id]/map-image.png  static map PNG for alert emails (owner session or signed token; ENABLE_MAP_IMAGES)
+  app/api/consent         cookie consent: sets mv_consent (12 months), records a consent event for a signed-in user
   payload.config.ts       Payload config (postgres adapter, email, jobs)
   payload/collections     Users, WatchAreas, Declarations, DeclarationRevisions, WatchAreaDeclarations, Alerts, NotificationLog, ConsentEvents, DataExportRequests, JobRuns, LegalDocuments, RateLimitBuckets, Exports (upload)
   payload/access          access-control helpers
@@ -199,6 +200,7 @@ docker-compose.yml        db (5432), db_test (5433), mailpit (1025/8025)
   `POST /api/jobs/run?task=cleanup` once a week (retention rules in `src/config/retention.ts`).
 - Migrations run automatically on boot in production (`prodMigrations`).
 - Static map images in alert emails: set `ENABLE_MAP_IMAGES=1`; off, `/api/alerts/[id]/map-image.png` answers 404 and emails go without the image.
+- Analytics: set `NEXT_PUBLIC_ANALYTICS_SCRIPT_URL` (build time) to the Plausible/Umami script; the cookie banner loads it only for visitors who accept analytics. Unset, no analytics loads.
 - Maintenance: set `MAINTENANCE_MODE=1` (and optionally `MAINTENANCE_RETURN_TIME=07.00`) and restart; every page redirects to `/huolto` and `/api/*` answers 503, except `/api/health`.
 
 ## Roadmap (not yet built)

@@ -1,6 +1,6 @@
 import { AUTH_STATE } from '../../playwright.config'
 import { expectNoA11yViolations } from './a11y'
-import { expect, test } from './fixtures'
+import { addConsentChoice, expect, test } from './fixtures'
 
 const attributionPattern =
   /Sisältää Suomen metsäkeskuksen Metsänkäyttöilmoitukset-aineistoa \d{2}\/\d{4}/
@@ -68,6 +68,7 @@ test.describe('marketing layout', () => {
   test('keeps the attribution footer on the logged-in pages', async ({ browser }) => {
     // The (app) group reuses the frame until the app shell (MV-050) replaces it.
     const context = await browser.newContext({ storageState: AUTH_STATE })
+    await addConsentChoice(context)
     const page = await context.newPage()
     await page.goto('/dashboard')
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vahtialueesi')
@@ -104,6 +105,7 @@ test.describe('system pages', () => {
   }) => {
     // `src/proxy.ts` sends a guest from every `/dashboard/…` path to the login first (MV-046).
     const context = await browser.newContext({ storageState: AUTH_STATE })
+    await addConsentChoice(context)
     const page = await context.newPage()
     const response = await page.goto('/dashboard/ei/ole')
     expect(response?.status()).toBe(404)
