@@ -50,11 +50,14 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_SERVER_URL: z.url(),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).optional(),
+    /** Analytics script (Plausible/Umami, MV-126), loaded only after analytics consent (MV-090); unset = none. */
+    NEXT_PUBLIC_ANALYTICS_SCRIPT_URL: z.url().optional(),
   },
   // Only NEXT_PUBLIC_* keys must be listed; server keys are read from process.env.
   experimental__runtimeEnv: {
     NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_ANALYTICS_SCRIPT_URL: process.env.NEXT_PUBLIC_ANALYTICS_SCRIPT_URL,
   },
   emptyStringAsUndefined: true,
   skipValidation: Boolean(process.env.SKIP_ENV_VALIDATION),

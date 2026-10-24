@@ -125,6 +125,27 @@ export const fi = {
     mapCredit: 'Kartta © OpenStreetMapin tekijät, Maanmittauslaitos.',
     copyright: (year: number) => `© ${year} Metsävahti`,
   },
+  consent: {
+    banner: {
+      label: 'Evästeet',
+      body: 'Käytämme välttämättömiä evästeitä palvelun toimintaan ja valinnaisesti analytiikkaevästeitä sen kehittämiseen.',
+      cookiesLink: 'Lue lisää evästeistä',
+      privacyLink: 'Tietosuojaseloste',
+      acceptAll: 'Hyväksy kaikki',
+      necessaryOnly: 'Vain välttämättömät',
+      customize: 'Mukauta',
+    },
+    modal: {
+      title: 'Evästeasetukset',
+      necessary: 'Välttämättömät',
+      necessaryBody: 'Kirjautuminen, suostumusvalinnat, tietoturva. Aina käytössä.',
+      analytics: 'Analytiikka',
+      analyticsBody: 'Anonyymi käyttötilasto palvelun kehittämiseen.',
+      save: 'Tallenna valinnat',
+      close: 'Sulje',
+    },
+    saveFailed: 'Valintojen tallennus epäonnistui. Yritä uudelleen.',
+  },
   app: {
     nav: {
       label: 'Päävalikko',

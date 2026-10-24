@@ -9,7 +9,7 @@ import {
   waitForForm,
 } from './accounts'
 import { expectNoA11yViolations } from './a11y'
-import { expect, test } from './fixtures'
+import { addConsentChoice, expect, test } from './fixtures'
 
 const NEW_PASSWORD = 'tunturi-koivu-puro-2027'
 /** The "other device" of these tests: a Windows Chrome, whatever browser the project runs. */
@@ -22,6 +22,7 @@ async function otherDevice(browser: Browser, email: string) {
     storageState: { cookies: [], origins: [] },
     userAgent: OTHER_DEVICE_UA,
   })
+  await addConsentChoice(context)
   // Logins have no per-address limit (D-017), so this context needs no `useOwnAddress()`.
   const page = await context.newPage()
   await logIn(page, email, ACCOUNT_PASSWORD)
