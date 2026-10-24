@@ -1725,8 +1725,8 @@
         "2026-10-24 pnpm test:unit tests/unit/marketing/landing-page.test.ts → pass (commit f80bcf2)",
         "2026-10-24 pnpm test:e2e tests/e2e/landing-page.spec.ts → pass (commit f80bcf2, Docker available)"
       ],
-      "attempts": 0,
-      "notes": "Tests (ticket): unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget (perf ≥ 90 in CI via `@lhci/cli`, non-blocking). Status (ticket): absorbs MV-103 and MV-104 (merged 2026-09-20, ledger P11)."
+      "attempts": 1,
+      "notes": "Tests (ticket): unit for sitemap entries; E2E `@smoke` + axe + Lighthouse budget (perf ≥ 90 in CI via `@lhci/cli`, non-blocking). Status (ticket): absorbs MV-103 and MV-104 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-101",
