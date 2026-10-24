@@ -48,6 +48,9 @@ database or points at port 5432.
   the `Set-Cookie` attributes, the guest side of `POST /api/consent` with 415 / 400; `….ui.test.tsx`
   (jsdom): banner choices of equal size, "Mukauta" and the footer event open the modal, "Sulje" saves
   nothing, the analytics script only after consent, the error on a failed save),
+  legal pages (`legal/legaldocument-renderer.test.tsx`: `splitLegalSections()` slugs, suffixes and reserved
+  ids; `LegalDocument` markup: date in Finnish time, version, numbered sections whose ids match the TOC links,
+  lists and links, extra sections first, no TOC without sections; the `config/cookies.ts` lifetimes),
 
 ## Integration — `pnpm test:integration`
 
@@ -138,9 +141,12 @@ database or points at port 5432.
   to count analytics requests.
 - Project order: `db-setup` (guard → migrate → truncate → seed first user, a
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
-  the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents through the REST API) → `auth-setup` (logs in once, stores cookies
+  the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents, each with a lead and the `E2E_LEGAL_SECTIONS` of `fixtures.ts`, through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: app shell (`app-layout-sidebar-bottom-tabs.spec.ts`: sidebar on desktop, bottom tabs on Mobile Chrome,
+- Specs: legal pages (`legaldocument-renderer-and-pages.spec.ts`: the four routes show the seeded document's
+  date, version, lead and numbered sections, pass axe; at a desktop viewport the TOC links land on their
+  sections, at a phone viewport the TOC is hidden; `/evasteet` lists the cookies from `config/cookies.ts` and
+  "Avaa evästeasetukset" opens the consent modal; the footer reaches every page), app shell (`app-layout-sidebar-bottom-tabs.spec.ts`: sidebar on desktop, bottom tabs on Mobile Chrome,
   navigation between the three sections, the unread badge against the REST count, account menu, logout through
   `logOut()` in `e2e/accounts.ts`, which every logout test uses), profile and security pages
   (`profile-security.spec.ts`, guest, own account per test, `test.slow()`: `/tili` saves name and time zone and

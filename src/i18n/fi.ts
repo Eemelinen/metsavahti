@@ -379,6 +379,33 @@ export const fi = {
           : `Pyyntörajoituksen laskuri poistetaan ${days} päivän kuluttua laskentaikkunan päättymisestä.`,
     },
   },
+  /** Legal pages (MV-091); the documents' own text comes from `legal-documents`. */
+  legal: {
+    tocLabel: 'Sisältö',
+    updated: (date: string) => `Päivitetty ${date}`,
+    version: (version: string) => `Versio ${version}`,
+    openCookieSettings: 'Avaa evästeasetukset',
+    cookieTable: {
+      title: 'Käytetyt evästeet',
+      caption: 'Palvelun käyttämät evästeet',
+      name: 'Nimi',
+      purpose: 'Tarkoitus',
+      category: 'Luokka',
+      lifetime: 'Voimassa',
+      categories: { necessary: 'Välttämätön', analytics: 'Analytiikka' },
+    },
+    cookies: {
+      session: {
+        purpose: 'Kirjautumisistunto',
+        lifetime: (standardDays: number, rememberedDays: number) =>
+          `${standardDays} pv / ${rememberedDays} pv (Muista minut)`,
+      },
+      consent: {
+        purpose: 'Suostumusvalinnat',
+        lifetime: (months: number) => `${months} kk`,
+      },
+    },
+  },
   admin: {
     runPipeline: {
       button: 'Aja haku nyt',

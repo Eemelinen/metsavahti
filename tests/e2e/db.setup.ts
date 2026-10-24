@@ -4,19 +4,20 @@ import {
   LEGAL_DOCUMENT_SLUGS,
   LEGAL_DOCUMENT_TITLES,
   PLACEHOLDER_VERSION,
-  richTextFromParagraphs,
+  richTextFromSections,
 } from '@/lib/legal/documents'
 import { insertDeclaration, runMigrations, truncateAll } from '../helpers/db'
 import { assertTestDatabaseUrl } from '../helpers/db-guard'
 import { createMailpitClient } from '../helpers/mailpit'
-import { E2E_USER, E2E_WATCH_AREA } from './fixtures'
+import { E2E_LEGAL_SECTIONS, E2E_USER, E2E_WATCH_AREA } from './fixtures'
 
 /**
  * Prepares the e2e database through the running app:
  *  1. guard against non-test databases, 2. migrate, 3. truncate,
  *  4. seed the first user (auto-verified admin), one watch area, one sent but unread alert
  *     (the nav badge, MV-050; its declaration through SQL) and the four placeholder legal
- *     documents (registration records their versions) via the REST API.
+ *     documents (registration records their versions; the legal pages render their
+ *     `E2E_LEGAL_SECTIONS`, MV-091) via the REST API.
  * Runs once per `playwright test` invocation (project `db-setup`).
  */
 setup('migrate, reset and seed the e2e database', async ({ request }) => {
@@ -62,7 +63,7 @@ setup('migrate, reset and seed the e2e database', async ({ request }) => {
         title,
         version: PLACEHOLDER_VERSION,
         publishedAt: new Date().toISOString(),
-        body: richTextFromParagraphs(`${title} – luonnos.`),
+        body: richTextFromSections([`${title} – luonnos.`], E2E_LEGAL_SECTIONS),
       },
     })
     expect(doc.ok(), await doc.text()).toBeTruthy()
