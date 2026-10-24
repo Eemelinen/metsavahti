@@ -15,7 +15,7 @@ database or points at port 5432.
 - No database, no network: `helpers/msw.ts` errors on any unhandled request.
 - Covers CRS transforms (5 control points, round-trip < 1 mm) and GeoJSON reprojection, buffers/bboxes, WFS URL building + retry policy, Zod
   schema against the recorded fixture (snapshot), geometry hashing, hakkuutapa
-  labels, attribution text, cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
+  labels, attribution text, the landing page's sitemap / robots entries, FAQ content and JSON-LD (`marketing/landing-page.test.ts`), cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
   template, adapter selection by env), the auth layout and form components (`PasswordInput`
   toggle + zxcvbn meter, `FormError`, `FormSuccess`, `scorePassword` thresholds), registration
   (`auth/registration.test.ts`: form schema per field, `validateRegistration` with the zxcvbn
@@ -204,7 +204,7 @@ database or points at port 5432.
   (`profile-security.spec.ts`, guest, own account per test, `test.slow()`: `/tili` saves name and time zone and
   the header initials follow, axe; `/tili/turvallisuus` with a second Windows-Chrome context lists two sessions,
   refuses a wrong current password, changes it, the other context is sent to `/kirjaudu?next=`, the old
-  password is refused and the new one works; "Kirjaa ulos muista laitteista" ends only the other session), landing page + attribution + axe, login and logout (`login-logout.spec.ts`, guest, an own
+  password is refused and the new one works; "Kirjaa ulos muista laitteista" ends only the other session), landing page (`landing-page.spec.ts`, MV-100: `@smoke` hero, steps, map legend, attribution, Figtree, `#miten` anchor, "Luo vahtialue" → `/rekisteroidy`; the FAQ `<details>` open / close by click and Enter; axe; canonical, `og:locale` / `og:url` / `og:image` (the PNG answers 200) and the Organization + FAQPage JSON-LD; `sitemap.xml` and `robots.txt`), login and logout (`login-logout.spec.ts`, guest, an own
   verified account per test through `e2e/accounts.ts`: `@smoke` `/kirjaudu` → `/dashboard` (1-day cookie) →
   `Kirjaudu ulos` → `/kirjauduttu-ulos` → the session is gone server-side; remember-me gives a 30-day cookie and
   `?next=` follows same-origin paths only; invalid, unverified (+ inline resend → second Mailpit link) and locked
@@ -235,6 +235,13 @@ vahtialue` points at `/aloita` → login succeeds → the same link is `used`; a
   jobs API (runs the sync against the mock). `/virhe` throws only because `.env.test` sets
   `ENABLE_ERROR_TEST_ROUTE=1`; the unit test `infra/error-test-route.test.ts` checks that
   it is a 404 otherwise.
+- Lighthouse budget (MV-100, non-blocking): after the E2E step the CI job runs
+  `pnpm dlx @lhci/cli@0.15.1 autorun` against the same build (`lighthouserc.json`: `/`, 3 runs,
+  performance, accessibility and SEO ≥ 0.9). The step has `continue-on-error`, so a miss is a
+  warning; the reports are uploaded as the `lighthouse-report` artifact. Locally: build with
+  `.env.test` (`pnpm exec dotenv -e .env.test -- pnpm build`), then the same command with
+  `CHROME_PATH` pointing at Playwright's Chromium; under WSL Chrome leaves `C:\Users\…\lighthouse.*`
+  profile directories in the repository root, delete them afterwards.
 
 ## Live contract — `pnpm test:live`
 

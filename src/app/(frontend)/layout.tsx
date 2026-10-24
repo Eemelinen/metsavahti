@@ -8,11 +8,19 @@ import { ConsentManager } from '@/components/consent/consent-manager'
 import { CONSENT_COOKIE, parseConsentCookie } from '@/lib/consent/consent-cookie'
 import { env } from '@/lib/env'
 import { figtree } from '@/lib/fonts'
+import { SITE_OPEN_GRAPH } from '@/lib/seo'
 
+/**
+ * `metadataBase` turns the pages' relative canonical and Open Graph URLs absolute; the Open
+ * Graph defaults (static image included) live in `lib/seo.ts` (MV-100).
+ */
 export const metadata: Metadata = {
+  metadataBase: new URL(env.NEXT_PUBLIC_SERVER_URL),
   title: { default: 'Metsävahti', template: '%s · Metsävahti' },
   description:
     'Metsävahti seuraa Metsäkeskuksen metsänkäyttöilmoituksia valitsemasi alueen ympärillä ja ilmoittaa uusista tai muuttuneista ilmoituksista.',
+  openGraph: SITE_OPEN_GRAPH,
+  twitter: { card: 'summary_large_image' },
 }
 
 /**

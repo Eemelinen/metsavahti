@@ -13,6 +13,14 @@ export const LEGAL_DOCUMENT_TITLES: Record<LegalDocumentSlug, string> = {
   accessibility: 'Saavutettavuusseloste',
 }
 
+/** Public page of each document (`03-pages.md` → (legal)); also its canonical URL and sitemap entry. */
+export const LEGAL_DOCUMENT_PATHS: Record<LegalDocumentSlug, string> = {
+  privacy: '/tietosuoja',
+  terms: '/kayttoehdot',
+  cookies: '/evasteet',
+  accessibility: '/saavutettavuus',
+}
+
 /** Version string of the placeholder seed (MV-036); MV-092 replaces it with `2026-09`. */
 export const PLACEHOLDER_VERSION = '2026-09-draft'
 

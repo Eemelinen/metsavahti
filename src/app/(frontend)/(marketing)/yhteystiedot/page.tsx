@@ -8,7 +8,7 @@ import { submitContact } from './actions'
 
 const copy = fi.publicForms.contact
 
-export const metadata: Metadata = { title: copy.title }
+export const metadata: Metadata = { title: copy.title, alternates: { canonical: '/yhteystiedot' } }
 
 /**
  * `/yhteystiedot` (`03-pages.md` (marketing), Yhteystiedot artboard, MV-095): the contact form
