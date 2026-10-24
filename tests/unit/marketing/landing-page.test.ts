@@ -19,6 +19,7 @@ describe('sitemap.xml entries (MV-100)', () => {
   it('lists exactly the marketing and legal pages, landing first', () => {
     expect(sitemapEntries(BASE).map((entry) => entry.url)).toEqual([
       'https://metsavahti.example/',
+      'https://metsavahti.example/miten-se-toimii',
       'https://metsavahti.example/yhteystiedot',
       'https://metsavahti.example/tietopyynto',
       'https://metsavahti.example/tietosuoja',
@@ -27,6 +28,13 @@ describe('sitemap.xml entries (MV-100)', () => {
       'https://metsavahti.example/saavutettavuus',
     ])
     expect(sitemapEntries(BASE)[0]).toMatchObject({ changeFrequency: 'weekly', priority: 1 })
+  })
+
+  it('adds /hinnoittelu only when SHOW_PRICING is on (MV-101)', () => {
+    const urls = (showPricing: boolean) =>
+      sitemapEntries(BASE, showPricing).map((entry) => entry.url)
+    expect(urls(false)).not.toContain('https://metsavahti.example/hinnoittelu')
+    expect(urls(true)).toEqual([...urls(false), 'https://metsavahti.example/hinnoittelu'])
   })
 
   it('never lists a signed-in, auth, admin or API route', () => {

@@ -25,7 +25,19 @@ export default defineConfig({
     ? [['list'], ['html', { open: 'never' }], ['github']]
     : [['list'], ['html', { open: 'never' }]],
   timeout: 30_000,
-  expect: { timeout: 10_000 },
+  expect: {
+    timeout: 10_000,
+    // `@visual` snapshots (MV-101): still frames, no caret, the dev-tools indicator hidden. The
+    // per-pixel colour threshold (default 0.2) absorbs anti-aliasing; at most 100 pixels may
+    // differ beyond it, so a moved label still fails (a 1 % ratio let one through).
+    toHaveScreenshot: {
+      animations: 'disabled',
+      caret: 'hide',
+      scale: 'css',
+      stylePath: './tests/e2e/visual.css',
+      maxDiffPixels: 100,
+    },
+  },
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -50,6 +62,8 @@ export default defineConfig({
       // The consolidated auth suite runs on Chromium + Mobile Chrome (MV-046); the per-ticket
       // auth specs keep covering webkit.
       testIgnore: [/.*\.setup\.ts/, /auth\.spec\.ts/],
+      // `@visual` baselines exist for desktop (chromium) and mobile (mobile-chrome) only.
+      grepInvert: /@visual/,
     },
     {
       name: 'mobile-chrome',

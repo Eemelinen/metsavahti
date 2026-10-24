@@ -198,6 +198,128 @@ export const fi = {
       button: 'Luo vahtialue',
     },
   },
+  /**
+   * `/miten-se-toimii` (MV-101, docs/design/Miten.dc.html). The times are the sync schedule of
+   * `01 §2` (Metsäkeskus updates at 9 and 21, the cron runs 30 minutes later), not the artboard's.
+   */
+  howItWorks: {
+    meta: {
+      title: 'Miten se toimii',
+      description:
+        'Metsävahti tarkistaa Suomen metsäkeskuksen metsänkäyttöilmoitukset kaksi kertaa päivässä ja lähettää sähköpostin, kun vahtialueellesi tulee uusi ilmoitus.',
+    },
+    eyebrow: 'Miten se toimii',
+    title: 'Kaksi tarkistusta päivässä, yksi sähköposti kun jotain tapahtuu',
+    lead: 'Metsävahti ei kerää mitään uutta tietoa. Se lukee saman avoimen aineiston, jonka Suomen metsäkeskus julkaisee, ja vertaa sitä sinun vahtialueisiisi.',
+    cycle: {
+      title: 'Tarkistuskierto',
+      body: 'Joka aamu klo 9.30 ja joka ilta klo 21.30 haemme Metsäkeskuksen aineistosta uudet ja muuttuneet metsänkäyttöilmoitukset. Jokainen niistä verrataan kaikkiin vahtialueisiin.',
+      steps: [
+        {
+          title: 'Metsäkeskus julkaisee',
+          body: 'Uudet metsänkäyttöilmoitukset ilmestyvät avoimeen aineistoon klo 9 ja 21.',
+        },
+        {
+          title: 'Haemme muutokset',
+          body: 'Klo 9.30 ja 21.30 luemme uudet ja muuttuneet ilmoitukset.',
+        },
+        {
+          title: 'Vertaamme vahtialueisiin',
+          body: 'Jokainen ilmoitettu alue tarkistetaan jokaista vahtialuetta vasten.',
+        },
+        {
+          title: 'Lähetämme sähköpostin',
+          body: 'Heti, tai koosteena valitsemallasi tahdilla.',
+        },
+      ],
+      illustration: {
+        description:
+          'Kaavio vuorokauden tarkistuskierrosta: tarkistus klo 9.30 ja klo 21.30, Metsäkeskus julkaisee aineiston ja sähköposti lähtee sinulle.',
+        morning: '9.30 tarkistus',
+        evening: '21.30 tarkistus',
+        source: 'Metsäkeskus julkaisee',
+        email: 'Sähköposti sinulle',
+        centreLabel: 'Vahtialueesi',
+        centreValue: '24 h',
+        centreNote: 'kaksi kierrosta',
+      },
+    },
+    email: {
+      title: 'Tällainen sähköposti tulee',
+      body: 'Yksi viesti per uusi ilmoitus, tai halutessasi päivittäinen tai viikoittainen kooste. Viestissä on kaikki olennainen ilman kirjautumista: tyyppi, koko ja etäisyys.',
+      points: [
+        'Hakkuun tyyppi selkokielellä, värillä ja tekstillä',
+        'Etäisyys vahtialueen keskipisteestä',
+        'Muistutus siitä, että ilmoitus on aikomus, ei velvoite',
+      ],
+      illustration: {
+        label: 'Esimerkkisähköposti',
+        sender: 'Metsävahti',
+        senderInitial: 'M',
+        sentAt: 'tänään 9.34',
+        subject: 'Uusi metsänkäyttöilmoitus vahtialueellasi Mökki, Rääkkylä',
+        mapDescription: 'Kartta, jossa ilmoitettu hakkuualue vahtialueen sisällä',
+        cuttingType: 'Uudistushakkuu',
+        area: '3,4 ha',
+        distance: '420 m vahtialueen keskipisteestä',
+        received: 'Ilmoitus saapunut 5.9.2026',
+        cta: 'Näytä kartalla',
+      },
+    },
+    notDoing: {
+      title: 'Mitä palvelu ei tee',
+      items: [
+        {
+          title: 'Ei näytä omistajia.',
+          body: 'Aineisto ei sisällä henkilötietoja, emmekä yhdistä sitä kiinteistörekisteriin.',
+        },
+        {
+          title: 'Ei lupaa täydellisyyttä.',
+          body: 'Kotitarvehakkuut eivät vaadi ilmoitusta, ja aineiston julkaisussa voi olla viivettä.',
+        },
+        {
+          title: 'Ei ota kantaa.',
+          body: 'Kerromme, mitä on ilmoitettu. Mitä sillä tiedolla tekee, on sinun asiasi.',
+        },
+      ],
+    },
+    cta: {
+      title: 'Ensimmäinen vahtialue vie alle minuutin.',
+      button: 'Luo vahtialue',
+    },
+  },
+  /** `/hinnoittelu` behind `SHOW_PRICING` (MV-101, docs/design/Hinnoittelu.dc.html). */
+  pricing: {
+    meta: {
+      title: 'Hinnoittelu',
+      description:
+        'Metsävahdin perustoiminnot ovat ilmaisia: vahtialueet ja sähköposti-ilmoitukset uusista metsänkäyttöilmoituksista.',
+    },
+    title: 'Hinnoittelu',
+    lead: 'Perustoiminnot ovat ilmaisia ja pysyvät sellaisina. Laajempi taso tulee myöhemmin niille, jotka seuraavat useampaa paikkaa.',
+    perMonth: '/ kk',
+    price: (euros: number) => `${euros} €`,
+    free: {
+      features: (maxWatchAreas: number, minRadiusM: number, maxRadiusKm: number) => [
+        `Enintään ${maxWatchAreas} vahtialuetta`,
+        `Säde ${minRadiusM} m – ${maxRadiusKm} km`,
+        'Sähköposti-ilmoitukset heti tai koosteena',
+        'Tarkistus kaksi kertaa päivässä',
+        'Tietojen vienti ja tilin poisto itsepalveluna',
+      ],
+      cta: 'Luo tili',
+    },
+    upcoming: {
+      eyebrow: 'Tulossa',
+      name: 'Laaja',
+      features: [
+        'Rajaton määrä vahtialueita',
+        'Oma kiinteistöraja vahtialueena',
+        'Ilmoitushistoria ja vienti taulukkona',
+      ],
+      cta: 'Ilmoita kun taso julkaistaan',
+    },
+  },
   consent: {
     banner: {
       label: 'Evästeet',

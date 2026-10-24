@@ -1737,7 +1737,7 @@
       "area": "marketing",
       "title": "/miten-se-toimii, /hinnoittelu and marketing E2E + visual snapshots",
       "user_visible_behavior": "`/miten-se-toimii`: long-form page with two SVG illustrations (2×/day cycle; sample email). `/hinnoittelu` behind `SHOW_PRICING`: plan cards from `plans.ts`. `tests/e2e/marketing.spec.ts` with `@visual` snapshots desktop/mobile for every marketing page.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-011", "F-100"],
       "ticket": "MV-101",
       "epic": "E09",
@@ -1751,9 +1751,14 @@
         "L1: pnpm check",
         "L3: pnpm test:e2e tests/e2e/marketing.spec.ts (E2E + `@visual` snapshots.)"
       ],
-      "evidence": [],
-      "attempts": 0,
-      "notes": "Tests (ticket): E2E + `@visual` snapshots. Status (ticket): absorbs MV-102 and MV-105 (merged 2026-09-20, ledger P11)."
+      "evidence": [
+        "2026-10-24 pnpm check → pass (commit 4b8cba5)",
+        "2026-10-24 pnpm test:e2e tests/e2e/marketing.spec.ts → pass (commit 4b8cba5, Docker available)",
+        "2026-10-24 pnpm check → pass (commit 3cf01a5)",
+        "2026-10-24 pnpm test:e2e tests/e2e/marketing.spec.ts → pass (commit 3cf01a5, Docker available)"
+      ],
+      "attempts": 1,
+      "notes": "Tests (ticket): E2E + `@visual` snapshots. Status (ticket): absorbs MV-102 and MV-105 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-110",

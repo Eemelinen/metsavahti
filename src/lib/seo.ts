@@ -4,6 +4,7 @@ import type { FaqEntry } from '@/content/faq'
 import { fi } from '@/i18n/fi'
 import { USER_ROUTE_PREFIXES } from '@/lib/auth/route-protection'
 import { LEGAL_DOCUMENT_PATHS, LEGAL_DOCUMENT_SLUGS } from '@/lib/legal/documents'
+import { PRICING_PATH } from '@/lib/marketing/routes'
 
 /**
  * Search-engine surface (MV-100): what `sitemap.xml` lists, what `robots.txt` keeps crawlers
@@ -18,11 +19,12 @@ type SitemapRoute = {
 }
 
 /**
- * Marketing and legal pages only (`03-pages.md` → System routes). MV-101 adds
- * `/miten-se-toimii` and, behind `SHOW_PRICING`, `/hinnoittelu` when it builds them.
+ * Marketing and legal pages only (`03-pages.md` → System routes). `/hinnoittelu` is added by
+ * `sitemapEntries()` only when `SHOW_PRICING` is on (`PRICING_SITEMAP_ROUTE`).
  */
 export const SITEMAP_ROUTES: readonly SitemapRoute[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
+  { path: '/miten-se-toimii', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/yhteystiedot', changeFrequency: 'yearly', priority: 0.5 },
   { path: '/tietopyynto', changeFrequency: 'yearly', priority: 0.3 },
   ...LEGAL_DOCUMENT_SLUGS.map((slug) => ({
@@ -32,13 +34,20 @@ export const SITEMAP_ROUTES: readonly SitemapRoute[] = [
   })),
 ]
 
+export const PRICING_SITEMAP_ROUTE: SitemapRoute = {
+  path: PRICING_PATH,
+  changeFrequency: 'monthly',
+  priority: 0.6,
+}
+
 /** Absolute URL of `path` on the site; `baseUrl` may or may not end in a slash. */
 export function absoluteUrl(baseUrl: string, path: string): string {
   return new URL(path, baseUrl).toString()
 }
 
-export function sitemapEntries(baseUrl: string): MetadataRoute.Sitemap {
-  return SITEMAP_ROUTES.map(({ path, changeFrequency, priority }) => ({
+export function sitemapEntries(baseUrl: string, showPricing = false): MetadataRoute.Sitemap {
+  const routes = showPricing ? [...SITEMAP_ROUTES, PRICING_SITEMAP_ROUTE] : SITEMAP_ROUTES
+  return routes.map(({ path, changeFrequency, priority }) => ({
     url: absoluteUrl(baseUrl, path),
     changeFrequency,
     priority,

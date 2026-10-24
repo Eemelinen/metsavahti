@@ -15,7 +15,7 @@ database or points at port 5432.
 - No database, no network: `helpers/msw.ts` errors on any unhandled request.
 - Covers CRS transforms (5 control points, round-trip < 1 mm) and GeoJSON reprojection, buffers/bboxes, WFS URL building + retry policy, Zod
   schema against the recorded fixture (snapshot), geometry hashing, hakkuutapa
-  labels, attribution text, the landing page's sitemap / robots entries, FAQ content and JSON-LD (`marketing/landing-page.test.ts`), cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
+  labels, attribution text, the landing page's sitemap / robots entries, FAQ content and JSON-LD (`marketing/landing-page.test.ts`), the marketing header links and the `SHOW_PRICING` 404 of `/hinnoittelu` (`marketing/routes.test.ts`, `marketing/pricing-page.test.ts`), cron-secret comparison, email rendering (`EmailLayout` snapshot, alert
   template, adapter selection by env), the auth layout and form components (`PasswordInput`
   toggle + zxcvbn meter, `FormError`, `FormSuccess`, `scorePassword` thresholds), registration
   (`auth/registration.test.ts`: form schema per field, `validateRegistration` with the zxcvbn
@@ -182,7 +182,21 @@ database or points at port 5432.
   watch area, one sent but unread alert (its declaration through SQL, `insertDeclaration()` in `helpers/db.ts`;
   the pipeline in `api.spec.ts` may add more) and the four placeholder legal documents, each with a lead and the `E2E_LEGAL_SECTIONS` of `fixtures.ts`, through the REST API) → `auth-setup` (logs in once, stores cookies
   in `e2e/.auth/user.json`) → `chromium`, `webkit`, `mobile-chrome` in parallel.
-- Specs: public forms (`public-forms.spec.ts`: footer → `/yhteystiedot` with the addresses, the form switch
+- Visual snapshots (MV-101): tests tagged `@visual` compare a full-page screenshot with a baseline in
+  `e2e/<spec>-snapshots/<name>-<project>-linux.png`. They run on `chromium` (desktop) and `mobile-chrome`
+  (mobile); `webkit` skips them by `grepInvert`. `playwright.config.ts` freezes animations, hides the caret
+  and injects `e2e/visual.css` (hides the `next dev` tools indicator, which `next start` in CI does not
+  render); at most 100 pixels may differ beyond the per-pixel threshold. The spec masks the attribution and
+  copyright lines, which follow the calendar. After an intended visual change, regenerate and look at the
+  images before committing: `pnpm test:e2e tests/e2e/marketing.spec.ts --grep @visual --update-snapshots=all`.
+  The baselines are Linux renders (WSL locally, `ubuntu-latest` in CI); on another OS the files are missing
+  and the tests fail until that OS's baselines are written.
+- Specs: marketing pages (`marketing.spec.ts`, MV-101, needs `SHOW_PRICING=1` from `.env.test`: `@smoke`
+  header → `/miten-se-toimii` with its three sections, the four-step cycle at 9.30 / 21.30, both figures
+  (the dial's caption, the sample email with its map and the harvest label), attribution, canonical, axe,
+  CTA → `/rekisteroidy`; header → `/hinnoittelu`, the free card from `plans.ts` (price, watch-area limit,
+  radius bounds) and the "Laaja" card → `/yhteystiedot`, axe, "Luo tili" → `/rekisteroidy`; both pages in
+  `sitemap.xml`; `@visual` baselines of `/`, `/miten-se-toimii`, `/hinnoittelu` and `/yhteystiedot`), public forms (`public-forms.spec.ts`: footer → `/yhteystiedot` with the addresses, the form switch
   and the attribution (axe); the browser errors (axe), then a sent message shows "Kiitos viestistäsi" and
   arrives at `CONTACT_EMAIL` with `Reply-To`; `/tietopyynto` through the switch, Tarkastus preselected, the
   self-service link, an invalid address, then Poisto → "Tietopyyntö vastaanotettu", the receipt and the DPO email

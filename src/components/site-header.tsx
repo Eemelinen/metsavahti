@@ -1,28 +1,22 @@
 import Link from 'next/link'
 
 import { BrandMark } from '@/components/brand-mark'
+import { marketingNavLinks } from '@/lib/marketing/routes'
 
 /**
  * Marketing header (docs/design/Landing.dc.html#header-footer): logo, section links, login
- * and the "Luo tili" pill. The app variant with the account menu arrives with MV-050.
- *
- * "Kirjaudu" points at `/kirjaudu` (MV-044); the other targets are the spec routes their
- * tickets create (03-pages.md).
+ * and the "Luo tili" pill. "Hinnoittelu" is listed only when `showPricing` is set: the server
+ * layouts pass `SHOW_PRICING` (MV-101); the client error boundaries cannot read it and leave the
+ * link out.
  */
-const navLinks = [
-  { href: '/miten-se-toimii', label: 'Miten se toimii' },
-  { href: '/hinnoittelu', label: 'Hinnoittelu' },
-  { href: '/kirjaudu', label: 'Kirjaudu' },
-] as const
-
-export function SiteHeader() {
+export function SiteHeader({ showPricing = false }: { showPricing?: boolean }) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-6 px-5 py-3.5">
         <BrandMark />
         <nav aria-label="Päävalikko" className="ml-auto">
           <ul className="flex flex-wrap items-center gap-5 text-base font-medium">
-            {navLinks.map((link) => (
+            {marketingNavLinks(showPricing).map((link) => (
               <li key={link.href}>
                 <Link className="text-ink hover:text-forest-700 hover:underline" href={link.href}>
                   {link.label}
