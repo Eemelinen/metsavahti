@@ -1143,8 +1143,13 @@ export interface TaskFetchDeclarations {
 export interface TaskMatchWatchAreas {
   input?: unknown;
   output: {
+    watchAreas: number;
     matched: number;
     alertsCreated: number;
+    new: number;
+    geometryChanged: number;
+    attributesChanged: number;
+    removed: number;
   };
 }
 /**

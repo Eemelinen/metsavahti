@@ -1328,7 +1328,7 @@
       "area": "pipeline",
       "title": "match-watch-areas task",
       "user_visible_behavior": "Per `01 §4.2`: run `matchWatchAreas()`; create alerts `new` / `geometry_changed` / `attributes_changed` (+ `removed` behind `ALERT_ON_REMOVED`); update join hashes; update `lastCheckedAt`, `lastDeclarationCount`; snapshot in alert.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-034", "F-071"],
       "ticket": "MV-072",
       "epic": "E06",
@@ -1337,7 +1337,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/match-watch-areas-task.int.test.ts (integration: inside → 1 alert; borderline → 1; outside → 0; re-run → 0 new alerts; geometry change → `geometry_changed` alert once; area ed…)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 29b4208)",
+        "2026-10-24 pnpm test:integration tests/integration/match-watch-areas-task.int.test.ts → pass (working tree on 29b4208, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Was F-008 (attribute-level change detection; attr_hash next to geom_hash supersedes D-006). Tests (ticket): integration: inside → 1 alert; borderline → 1; outside → 0; re-run → 0 new alerts; geometry change → `geometry_changed` alert once; area edited (radius grows) → new matches alerted next run."
     },

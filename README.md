@@ -25,10 +25,12 @@ emails you when a **new or changed declaration** lands inside that circle.
                                                  └─ send-alerts          one email per (user, area) → notification-log
 ```
 
-Change detection is geometry-based: `watch-area-declarations` stores the hashes last seen per
-(watch area, declaration); a pair without a row produces a **new** alert, a pair whose `geom_hash`
-differs from the stored one produces a **geometry_changed** alert. A second run with identical
-upstream data sends nothing (idempotent). Alerts carry a `snapshot` of the declaration at alert
+Change detection compares hashes: `watch-area-declarations` stores the `geom_hash` and `attr_hash`
+last seen per (watch area, declaration); a pair without a row produces a **new** alert, a pair whose
+`geom_hash` differs produces a **geometry_changed** alert, one whose attributes alone changed an
+**attributes_changed** alert. With `ALERT_ON_REMOVED=1` a matched declaration that leaves the WFS
+produces a **removed** alert. Each run stamps the watch areas' `lastCheckedAt` / `lastDeclarationCount`
+and runs in one transaction. A second run with identical upstream data sends nothing (idempotent). Alerts carry a `snapshot` of the declaration at alert
 time; `notifiedAt` marks delivery and owners can only set `readAt`.
 
 ## Tech stack
