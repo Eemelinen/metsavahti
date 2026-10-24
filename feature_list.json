@@ -1216,8 +1216,8 @@
         "2026-10-24 pnpm test:integration tests/integration/dashboard-vahtialueet.int.test.ts → pass (working tree on 6e42dea, Docker available)",
         "2026-10-24 pnpm test:e2e tests/e2e/dashboard-vahtialueet.spec.ts → pass (working tree on 6e42dea, Docker available)"
       ],
-      "attempts": 0,
-      "notes": "Was F-004/F-006 (dashboard list; alert list moved to /ilmoitukset, 00-deviations R4). Tests (ticket): integration: other users' areas not listed; E2E `@smoke`."
+      "attempts": 1,
+      "notes": "Was F-004/F-006 (dashboard list; alert list moved to /ilmoitukset, 00-deviations R4). Tests (ticket): integration: other users' areas not listed; E2E `@smoke`. Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-067",
