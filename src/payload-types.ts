@@ -126,6 +126,7 @@ export interface Config {
       'match-watch-areas': TaskMatchWatchAreas;
       'send-alerts': TaskSendAlerts;
       cleanup: TaskCleanup;
+      export: TaskExport;
       inline: {
         input: unknown;
         output: unknown;
@@ -595,7 +596,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup';
+        taskSlug: 'inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export';
         taskID: string;
         input?:
           | {
@@ -629,7 +630,7 @@ export interface PayloadJob {
       }[]
     | null;
   workflowSlug?: 'sync-declarations' | null;
-  taskSlug?: ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup') | null;
+  taskSlug?: ('inline' | 'fetch-declarations' | 'match-watch-areas' | 'send-alerts' | 'cleanup' | 'export') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -1111,6 +1112,20 @@ export interface TaskCleanup {
     dataExports: number;
     jobRuns: number;
     rateLimitBuckets: number;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskExport".
+ */
+export interface TaskExport {
+  input: {
+    requestId: number;
+  };
+  output: {
+    files: number;
+    bytes: number;
+    emailsSent: number;
   };
 }
 /**

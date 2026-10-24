@@ -3,6 +3,7 @@ import type { TaskConfig } from 'payload'
 import { retention } from '@/config/retention'
 import { cleanup } from '@/lib/jobs/cleanup'
 import { createJobContext } from '@/lib/jobs/context'
+import { runDataExport } from '@/lib/jobs/export'
 import { fetchDeclarations } from '@/lib/jobs/fetch-declarations'
 import { withJobRun } from '@/lib/jobs/job-runs'
 import { matchWatchAreas } from '@/lib/jobs/match-watch-areas'
@@ -61,4 +62,26 @@ export const cleanupTask: TaskConfig<'cleanup'> = {
   },
 }
 
-export const tasks = [fetchDeclarationsTask, matchWatchAreasTask, sendAlertsTask, cleanupTask]
+/**
+ * One account export (`01 §4.5`, MV-093), queued by `POST /api/account/export`. No retries: a
+ * failure marks the request `failed` and the person can ask again from `/tili/tietosuoja`.
+ */
+export const exportTask: TaskConfig<'export'> = {
+  slug: 'export',
+  retries: 0,
+  inputSchema: [{ name: 'requestId', type: 'number', required: true }],
+  outputSchema: [count('files'), count('bytes'), count('emailsSent')],
+  handler: async ({ input, job, req }) => {
+    const ctx = createJobContext(req.payload, job.id)
+    const output = await withJobRun(ctx, 'export', () => runDataExport(ctx, input.requestId))
+    return { output }
+  },
+}
+
+export const tasks = [
+  fetchDeclarationsTask,
+  matchWatchAreasTask,
+  sendAlertsTask,
+  cleanupTask,
+  exportTask,
+]

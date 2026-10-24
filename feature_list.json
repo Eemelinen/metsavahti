@@ -1558,7 +1558,7 @@
       "area": "gdpr",
       "title": "Privacy page /tili/tietosuoja and data export",
       "user_visible_behavior": "`/tili/tietosuoja`: consent history table from `consent_events`, cookie-settings button, export section (pending/ready/expired), links to policy + supervisory authority. `POST /api/account/export` → `data_export_requests` + `export` job building zip (`account.json`, `watch-areas.geojson`, `alerts.json`, `consents.json`, `notifications.json`), stored in `exports`, `ExportReady` email with signed link (24 h), download route `GET /api/account/export/[id]?token=`. Rate limit 1/day.",
-      "status": "not_started",
+      "status": "in_progress",
       "depends_on": ["F-035", "F-050", "F-070"],
       "ticket": "MV-093",
       "epic": "E08",

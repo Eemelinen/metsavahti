@@ -187,6 +187,7 @@ export const fi = {
       profile: 'Tili',
       security: 'Turvallisuus',
       notifications: 'Ilmoitusasetukset',
+      privacy: 'Tietosuoja ja tiedot',
     },
     profile: {
       email: 'Sähköposti',
@@ -275,6 +276,49 @@ export const fi = {
       saved: 'Asetukset tallennettu.',
       failed: 'Yhteys palvelimeen katkesi. Yritä uudelleen.',
     },
+    privacy: {
+      export: {
+        title: 'Lataa tietoni',
+        body: 'Saat tilitietosi, vahtialueet (GeoJSON), ilmoitushistorian, suostumushistorian ja lähetetyt sähköpostit yhtenä zip-pakettina. Linkki on voimassa 24 tuntia.',
+        request: 'Lataa tietoni',
+        pending: 'Valmistellaan… lähetämme linkin sähköpostiin.',
+        ready: (email: string, until: string) =>
+          `Tietosi ovat valmiit. Lähetimme latauslinkin osoitteeseen ${email}. Linkki on voimassa ${until} asti.`,
+        download: 'Lataa tiedosto (zip)',
+        expired: 'Edellisen viennin linkki on vanhentunut. Voit pyytää uuden viennin.',
+        failed: 'Edellinen vienti epäonnistui. Yritä uudelleen.',
+        limited: (when: string) => `Voit pyytää seuraavan viennin ${when} jälkeen.`,
+        error: 'Pyyntö epäonnistui. Yritä uudelleen.',
+      },
+      consents: {
+        title: 'Suostumushistoria',
+        choice: 'Valinta',
+        version: 'Versio',
+        date: 'Päivämäärä',
+        empty: 'Ei tallennettuja suostumuksia.',
+        kinds: {
+          terms: { granted: 'Käyttöehdot hyväksytty', denied: 'Käyttöehtoja ei hyväksytty' },
+          privacy: {
+            granted: 'Tietosuojaseloste hyväksytty',
+            denied: 'Tietosuojaselostetta ei hyväksytty',
+          },
+          marketing: {
+            granted: 'Palvelun uutiset: suostumus annettu',
+            denied: 'Palvelun uutiset: ei suostumusta',
+          },
+          cookies: {
+            granted: 'Analytiikkaevästeet hyväksytty',
+            denied: 'Vain välttämättömät evästeet',
+          },
+        },
+      },
+      links: {
+        label: 'Tietosuojan linkit',
+        cookieSettings: 'Evästeasetukset',
+        policy: 'Tietosuojaseloste',
+        authority: 'Tietosuojavaltuutetun toimisto ↗',
+      },
+    },
   },
   emails: {
     testAlert: {
@@ -322,6 +366,20 @@ export const fi = {
       cta: 'Avaa turvallisuusasetukset',
       note: 'Jos et pyytänyt vaihtoa, vaihda salasanasi ja kirjaa muut laitteet ulos turvallisuusasetuksista.',
       footerWhy: 'Saat tämän viestin, koska tilisi sähköpostiosoitteen vaihtoa pyydettiin.',
+    },
+    exportReady: {
+      subject: 'Tietojen vienti on valmis',
+      preview: 'Tietosi ovat valmiit ladattavaksi – linkki voimassa 24 h',
+      badge: 'Tietopyyntö',
+      heading: 'Tietojen vienti on valmis',
+      lead: 'Pyytämäsi tietopaketti on koottu. Se sisältää tilitietosi, vahtialueet GeoJSON-muodossa, ilmoitushistorian, suostumushistorian ja sinulle lähetetyt sähköpostit.',
+      cta: (size: string) => `Lataa tiedot (zip, ${size})`,
+      contents: 'Sisältö',
+      size: 'Koko',
+      expires: 'Linkki vanhenee',
+      expiresAt: (when: string) => `${when} (24 h)`,
+      note: 'Kuka tahansa linkin saanut voi ladata tietosi sen voimassaoloaikana, joten älä jaa sitä. Jos et pyytänyt vientiä, vaihda salasanasi tilin turvallisuusasetuksista.',
+      footerWhy: 'Saat tämän viestin, koska pyysit tietojesi vientiä tilin asetuksista.',
     },
   },
   forms: {

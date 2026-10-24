@@ -17,6 +17,7 @@ export type ErrorCode =
   | 'not_found'
   | 'forbidden'
   | 'rate_limited'
+  | 'gone'
   | 'plan_limit'
   | 'external_service'
   | 'internal'
@@ -37,6 +38,7 @@ export const publicMessages: Record<ErrorCode, string> = {
   not_found: 'Kohdetta ei löytynyt.',
   forbidden: 'Ei käyttöoikeutta.',
   rate_limited: 'Liikaa pyyntöjä. Yritä hetken kuluttua uudelleen.',
+  gone: 'Linkki on vanhentunut.',
   plan_limit: 'Tilauksesi raja on täynnä.',
   external_service: 'Ulkoinen palvelu ei vastannut. Yritä myöhemmin uudelleen.',
   internal: 'Jotain meni pieleen. Yritä myöhemmin uudelleen.',
@@ -95,6 +97,14 @@ export class Forbidden extends AppError {
   constructor(message?: string, options: AppErrorOptions = {}) {
     super('forbidden', 403, message, { expose: true, ...options })
     this.name = 'Forbidden'
+  }
+}
+
+/** The thing existed but is no longer available, such as an expired download link. 410. */
+export class Gone extends AppError {
+  constructor(message?: string, options: AppErrorOptions = {}) {
+    super('gone', 410, message, { expose: true, ...options })
+    this.name = 'Gone'
   }
 }
 
