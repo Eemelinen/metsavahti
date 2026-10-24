@@ -1755,8 +1755,8 @@
         "2026-10-24 pnpm check → pass (commit 4b8cba5)",
         "2026-10-24 pnpm test:e2e tests/e2e/marketing.spec.ts → pass (commit 4b8cba5, Docker available)"
       ],
-      "attempts": 0,
-      "notes": "Tests (ticket): E2E + `@visual` snapshots. Status (ticket): absorbs MV-102 and MV-105 (merged 2026-09-20, ledger P11)."
+      "attempts": 1,
+      "notes": "Tests (ticket): E2E + `@visual` snapshots. Status (ticket): absorbs MV-102 and MV-105 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-110",
