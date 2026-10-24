@@ -31,18 +31,34 @@ function paragraph(text: string): RichText['root']['children'][number] {
   }
 }
 
+function heading(text: string): RichText['root']['children'][number] {
+  return { ...paragraph(text), type: 'heading', tag: 'h2' }
+}
+
+function root(children: RichText['root']['children']): RichText {
+  return { root: { type: 'root', version: 1, direction: 'ltr', format: '', indent: 0, children } }
+}
+
 /** Lexical editor state with one paragraph per string (what the seed and tests write). */
 export function richTextFromParagraphs(...texts: string[]): RichText {
-  return {
-    root: {
-      type: 'root',
-      version: 1,
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      children: texts.map(paragraph),
-    },
-  }
+  return root(texts.map(paragraph))
+}
+
+/**
+ * Lexical editor state with lead paragraphs and `h2` sections, the shape the legal pages turn
+ * into a table of contents (MV-091).
+ */
+export function richTextFromSections(
+  intro: string[],
+  sections: { title: string; paragraphs: string[] }[],
+): RichText {
+  return root([
+    ...intro.map(paragraph),
+    ...sections.flatMap((section) => [
+      heading(section.title),
+      ...section.paragraphs.map(paragraph),
+    ]),
+  ])
 }
 
 /**

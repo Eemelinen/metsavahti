@@ -6,15 +6,24 @@
  */
 export const COOKIE_SETTINGS_EVENT = 'metsavahti:open-cookie-settings'
 
-/** Footer "Evästeasetukset" button (docs/design/Landing.dc.html#header-footer). */
-export function CookieSettingsButton({ className }: { className?: string }) {
+/**
+ * Footer "Evästeasetukset" button (docs/design/Landing.dc.html#header-footer); `/evasteet`
+ * renders it as "Avaa evästeasetukset" (docs/design/Legal.dc.html#evasteet).
+ */
+export function CookieSettingsButton({
+  className,
+  children = 'Evästeasetukset',
+}: {
+  className?: string
+  children?: string
+}) {
   return (
     <button
       className={className}
       type="button"
       onClick={() => window.dispatchEvent(new CustomEvent(COOKIE_SETTINGS_EVENT))}
     >
-      Evästeasetukset
+      {children}
     </button>
   )
 }

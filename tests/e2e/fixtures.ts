@@ -11,6 +11,12 @@ export const E2E_USER = {
   name: 'E2E Tester',
 }
 
+/** `h2` sections of every seeded legal document; the legal pages list them in their TOC (MV-091). */
+export const E2E_LEGAL_SECTIONS = [
+  { title: 'Rekisterinpitäjä ja yhteystiedot', paragraphs: ['Metsävahti, e2e@metsavahti.test.'] },
+  { title: 'Säilytysajat', paragraphs: ['Tilin tiedot säilytetään tilin olemassaolon ajan.'] },
+]
+
 const [minE, minN, maxE, maxN] = fixtureBbox(loadWfsFixture())
 
 export const E2E_WATCH_AREA = {

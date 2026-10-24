@@ -168,17 +168,20 @@ src/
   payload/jobs            task + workflow definitions, cron access
   payload/schema          afterSchemaInit hook registering PostGIS columns
   payload/migrations      committed SQL migrations (PostGIS ext, generated column, GIST); README.md documents the raw-SQL pattern
+  app/(frontend)/(legal)  /tietosuoja, /kayttoehdot, /evasteet, /saavutettavuus (latest published legal document)
   config/wfs.ts           WFS query constants (grid cell, bbox padding, max bbox side)
   lib/env.ts              validated environment (t3-env + Zod)
   lib/errors.ts           typed AppError subclasses, actionResult() for Server Actions, toErrorResponse()
   lib/geo                 crs.ts, buffer.ts, bbox.ts, hash.ts, spatial-queries.ts
   lib/legal/documents.ts  legal document slugs, latest-published resolver, placeholder seed
+  lib/legal/legal-sections.ts  splits a document body into h2 sections for the TOC
+  config/cookies.ts       the cookies the service sets (the /evasteet table)
   lib/wfs                 client.ts, schemas.ts, parse.ts, hakkuutapa.ts
   lib/jobs                fetch-declarations, match-watch-areas, send-alerts, cleanup, withJobRun
   emails                  React Email templates: EmailLayout (shared frame), AlertEmail, renderEmail()
   lib/notifications       provider.ts (which email adapter is active)
   lib/privacy             ip.ts (IP → network prefix before storage)
-  components/             site header/footer/frame, brand mark, system pages, attribution, map (MapLibre), forms/ (PasswordInput, FormError, FormSuccess), shadcn ui/
+  components/             site header/footer/frame, brand mark, legal/ (LegalDocument, CookieTable), system pages, attribution, map (MapLibre), forms/ (PasswordInput, FormError, FormSuccess), shadcn ui/
   i18n/fi.ts              Finnish UI copy (new strings go here)
   proxy.ts                Next 16 middleware: maintenance mode, login redirect, security headers (lib/auth/route-protection.ts, lib/security-headers.ts)
   lib/auth                password-strength.ts (zxcvbn score + E03 thresholds), guards.ts (getSessionUser, requireUser, redirectSignedInUser), page-access.ts (assertOwner)

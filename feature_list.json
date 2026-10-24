@@ -1508,7 +1508,7 @@
       "area": "gdpr",
       "title": "LegalDocument renderer and pages",
       "user_visible_behavior": "`LegalDocument` (rich text → HTML, TOC on desktop, \"Päivitetty\" date, version); routes `/tietosuoja`, `/kayttoehdot`, `/evasteet` (+ cookie table from `config/cookies.ts`), `/saavutettavuus`.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-011", "F-036"],
       "ticket": "MV-091",
       "epic": "E08",
@@ -1523,7 +1523,12 @@
         "L1: pnpm check",
         "L3: pnpm test:e2e tests/e2e/legaldocument-renderer-and-pages.spec.ts (E2E render + TOC anchors + axe.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on a75393c)",
+        "2026-10-24 pnpm test:e2e tests/e2e/legaldocument-renderer-and-pages.spec.ts → pass (working tree on a75393c, Docker available)",
+        "2026-10-24 pnpm check → pass (working tree on a75393c)",
+        "2026-10-24 pnpm test:e2e tests/e2e/legaldocument-renderer-and-pages.spec.ts → pass (working tree on a75393c, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): E2E render + TOC anchors + axe."
     },
