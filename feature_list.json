@@ -437,8 +437,8 @@
         "2026-10-24 pnpm check → pass (working tree on e80867d)",
         "2026-10-24 pnpm test:unit tests/unit/wfs/normalisation.test.ts → pass (working tree on e80867d)"
       ],
-      "attempts": 0,
-      "notes": "Was F-009 (hakkuutapa labels verified against the Metsäkeskus code list; link the code list in the config). Tests (ticket): unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label. Status (ticket): absorbs MV-028 (merged 2026-09-20, ledger P11)."
+      "attempts": 1,
+      "notes": "Was F-009 (hakkuutapa labels verified against the Metsäkeskus code list; link the code list in the config). Tests (ticket): unit on every fixture; unknown code path; date parsing edge cases; every code in fixtures has a label. Status (ticket): absorbs MV-028 (merged 2026-09-20, ledger P11). Attempt 1 failed 2026-10-24: evaluator: Revise"
     },
     {
       "id": "F-025",
