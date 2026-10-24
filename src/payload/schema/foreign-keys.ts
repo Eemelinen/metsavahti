@@ -11,7 +11,10 @@ const CASCADING_RELATIONSHIPS: Record<string, string[]> = {
   // Deleting a watch area deletes its alerts (MV-064, migration `alerts_watch_area_cascade`).
   // `watch_area_declarations` cascades too, but through MV-034's hand-edited migration: listing
   // it here would make the next generated `down` reset those keys to `set null`.
-  alerts: ['watchArea'],
+  // Deleting a declaration (only the weekly cleanup does, MV-070) deletes its alerts and
+  // revisions (migration `jobs_cleanup`, D-026).
+  alerts: ['watchArea', 'declaration'],
+  declaration_revisions: ['declaration'],
 }
 
 /**

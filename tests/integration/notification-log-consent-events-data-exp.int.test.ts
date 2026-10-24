@@ -368,10 +368,12 @@ describe('notification_log, consent_events, data_export_requests, job_runs, expo
     expect(asAdmin.docs.map((d) => d.id)).toEqual([row.id])
   })
 
+  // The round-trip runs in a transaction that is rolled back: `down` drops `job_runs` and the
+  // other tables, and `up` recreates them as they were in 2026-09, without the columns later
+  // migrations added (`job_runs.run_id`, MV-070). Files that run after this one in the same
+  // worker need the current schema.
   it('migration round-trip restores `channel` and backfills the new columns (runs last)', async () => {
     const payload = await getTestPayload()
-    const db = await drizzle()
-    const args = { db } as unknown as MigrateUpArgs
 
     const failed = await payload.create({
       collection: 'notification-log',
@@ -379,42 +381,62 @@ describe('notification_log, consent_events, data_export_requests, job_runs, expo
       overrideAccess: true,
     })
 
-    await migration.down(args)
-    const { rows: oldShape } = await db.execute<{ channel: string; column_count: number }>(sql`
-      SELECT channel::text AS channel,
-        (SELECT count(*)::int FROM information_schema.columns
-          WHERE table_name = 'notification_log' AND column_name IN ('type', 'provider', 'sent_at')) AS column_count
-      FROM notification_log WHERE id = ${failed.id}
-    `)
-    expect(oldShape[0]).toEqual({ channel: 'email', column_count: 0 })
-    const { rows: tables } = await db.execute<{ n: number }>(sql`
-      SELECT count(*)::int AS n FROM pg_tables
-      WHERE tablename IN ('consent_events', 'data_export_requests', 'job_runs', 'exports')
-    `)
-    expect(tables[0]!.n).toBe(0)
+    await rolledBack(async (db) => {
+      const args = { db } as unknown as MigrateUpArgs
 
-    await migration.up(args)
-    const { rows: converted } = await db.execute<{
-      id: number
-      type: string
-      provider: string
-      sent_at_is_created: boolean | null
-    }>(sql`
-      SELECT id, type::text AS type, provider, sent_at = created_at AS sent_at_is_created
-      FROM notification_log ORDER BY id
-    `)
-    // The earlier `sent` row gets sent_at = created_at; the failed one keeps sent_at NULL.
-    expect(converted).toEqual([
-      {
-        id: expect.any(Number),
-        type: 'alert_immediate',
-        provider: 'email',
-        sent_at_is_created: true,
-      },
-      { id: failed.id, type: 'alert_immediate', provider: 'email', sent_at_is_created: null },
-    ])
-    expect(
-      (await payload.count({ collection: 'consent-events', overrideAccess: true })).totalDocs,
-    ).toBe(0)
+      await migration.down(args)
+      const { rows: oldShape } = await db.execute<{ channel: string; column_count: number }>(sql`
+        SELECT channel::text AS channel,
+          (SELECT count(*)::int FROM information_schema.columns
+            WHERE table_name = 'notification_log' AND column_name IN ('type', 'provider', 'sent_at')) AS column_count
+        FROM notification_log WHERE id = ${failed.id}
+      `)
+      expect(oldShape[0]).toEqual({ channel: 'email', column_count: 0 })
+      const { rows: tables } = await db.execute<{ n: number }>(sql`
+        SELECT count(*)::int AS n FROM pg_tables
+        WHERE tablename IN ('consent_events', 'data_export_requests', 'job_runs', 'exports')
+      `)
+      expect(tables[0]!.n).toBe(0)
+
+      await migration.up(args)
+      const { rows: converted } = await db.execute<{
+        id: number
+        type: string
+        provider: string
+        sent_at_is_created: boolean | null
+      }>(sql`
+        SELECT id, type::text AS type, provider, sent_at = created_at AS sent_at_is_created
+        FROM notification_log ORDER BY id
+      `)
+      // The earlier `sent` row gets sent_at = created_at; the failed one keeps sent_at NULL.
+      expect(converted).toEqual([
+        {
+          id: expect.any(Number),
+          type: 'alert_immediate',
+          provider: 'email',
+          sent_at_is_created: true,
+        },
+        { id: failed.id, type: 'alert_immediate', provider: 'email', sent_at_is_created: null },
+      ])
+      const { rows: consents } = await db.execute<{ n: number }>(
+        sql`SELECT count(*)::int AS n FROM consent_events`,
+      )
+      expect(consents[0]!.n).toBe(0)
+    })
   })
+
+  type Tx = Parameters<Parameters<Awaited<ReturnType<typeof drizzle>>['transaction']>[0]>[0]
+
+  async function rolledBack(fn: (db: Tx) => Promise<void>) {
+    const ROLLBACK = Symbol('rollback')
+    const db = await drizzle()
+    await db
+      .transaction(async (tx) => {
+        await fn(tx)
+        throw ROLLBACK
+      })
+      .catch((err: unknown) => {
+        if (err !== ROLLBACK) throw err
+      })
+  }
 })

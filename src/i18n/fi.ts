@@ -321,4 +321,12 @@ export const fi = {
       },
     },
   },
+  admin: {
+    runPipeline: {
+      button: 'Aja haku nyt',
+      running: 'Haku käynnissä…',
+      succeeded: 'Haku valmis.',
+      failed: 'Haku epäonnistui. Katso virhe tehtäväajoista.',
+    },
+  },
 } as const

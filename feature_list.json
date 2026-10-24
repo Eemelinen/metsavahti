@@ -1237,7 +1237,7 @@
       "area": "pipeline",
       "title": "Jobs infrastructure and cleanup task",
       "user_visible_behavior": "Configure Payload Jobs queue; `job_runs` writer helper (`withJobRun(task, fn)` recording status/stats/error); `POST /api/jobs/run` (Bearer `CRON_SECRET`, enqueues `pipeline`, returns runId); `pnpm jobs:run` script executing queue once; admin \"Run pipeline now\" button (admin only). `cleanup` task per `01 §4.4` using `retention.ts`, scheduled weekly via `POST /api/jobs/run?task=cleanup`.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-010", "F-033", "F-035"],
       "ticket": "MV-070",
       "epic": "E06",
@@ -1246,7 +1246,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts (integration: unauthenticated 401; run creates `job_runs` row; cleanup removes expired declarations and keeps referenced ones.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on 4603457)",
+        "2026-10-24 pnpm test:integration tests/integration/jobs-infrastructure.int.test.ts → pass (working tree on 4603457, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: unauthenticated 401; run creates `job_runs` row; cleanup removes expired declarations and keeps referenced ones. Status (ticket): absorbs MV-076 (merged 2026-09-20, ledger P11)."
     },
