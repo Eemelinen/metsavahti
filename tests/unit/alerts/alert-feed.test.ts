@@ -112,8 +112,8 @@ describe('AlertItem (MV-080)', () => {
     expect(row).toHaveTextContent('Mökki · 2,4 ha · 350 m · klo 06.12')
     expect(row).not.toHaveTextContent(fi.alerts.changeType.new.explanation)
     const link = screen.getByRole('link', { name: 'Näytä kartalla: Avohakkuu, Mökki' })
-    expect(link).toHaveAttribute('href', '/vahtialueet/3#ilmoitus-77')
-    expect(alertMapHref(ITEM)).toBe('/vahtialueet/3#ilmoitus-77')
+    expect(link).toHaveAttribute('href', `/ilmoitukset/${ITEM.id}`)
+    expect(alertMapHref(ITEM)).toBe(`/ilmoitukset/${ITEM.id}`)
   })
 
   it.each(['geometry_changed', 'attributes_changed', 'removed'] as const)(

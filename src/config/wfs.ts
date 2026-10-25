@@ -45,4 +45,12 @@ export const wfs = {
   previewFetchCellM: 5_000,
   /** Rows per `upsertDeclarations()` statement (`01 §4.1` step 4: transactions of 500). */
   upsertBatchSize: 500,
+  /**
+   * Metsäkeskus' own map of the declarations it has received ("Karttanäkymä: Metsäkeskukseen
+   * toimitetut metsänkäyttöilmoitukset", an ArcGIS Experience linked from
+   * metsakeskus.fi → Avoin metsä- ja luontotieto → Hakkuuaikomukset, checked on 2026-10-24).
+   * The alert page links it as "Metsäkeskuksen karttapalvelu" (MV-082). The page documents no
+   * parameters for a position or a declaration, so the link opens the whole map (ledger R47).
+   */
+  mapServiceUrl: 'https://experience.arcgis.com/experience/bc56dcb749f84297aad54c8371a11fdd',
 } as const

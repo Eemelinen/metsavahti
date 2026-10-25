@@ -75,6 +75,11 @@ export type MapViewProps = {
   onCenterChange?: (center: LonLat) => void
   /** Zoom when there is no watch area to fit. */
   zoom?: number
+  /**
+   * What the map opens on: the watch area (default) or the declarations, as the alert page
+   * zooms to its polygon (MV-082). "Keskitä vahtialueeseen" always fits the watch area.
+   */
+  fit?: 'watchArea' | 'declarations'
   className?: string
 }
 
@@ -158,6 +163,7 @@ export function MapViewCanvas({
   interactive = false,
   onCenterChange,
   zoom = DEFAULT_ZOOM,
+  fit = 'watchArea',
   className,
 }: MapViewProps) {
   const mapRef = useRef<MapRef>(null)
@@ -225,11 +231,12 @@ export function MapViewCanvas({
 
   const areaBounds = useMemo(() => boundsOf(watchArea), [watchArea])
   // Captured once: later prop changes move the overlays, not the camera.
-  const [initialViewState] = useState(() =>
-    areaBounds
-      ? { bounds: areaBounds, fitBoundsOptions: { padding: FIT_PADDING, maxZoom: 15 } }
-      : { longitude: center[0], latitude: center[1], zoom },
-  )
+  const [initialViewState] = useState(() => {
+    const bounds = (fit === 'declarations' && boundsOf(declarations ?? null)) || areaBounds
+    return bounds
+      ? { bounds, fitBoundsOptions: { padding: FIT_PADDING, maxZoom: 15 } }
+      : { longitude: center[0], latitude: center[1], zoom }
+  })
 
   const showPin = interactive || watchAreaGeoJSON === undefined
   // The WMS goes under our own layers.

@@ -551,6 +551,33 @@ export async function declarationsForWatchArea(
 }
 
 /**
+ * One declaration as a map feature of one watch area (WGS 84, distance from the area's
+ * centre), whatever its state: the alert page (MV-082) shows the polygon of a declaration that
+ * has since left the data or expired too. Null when the declaration or the area is gone. Does
+ * not check ownership; the caller must (`assertOwner()`, D-020).
+ */
+export async function declarationForWatchArea(
+  payload: Payload,
+  watchAreaId: number,
+  declarationId: number,
+): Promise<Feature<MultiPolygon, DeclarationMapProperties> | null> {
+  const { rows } = await run('declarationForWatchArea', () =>
+    drizzle(payload).execute<DeclarationMapRow>(sql`
+    SELECT
+      d.id, d.source_id, d.declaration_number, d.cutting_type_code, d.cutting_type_label,
+      d.area_ha, d.received_at, d.valid_until,
+      ST_Distance(ST_Transform(ST_SetSRID(wa.center, 4326), 3067), d.geom) AS distance_m,
+      ST_AsGeoJSON(ST_Transform(d.geom, 4326), ${MAP_GEOJSON_DECIMALS}::int) AS geojson
+    FROM watch_areas wa
+    JOIN declarations d ON d.id = ${declarationId}
+    WHERE wa.id = ${watchAreaId}
+  `),
+  )
+  const row = rows[0]
+  return row ? toMapFeature(row) : null
+}
+
+/**
  * How many stored declarations a not-yet-saved watch area would match (`01 §6` preview):
  * the same circle as `watch_areas.geom_3067` (D-003) and the same "not removed, valid at
  * `now`" rule as `matchWatchAreas()`. Reads the local cache only.

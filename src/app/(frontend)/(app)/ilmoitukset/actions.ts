@@ -14,16 +14,16 @@ import { type ActionResult, actionResult } from '@/lib/errors'
 import { watchAreaIdSchema } from '@/lib/watch-areas/watch-area-schema'
 
 /**
- * Alert Server Actions (E07 MV-080), used by `/ilmoitukset`. The account comes from the
- * session (`requireUser()`); the alert id from the browser is checked against it again in
- * `lib/alerts/unread.ts`. Both refresh the client router, so the nav badge of the `(app)`
- * layout shows the new unread count without a reload (a layout does not re-render on
- * client-side navigation).
+ * Alert Server Actions (E07 MV-080, MV-082), used by `/ilmoitukset` and `/ilmoitukset/[id]`.
+ * The account comes from the session (`requireUser()`); the alert id from the browser is
+ * checked against it again in `lib/alerts/unread.ts`. Both refresh the client router, so the
+ * nav badge of the `(app)` layout shows the new unread count without a reload (a layout does
+ * not re-render on client-side navigation).
  */
 
 const alertIdSchema = z.number().int().positive()
 
-/** Marks one of the account's alerts read ("Näytä kartalla" on an unread alert). */
+/** Marks one of the account's alerts read (`/ilmoitukset/[id]` on view, MV-082). */
 export async function markAlertRead(
   id: unknown,
 ): Promise<ActionResult<{ id: number; readAt: string }>> {

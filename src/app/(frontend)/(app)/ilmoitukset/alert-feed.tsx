@@ -4,19 +4,19 @@ import { cn } from 'cn'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { type MouseEvent, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 
-import { AlertItem, alertMapHref } from '@/components/alerts/alert-item'
+import { AlertItem } from '@/components/alerts/alert-item'
 import { FormError } from '@/components/forms/form-error'
 import { FormSuccess } from '@/components/forms/form-success'
 import { useHydrated } from '@/components/forms/use-hydrated'
 import { Label } from '@/components/ui/label'
 import { NativeSelect } from '@/components/ui/native-select'
 import { fi } from '@/i18n/fi'
-import type { AlertFeed as AlertFeedData, AlertFeedItem } from '@/lib/alerts/feed'
+import type { AlertFeed as AlertFeedData } from '@/lib/alerts/feed'
 import { alertFeedQuery } from '@/lib/alerts/feed-query'
 
-import { markAlertRead, markAllAlertsRead } from './actions'
+import { markAllAlertsRead } from './actions'
 
 const copy = fi.alerts.feed
 
@@ -27,9 +27,9 @@ const PAGE_LINK =
  * The interactive part of `/ilmoitukset` (App artboard `ilmoitukset`): the watch-area filter,
  * "Merkitse kaikki luetuiksi", the date groups and the page links. The server page has already
  * loaded the page the URL names; the filter replaces the search params and the page renders
- * again. Both actions refresh the router, so the list and the nav badge update together.
- * "Näytä kartalla" on an unread alert marks it read before it navigates (a modified click opens
- * the link as it is). `data-hydrated` tells the e2e tests when a click is no longer lost.
+ * again. Mark-all refreshes the router, so the list and the nav badge update together;
+ * "Näytä kartalla" opens the alert's page, which marks it read (MV-082). `data-hydrated` tells
+ * the e2e tests when a click is no longer lost.
  */
 export function AlertFeed({ feed, paged }: { feed: AlertFeedData; paged: boolean }) {
   const router = useRouter()
@@ -51,16 +51,6 @@ export function AlertFeed({ feed, paged }: { feed: AlertFeedData; paged: boolean
     startTransition(async () => {
       const result = await markAllAlertsRead(feed.watchAreaId).catch(() => null)
       setOutcome(result?.ok ? 'marked' : 'failed')
-    })
-  }
-
-  function showOnMap(item: AlertFeedItem, event: MouseEvent<HTMLAnchorElement>) {
-    if (!item.unread || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-    event.preventDefault()
-    startTransition(async () => {
-      // A failed stamp must not keep the user from the map; the alert just stays unread.
-      await markAlertRead(item.id).catch(() => null)
-      router.push(alertMapHref(item))
     })
   }
 
@@ -143,11 +133,7 @@ export function AlertFeed({ feed, paged }: { feed: AlertFeedData; paged: boolean
               </h2>
               <ul className="flex flex-col gap-2.5">
                 {group.items.map((item) => (
-                  <AlertItem
-                    item={item}
-                    key={item.id}
-                    onShowOnMap={(event) => showOnMap(item, event)}
-                  />
+                  <AlertItem item={item} key={item.id} />
                 ))}
               </ul>
             </section>

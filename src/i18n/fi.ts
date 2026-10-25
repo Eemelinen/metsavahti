@@ -404,6 +404,40 @@ export const fi = {
       older: 'Näytä vanhemmat ilmoitukset',
       newest: 'Uusimpiin ilmoituksiin',
     },
+    detail: {
+      back: '← Ilmoitukset',
+      mapLabel: 'Ilmoituksen kartta',
+      title: (ha: string, distance: string, area: string) =>
+        `${ha}, ${distance} vahtialueesta ${area}`,
+      attributes: {
+        received: 'Ilmoitus saapunut',
+        cuttingType: 'Hakkuutapa',
+        area: 'Pinta-ala',
+        distance: 'Etäisyys',
+        distanceValue: (distance: string) => `${distance} vahtialueen keskipisteestä`,
+        declarationNumber: 'Ilmoitusnumero',
+        validUntil: 'Voimassa',
+        validUntilValue: (date: string) => `${date} asti (3 vuotta ilmoituspäivästä)`,
+        validUntilDefault: '3 vuotta ilmoituspäivästä',
+        earliest: 'Aikaisintaan',
+        earliestValue: '10 päivää ilmoituksesta',
+      },
+      updatedTitle: 'Tiedot päivittyneet',
+      updatedBody:
+        'Metsäkeskuksen aineisto on muuttunut ilmoituksen jälkeen. Yllä ovat tiedot ilmoitushetkeltä.',
+      removedBody: 'Ilmoitus ei ole enää Metsäkeskuksen aineistossa.',
+      changeLabel: {
+        cuttingType: 'Hakkuutapa nyt',
+        areaHa: 'Pinta-ala nyt',
+        receivedAt: 'Saapunut nyt',
+      },
+      explainerTitle: 'Mitä tämä tarkoittaa?',
+      explainerBody:
+        'Metsänomistaja on ilmoittanut Metsäkeskukselle aikomuksestaan hakata tämä alue. Ilmoitus ei velvoita hakkaamaan, ja osa ilmoitetuista hakkuista jää toteutumatta. Hakkuu voi alkaa aikaisintaan 10 päivää ilmoituksen jättämisestä ja ilmoitus on voimassa kolme vuotta.',
+      openArea: 'Avaa vahtialue',
+      mapService: 'Metsäkeskuksen karttapalvelu',
+      newTab: '(avautuu uuteen välilehteen)',
+    },
   },
   watchAreas: {
     errors: {

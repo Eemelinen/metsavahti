@@ -1489,7 +1489,7 @@
       "area": "alerts",
       "title": "Alert detail /ilmoitukset/[id] and full-loop E2E",
       "user_visible_behavior": "Map zoomed to polygon (+ watch circle), snapshot attributes vs current (shows \"Tiedot päivittyneet\" if declaration changed since), link to Metsäkeskus map service (URL pattern in `config/wfs.ts`), \"Mitä tämä tarkoittaa?\" explainer per cutting type, marks read on view. `tests/e2e/alert-loop.spec.ts`: login → create area over fixture bbox → trigger `/api/jobs/run` via request context → feed shows alert → email in Mailpit contains link → link opens alert detail. Tag `@smoke`.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-060", "F-075", "F-080"],
       "ticket": "MV-082",
       "epic": "E07",
@@ -1499,7 +1499,10 @@
         "L1: pnpm check",
         "L3: pnpm test:e2e tests/e2e/alert-loop.spec.ts (E2E detail page; E2E full loop `@smoke`.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-24 pnpm check → pass (working tree on b120b00)",
+        "2026-10-24 pnpm test:e2e tests/e2e/alert-loop.spec.ts → pass (working tree on b120b00, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): E2E detail page; E2E full loop `@smoke`. Status (ticket): absorbs MV-085 (merged 2026-09-20, ledger P11)."
     },
