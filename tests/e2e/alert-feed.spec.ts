@@ -1,35 +1,14 @@
-import type { APIRequestContext } from '@playwright/test'
-
 import { signInOwnAccount } from './accounts'
 import { expectNoA11yViolations } from './a11y'
 import { E2E_WATCH_AREA, expect, test } from './fixtures'
-
-/**
- * `POST /api/jobs/run` with the cron secret. The browser projects run pipelines at the same
- * time; a trigger during another run gets 409 from the pipeline lock (MV-075) and tries again
- * once that run is over, so the run that answers 200 started after the caller's area existed.
- */
-async function runPipeline(request: APIRequestContext) {
-  const run = () =>
-    request.post('/api/jobs/run', {
-      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-    })
-  let res = await run()
-  await expect
-    .poll(async () => (res.status() === 409 ? (res = await run()).status() : res.status()), {
-      intervals: [1_000],
-      timeout: 120_000,
-    })
-    .not.toBe(409)
-  expect(res.ok(), await res.text()).toBeTruthy()
-}
+import { runPipeline } from './pipeline'
 
 /**
  * MV-080: `/ilmoitukset` for an account of the test's own. Empty before its first area; after a
  * pipeline run against the mocked WFS it lists the two fixture declarations inside the area as
  * unread "Uusi ilmoitus" items under a date header, and the nav badge counts them. "Näytä
- * kartalla" marks its alert read on the way to the area page, "Merkitse kaikki luetuiksi" the
- * rest; the badge follows both without a reload. Owner-only reads and actions are covered by
+ * kartalla" opens the alert's page (MV-082), which marks it read, "Merkitse kaikki luetuiksi"
+ * the rest; the badge follows both without a reload. Owner-only reads and actions are covered by
  * `tests/integration/alert-feed.int.test.ts`.
  */
 test.describe('/ilmoitukset', () => {
@@ -60,7 +39,6 @@ test.describe('/ilmoitukset', () => {
       data: { ...E2E_WATCH_AREA, name },
     })
     expect(created.ok(), await created.text()).toBeTruthy()
-    const { doc: area } = (await created.json()) as { doc: { id: number } }
     await runPipeline(page.request)
 
     await page.reload()
@@ -80,17 +58,16 @@ test.describe('/ilmoitukset', () => {
     ).toHaveCount(1)
     await expectNoA11yViolations(page)
 
-    // "Näytä kartalla" marks the alert read and opens its declaration on the area page.
+    // "Näytä kartalla" opens the alert's own page, which marks it read (MV-082).
     await expect(page.locator('[data-testid="alert-feed"][data-hydrated]')).toBeAttached()
+    const first = await items.first().getAttribute('data-alert-id')
     await items
       .first()
       .getByRole('link', { name: /^Näytä kartalla: / })
       .click()
     // The first visit of the map page compiles MapLibre on a cold `next dev`.
-    await expect(page).toHaveURL(new RegExp(`/vahtialueet/${area.id}#ilmoitus-\\d+$`), {
-      timeout: 30_000,
-    })
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(name)
+    await expect(page).toHaveURL(`/ilmoitukset/${first}`, { timeout: 30_000 })
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(name)
     await expect(badge).toHaveText('1 (1 lukematonta)')
 
     await nav.getByRole('link', { name: /^Ilmoitukset/ }).click()

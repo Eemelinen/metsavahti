@@ -1,7 +1,6 @@
 import { cn } from 'cn'
 import { CircleMinus, FilePenLine, type LucideIcon, Sparkles, Spline } from 'lucide-react'
 import Link from 'next/link'
-import type { MouseEvent } from 'react'
 
 import { formatAreaHa, formatDistance } from '@/components/map/declaration-popover'
 import type { CuttingColourToken } from '@/config/cutting-types'
@@ -42,9 +41,9 @@ export function ChangeTypeTag({ type }: { type: AlertChangeType }) {
   )
 }
 
-/** Where "Näytä kartalla" goes: the declaration's row on its watch area's page (MV-067). */
-export function alertMapHref(item: Pick<AlertFeedItem, 'watchArea' | 'declarationId'>): string {
-  return `/vahtialueet/${item.watchArea.id}#ilmoitus-${item.declarationId}`
+/** Where "Näytä kartalla" goes: the alert's own page, which marks it read (MV-082). */
+export function alertMapHref(item: Pick<AlertFeedItem, 'id'>): string {
+  return `/ilmoitukset/${item.id}`
 }
 
 /**
@@ -54,14 +53,7 @@ export function alertMapHref(item: Pick<AlertFeedItem, 'watchArea' | 'declaratio
  * alerts sit on the page colour instead of the artboard's 72 % opacity, which would take the
  * muted text below AA contrast.
  */
-export function AlertItem({
-  item,
-  onShowOnMap,
-}: {
-  item: AlertFeedItem
-  /** Called on a plain click of "Näytä kartalla" (the feed marks the alert read first). */
-  onShowOnMap?: (event: MouseEvent<HTMLAnchorElement>) => void
-}) {
+export function AlertItem({ item }: { item: AlertFeedItem }) {
   return (
     <li
       className={cn(
@@ -106,7 +98,6 @@ export function AlertItem({
         aria-label={copy.showOnMapLabel(item.cuttingTypeLabel, item.watchArea.name)}
         className="inline-flex min-h-10 flex-none items-center rounded-lg border border-line bg-paper-raised px-3 py-2 text-sm font-semibold text-forest-700 outline-none hover:border-line-strong focus-visible:ring-3 focus-visible:ring-ring/50"
         href={alertMapHref(item)}
-        onClick={onShowOnMap}
       >
         {copy.showOnMap}
       </Link>

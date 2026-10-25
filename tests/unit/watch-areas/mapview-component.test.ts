@@ -210,6 +210,28 @@ describe('MapView (MapViewCanvas)', () => {
     expect(maplibre.fitBounds).toHaveBeenCalledWith(initial.bounds, expect.any(Object))
   })
 
+  it('opens on the declarations with fit="declarations" (MV-082); "Keskitä" fits the area', async () => {
+    const user = userEvent.setup()
+    // One 0.002° square starting at the centre, inside an 800 m circle.
+    renderMap({ radiusM: 800, declarationsGeoJSON: declarations([5]), fit: 'declarations' })
+    const initial = maplibre.map.initialViewState as { bounds: [LonLat, LonLat] }
+    expect(initial.bounds).toEqual([
+      [CENTER[0], CENTER[1]],
+      [CENTER[0] + 0.002, CENTER[1] + 0.002],
+    ])
+    expect(maplibre.sources['watch-area']).toBeDefined()
+
+    await user.click(screen.getByRole('button', { name: 'Keskitä vahtialueeseen' }))
+    const [areaBounds] = maplibre.fitBounds.mock.calls[0] as [[LonLat, LonLat]]
+    expect(areaBounds[1][1] - areaBounds[0][1]).toBeCloseTo((2 * 800) / 111_320, 3)
+
+    // Nothing to fit: the watch area again.
+    cleanup()
+    renderMap({ radiusM: 800, fit: 'declarations' })
+    const fallback = maplibre.map.initialViewState as { bounds: [LonLat, LonLat] }
+    expect(fallback.bounds[1][1] - fallback.bounds[0][1]).toBeCloseTo((2 * 800) / 111_320, 3)
+  })
+
   it('draws a given watch-area geometry without a pin, and centres on the point without one', async () => {
     const user = userEvent.setup()
     renderMap({
