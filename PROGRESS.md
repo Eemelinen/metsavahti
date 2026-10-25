@@ -142,6 +142,16 @@ Any coding agent can use it; nothing updates it automatically.
 
 ## Session Log
 
+### Session 077 — 2026-10-25 (interactive: guard exemption for new migrations)
+
+- Harness v0.3.7 added `exceptNewOnBranch` for guard path rules (harness#20, from this project's
+  F-063, which blocked because a loop session could not reorder the `down` of a migration it had
+  generated). The `src/payload/migrations/*` rule now sets it, so a migration file missing on
+  `main` can be edited in the branch that generated it. A new rule before it keeps the `.json`
+  snapshots asking. Migrations already on `main` are guarded as before.
+- AGENTS.md: hand edits are allowed for PostGIS SQL and for the `down` order of a migration the
+  branch generated (D-021), never for snapshots. docs/harness/README.md says the same.
+
 ### Session 076 — 2026-10-25 (driver-run: F-086 re-acceptance banner, attempt 1)
 
 - Goal: MV-086 — `ReacceptanceBanner` compares the account's latest consent-event versions with the published legal documents; soft banner with "Lue muutokset" + "Hyväksyn", blocking modal if `requiresReacceptance`.
