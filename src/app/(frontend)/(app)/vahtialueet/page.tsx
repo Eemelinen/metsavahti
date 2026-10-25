@@ -12,9 +12,11 @@ import { formatSessionTime } from '@/lib/account/sessions'
 import { DEFAULT_TIMEZONE } from '@/lib/account/timezone'
 import { requireUser } from '@/lib/auth/guards'
 import { previewCircle } from '@/lib/geo/buffer'
+import { loadReacceptance } from '@/lib/legal/reacceptance'
 import { mapSources } from '@/lib/map-sources'
 import { formatRadius, loadWatchAreaDashboard } from '@/lib/watch-areas/dashboard'
 
+import { ReacceptanceBanner } from '../reacceptance-banner'
 import { NewWatchAreaButton } from './new-watch-area-button'
 import { type WatchAreaCard, WatchAreaCards } from './watch-area-cards'
 
@@ -28,15 +30,17 @@ export const dynamic = 'force-dynamic'
  * (address and radius, declarations in force, "Uusia: N", last check, e-mail switch, kebab with
  * edit / delete), an overview map of every area, "Uusi vahtialue" (disabled with a tooltip at
  * the plan limit) and the "Tiedot päivitetty" strip from the latest succeeded `pipeline` run,
- * with a warning once that run is stale (MV-083). Without areas the page shows the empty state
- * instead of the cards and the map.
+ * with a warning once that run is stale (MV-083), and above the heading `ReacceptanceBanner` while
+ * the account has not accepted the current terms / privacy versions (MV-086). Without areas the
+ * page shows the empty state instead of the cards and the map.
  */
 export default async function WatchAreasPage() {
   const user = await requireUser({ next: '/vahtialueet' })
-  const { areas, maxWatchAreas, dataUpdatedAt, dataStale } = await loadWatchAreaDashboard(
-    await getPayload({ config }),
-    user,
-  )
+  const payload = await getPayload({ config })
+  const [{ areas, maxWatchAreas, dataUpdatedAt, dataStale }, reacceptance] = await Promise.all([
+    loadWatchAreaDashboard(payload, user),
+    loadReacceptance(payload, user),
+  ])
   const timeZone = user.timezone ?? DEFAULT_TIMEZONE
 
   const cards: WatchAreaCard[] = areas.map((a) => ({
@@ -62,7 +66,7 @@ export default async function WatchAreasPage() {
 
   return (
     <div className="flex w-full max-w-275 flex-col gap-5">
-      {/* MV-086 renders `ReacceptanceBanner` here, above the heading (03-pages.md). */}
+      {reacceptance && <ReacceptanceBanner reacceptance={reacceptance} />}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-forest-700">{copy.title}</h1>

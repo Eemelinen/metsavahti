@@ -1049,6 +1049,19 @@ export const fi = {
         lifetime: (months: number) => `${months} kk`,
       },
     },
+    /** `ReacceptanceBanner` (MV-086) on `/vahtialueet` and `/tili`; no artboard. */
+    reacceptance: {
+      title: 'Käyttöehtoja tai tietosuojaselostetta on päivitetty',
+      softBody: 'Lue muutokset ja vahvista, että hyväksyt ne.',
+      blockingBody: 'Muutokset vaativat hyväksyntäsi ennen kuin voit jatkaa palvelun käyttöä.',
+      readChanges: 'Lue muutokset',
+      hideChanges: 'Piilota muutokset',
+      version: (version: string) => `versio ${version}`,
+      noSummary: 'Lue päivitetty asiakirja kokonaan.',
+      accept: 'Hyväksyn',
+      outdated: 'Asiakirjaa päivitettiin juuri uudelleen. Lue uusin versio ja hyväksy se.',
+      failed: 'Hyväksyntä epäonnistui. Yritä uudelleen.',
+    },
   },
   admin: {
     runPipeline: {
