@@ -1535,7 +1535,7 @@
       "area": "alerts",
       "title": "Reacceptance banner",
       "user_visible_behavior": "`ReacceptanceBanner` compares user's latest `consent_events` versions to published `legal_documents`; soft banner with \"Lue muutokset\" + \"Hyväksyn\"; blocking modal if `requiresReacceptance`.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-035", "F-036", "F-066"],
       "ticket": "MV-086",
       "epic": "E07",
@@ -1545,7 +1545,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/reacceptance-banner.int.test.ts (integration: new version → banner data; accept writes event.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-25 pnpm check → pass (working tree on 65667ac)",
+        "2026-10-25 pnpm test:integration tests/integration/reacceptance-banner.int.test.ts → pass (working tree on 65667ac, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration: new version → banner data; accept writes event."
     },
