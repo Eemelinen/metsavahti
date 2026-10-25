@@ -1,6 +1,8 @@
 import type { Payload } from 'payload'
 
+import { pipelineHealth } from '@/config/pipeline'
 import { planLimits } from '@/config/plans'
+import { visibleAlertsWhere } from '@/lib/alerts/feed'
 import type { LonLat } from '@/lib/geo/crs'
 import { activeDeclarationCounts } from '@/lib/geo/spatial-queries'
 import type { User } from '@/payload-types'
@@ -17,7 +19,7 @@ export type DashboardWatchArea = {
   lastCheckedAt: string | null
   /** Declarations in force inside the area now (`activeDeclarationCounts()`). */
   activeCount: number
-  /** The account's unread alerts of this area (`alerts.readAt IS NULL`, as the nav badge). */
+  /** The account's unread alerts of this area the feed shows (`visibleAlertsWhere()`, as the badge). */
   newCount: number
 }
 
@@ -25,8 +27,10 @@ export type WatchAreaDashboard = {
   areas: DashboardWatchArea[]
   /** The plan's `maxWatchAreas`; "Uusi vahtialue" is disabled once `areas` reaches it. */
   maxWatchAreas: number
-  /** `finishedAt` of the latest succeeded `fetch-declarations` run; null before the first. */
+  /** `finishedAt` of the latest succeeded `pipeline` run; null before the first. */
   dataUpdatedAt: string | null
+  /** That run finished over `pipelineHealth.staleAfterMs` (14 h) ago: at least one run was missed. */
+  dataStale: boolean
 }
 
 /**
@@ -34,7 +38,8 @@ export type WatchAreaDashboard = {
  * last pipeline run"). Areas and alerts are read as the account and filtered on it explicitly:
  * the collections' read access lets an admin see every account's rows, and the app pages are
  * personal. The status strip's run is pipeline-wide, not personal, so `job-runs` (admin-only)
- * is read with `overrideAccess` and only its finish time leaves this function.
+ * is read with `overrideAccess` and only its finish time leaves this function (MV-083: the
+ * last succeeded `pipeline` run, stale after the same 14 h as `/api/health`).
  */
 export async function loadWatchAreaDashboard(
   payload: Payload,
@@ -53,7 +58,7 @@ export async function loadWatchAreaDashboard(
     }),
     payload.find({
       collection: 'alerts',
-      where: { and: [{ user: { equals: user.id } }, { readAt: { exists: false } }] },
+      where: visibleAlertsWhere(user, { unreadOnly: true }),
       select: { watchArea: true },
       depth: 0,
       pagination: false,
@@ -63,7 +68,7 @@ export async function loadWatchAreaDashboard(
     payload.find({
       collection: 'job-runs',
       where: {
-        and: [{ task: { equals: 'fetch-declarations' } }, { status: { equals: 'succeeded' } }],
+        and: [{ task: { equals: 'pipeline' } }, { status: { equals: 'succeeded' } }],
       },
       sort: '-finishedAt',
       select: { finishedAt: true },
@@ -84,6 +89,8 @@ export async function loadWatchAreaDashboard(
     now,
   )
 
+  const dataUpdatedAt = runs[0]?.finishedAt ?? null
+
   return {
     areas: areas.map((a) => ({
       id: a.id,
@@ -97,7 +104,10 @@ export async function loadWatchAreaDashboard(
       newCount: newCounts.get(a.id) ?? 0,
     })),
     maxWatchAreas: planLimits(user.plan).maxWatchAreas,
-    dataUpdatedAt: runs[0]?.finishedAt ?? null,
+    dataUpdatedAt,
+    dataStale:
+      dataUpdatedAt !== null &&
+      now.getTime() - new Date(dataUpdatedAt).getTime() > pipelineHealth.staleAfterMs,
   }
 }
 

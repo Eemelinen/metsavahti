@@ -1,4 +1,5 @@
 import { type PostgresAdapter, sql } from '@payloadcms/db-postgres'
+import { updateTag } from 'next/cache'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -317,7 +318,10 @@ describe('watch-area Server Actions (MV-064)', () => {
     })
 
     signIn(user)
+    vi.mocked(updateTag).mockClear()
     expect(await deleteWatchArea(id)).toEqual({ ok: true, data: { id } })
+    // Its alerts leave the nav badge: the account's cached count expires (MV-083).
+    expect(updateTag).toHaveBeenCalledExactlyOnceWith(`alerts:${user.id}`)
 
     expect(await readArea(id)).toBeNull()
     expect(await count('watch-area-declarations', id)).toBe(0)

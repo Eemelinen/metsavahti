@@ -36,12 +36,16 @@ const sent: SendAlertsResult = {
   alertsGivenUp: 0,
 }
 
-/** A context whose `payload` records the `job_runs` writes `withJobRun()` makes. */
+/**
+ * A context whose `payload` records the `job_runs` writes `withJobRun()` makes; `find` (the
+ * accounts to revalidate the badge of, MV-083) finds no alerts.
+ */
 function fakeContext() {
+  const find = vi.fn(async () => ({ docs: [] }))
   const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }))
   const update = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }))
   const ctx: JobContext = {
-    payload: { create, update } as unknown as Payload,
+    payload: { create, update, find } as unknown as Payload,
     runId: '42',
     logger: logger.child({ test: 'pipeline' }),
     wfs: {} as WfsClient,

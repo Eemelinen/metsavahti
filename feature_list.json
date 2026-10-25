@@ -1,6 +1,6 @@
 {
   "project": "metsavahti",
-  "last_updated": "2026-10-24",
+  "last_updated": "2026-10-25",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1512,7 +1512,7 @@
       "area": "alerts",
       "title": "Dashboard \"Uusia\" badges, status strip and badge revalidation",
       "user_visible_behavior": "Counts on `/vahtialueet` from unread alerts per area; status strip reads `job_runs` (last successful pipeline, stale warning). Nav badge revalidated via `revalidateTag('alerts:userId')` after pipeline run; no websockets in v1.",
-      "status": "not_started",
+      "status": "passing",
       "depends_on": ["F-066", "F-072", "F-074", "F-080"],
       "ticket": "MV-083",
       "epic": "E07",
@@ -1522,7 +1522,10 @@
         "L1: pnpm check",
         "L2: pnpm test:integration tests/integration/dashboard-badges.int.test.ts (integration counts; integration tag invalidation called.)"
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-10-25 pnpm check → pass (working tree on 90b0f07)",
+        "2026-10-25 pnpm test:integration tests/integration/dashboard-badges.int.test.ts → pass (working tree on 90b0f07, Docker available)"
+      ],
       "attempts": 0,
       "notes": "Tests (ticket): integration counts; integration tag invalidation called. Status (ticket): absorbs MV-087 (merged 2026-09-20, ledger P11)."
     },

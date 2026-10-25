@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import { fieldErrorsOf, watchAreaNotificationsSchema } from '@/lib/account/account-schema'
+import { refreshOwnAlertBadge } from '@/lib/alerts/badge'
 import { requireUser } from '@/lib/auth/guards'
 import { type ActionError, type ActionResult, actionResult } from '@/lib/errors'
 import {
@@ -65,12 +66,16 @@ export async function updateWatchArea(
   })
 }
 
-/** Delete one of the account's areas together with its matches and alerts. */
+/**
+ * Delete one of the account's areas together with its matches and alerts; the alerts leave
+ * the nav badge too (MV-083).
+ */
 export async function deleteWatchArea(id: unknown): Promise<ActionResult<{ id: number }>> {
   return actionResult(async () => {
     const areaId = watchAreaIdSchema.parse(id)
     const user = await requireUser()
     await removeWatchArea(await getPayload({ config }), user, areaId)
+    refreshOwnAlertBadge(user)
     return { id: areaId }
   })
 }

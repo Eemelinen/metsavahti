@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import { z } from 'zod'
 
 import config from '@payload-config'
+import { refreshOwnAlertBadge } from '@/lib/alerts/badge'
 import {
   markAlertRead as stampAlertRead,
   markAllAlertsRead as stampAllAlertsRead,
@@ -16,9 +17,10 @@ import { watchAreaIdSchema } from '@/lib/watch-areas/watch-area-schema'
 /**
  * Alert Server Actions (E07 MV-080, MV-082), used by `/ilmoitukset` and `/ilmoitukset/[id]`.
  * The account comes from the session (`requireUser()`); the alert id from the browser is
- * checked against it again in `lib/alerts/unread.ts`. Both refresh the client router, so the
- * nav badge of the `(app)` layout shows the new unread count without a reload (a layout does
- * not re-render on client-side navigation).
+ * checked against it again in `lib/alerts/unread.ts`. Both expire the account's cached badge
+ * count (`refreshOwnAlertBadge()`, MV-083) and refresh the client router, so the nav badge of
+ * the `(app)` layout shows the new unread count without a reload (a layout does not re-render
+ * on client-side navigation).
  */
 
 const alertIdSchema = z.number().int().positive()
@@ -31,6 +33,7 @@ export async function markAlertRead(
     const alertId = alertIdSchema.parse(id)
     const user = await requireUser()
     const result = await stampAlertRead(await getPayload({ config }), user, alertId)
+    refreshOwnAlertBadge(user)
     refresh()
     return result
   })
@@ -46,6 +49,7 @@ export async function markAllAlertsRead(
     const result = await stampAllAlertsRead(await getPayload({ config }), user, {
       watchAreaId: areaId,
     })
+    refreshOwnAlertBadge(user)
     refresh()
     return result
   })
