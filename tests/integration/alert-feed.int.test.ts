@@ -1,5 +1,5 @@
 import { type PostgresAdapter, sql } from '@payloadcms/db-postgres'
-import { refresh } from 'next/cache'
+import { refresh, updateTag } from 'next/cache'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { markAlertRead, markAllAlertsRead } from '@/app/(frontend)/(app)/ilmoitukset/actions'
@@ -16,8 +16,6 @@ import { createTestUser, getTestPayload, resetDatabase } from '../helpers/payloa
 
 // The actions take the account from the session; here the session is whoever the test says.
 vi.mock('@/lib/auth/guards', () => ({ requireUser: vi.fn() }))
-// `refresh()` needs a Next request; the test only checks that the actions ask for it.
-vi.mock('next/cache', () => ({ refresh: vi.fn() }))
 
 const signIn = (user: User | null) =>
   vi.mocked(requireUser).mockImplementation(async () => {
@@ -33,7 +31,8 @@ const CENTER = toWgs84([435050, 6900050])
  * access covers every account), newest first in Finnish-day groups, 50 per page by cursor, with
  * the watch-area filter; `removed` alerts stay hidden while `ALERT_ON_REMOVED` is off (it is
  * off in `.env.test`). `markAlertRead` / `markAllAlertsRead` change only the account's own
- * alerts and refresh the router so the nav badge (`countUnreadAlerts()`) follows.
+ * alerts and refresh the router so the nav badge (`countUnreadAlerts()`) follows, after
+ * expiring its cached count (`alerts:<userId>`, MV-083).
  */
 describe('/ilmoitukset alert feed and actions (MV-080)', () => {
   let admin: User
@@ -116,6 +115,7 @@ describe('/ilmoitukset alert feed and actions (MV-080)', () => {
   beforeEach(async () => {
     vi.mocked(requireUser).mockReset()
     vi.mocked(refresh).mockClear()
+    vi.mocked(updateTag).mockClear()
     await clearAlerts()
   })
 
@@ -240,6 +240,8 @@ describe('/ilmoitukset alert feed and actions (MV-080)', () => {
     const readAt = await readAtOf(annas)
     expect(readAt).not.toBeNull()
     expect(refresh).toHaveBeenCalledTimes(1)
+    // The badge's cached count expires too (MV-083).
+    expect(updateTag).toHaveBeenCalledExactlyOnceWith(`alerts:${anna.id}`)
     expect(await countUnreadAlerts(payload, anna)).toBe(0)
     // Marking again keeps the first time.
     expect(await markAlertRead(annas)).toEqual({ ok: true, data: { id: annas, readAt } })
@@ -273,6 +275,7 @@ describe('/ilmoitukset alert feed and actions (MV-080)', () => {
     expect(await markAllAlertsRead()).toEqual({ ok: true, data: { count: 1 } })
     expect(await readAtOf(atKotitalo)).not.toBeNull()
     expect(refresh).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(updateTag).mock.calls).toEqual([[`alerts:${anna.id}`], [`alerts:${anna.id}`]])
     expect(await countUnreadAlerts(payload, anna)).toBe(0)
     // Neither the hidden removal nor Ben's alert changed.
     expect(await readAtOf(removed)).toBeNull()

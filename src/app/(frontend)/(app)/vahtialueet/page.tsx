@@ -1,4 +1,5 @@
 import type { FeatureCollection, Polygon } from 'geojson'
+import { TriangleAlert } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPayload } from 'payload'
@@ -26,12 +27,13 @@ export const dynamic = 'force-dynamic'
  * `/vahtialueet` (E05 MV-066, App artboard `vahtialueet`): the account's watch areas as cards
  * (address and radius, declarations in force, "Uusia: N", last check, e-mail switch, kebab with
  * edit / delete), an overview map of every area, "Uusi vahtialue" (disabled with a tooltip at
- * the plan limit) and the "Tiedot päivitetty" strip from the latest `fetch-declarations` run.
- * Without areas the page shows the empty state instead of the cards and the map.
+ * the plan limit) and the "Tiedot päivitetty" strip from the latest succeeded `pipeline` run,
+ * with a warning once that run is stale (MV-083). Without areas the page shows the empty state
+ * instead of the cards and the map.
  */
 export default async function WatchAreasPage() {
   const user = await requireUser({ next: '/vahtialueet' })
-  const { areas, maxWatchAreas, dataUpdatedAt } = await loadWatchAreaDashboard(
+  const { areas, maxWatchAreas, dataUpdatedAt, dataStale } = await loadWatchAreaDashboard(
     await getPayload({ config }),
     user,
   )
@@ -69,6 +71,15 @@ export default async function WatchAreasPage() {
               ? copy.dataUpdated(formatSessionTime(dataUpdatedAt, timeZone))
               : copy.dataNotUpdated}
           </p>
+          {dataStale && (
+            <p
+              className="mt-1 flex items-start gap-1.5 text-sm font-medium text-amber-700"
+              data-testid="data-stale"
+            >
+              <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+              {copy.dataStale}
+            </p>
+          )}
         </div>
         <NewWatchAreaButton
           limitReached={areas.length >= maxWatchAreas}

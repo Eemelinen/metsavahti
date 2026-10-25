@@ -453,6 +453,8 @@ export const fi = {
       title: 'Vahtialueet',
       dataUpdated: (at: string) => `Tiedot päivitetty viimeksi ${at} (Metsäkeskus)`,
       dataNotUpdated: 'Metsäkeskuksen tietoja ei ole vielä haettu.',
+      dataStale:
+        'Tietojen haku Metsäkeskuksesta on myöhässä, joten uusimmat ilmoitukset voivat puuttua.',
       newArea: 'Uusi vahtialue',
       limitReached: (max: number) => `Ilmaisella tasolla enintään ${max} vahtialuetta`,
       place: (address: string | null, radius: string) =>

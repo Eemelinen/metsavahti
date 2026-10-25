@@ -19,7 +19,8 @@ const ELSEWHERE = toWgs84([435050, 6950050])
  * MV-066: what `/vahtialueet` reads (`loadWatchAreaDashboard()`) against a real Payload +
  * PostGIS. Only the account's own areas are listed (also for an admin, whose read access covers
  * every account), each with its declarations in force and its unread alerts, plus the finish
- * time of the latest succeeded `fetch-declarations` run for the status strip.
+ * time of the latest succeeded `pipeline` run for the status strip (MV-083; its stale warning
+ * and the hidden `removed` alerts: `dashboard-badges.int.test.ts`).
  */
 describe('/vahtialueet dashboard data (MV-066)', () => {
   let admin: User
@@ -55,8 +56,8 @@ describe('/vahtialueet dashboard data (MV-066)', () => {
   }
 
   async function jobRun(
-    task: 'fetch-declarations' | 'match-watch-areas',
-    status: 'succeeded' | 'failed',
+    task: 'pipeline' | 'fetch-declarations',
+    status: 'succeeded' | 'partial' | 'failed',
     finishedAt: string,
   ) {
     const payload = await getTestPayload()
@@ -169,14 +170,16 @@ describe('/vahtialueet dashboard data (MV-066)', () => {
     )
   })
 
-  it('dates the status strip from the latest succeeded fetch-declarations run', async () => {
+  it('dates the status strip from the latest succeeded pipeline run', async () => {
     const payload = await getTestPayload()
     expect((await loadWatchAreaDashboard(payload, anna, NOW)).dataUpdatedAt).toBeNull()
 
-    await jobRun('fetch-declarations', 'succeeded', '2026-10-23T06:10:00.000Z')
-    await jobRun('fetch-declarations', 'succeeded', '2026-10-24T06:10:00.000Z')
-    await jobRun('fetch-declarations', 'failed', '2026-10-24T18:10:00.000Z')
-    await jobRun('match-watch-areas', 'succeeded', '2026-10-24T18:12:00.000Z')
+    await jobRun('pipeline', 'succeeded', '2026-10-23T06:10:00.000Z')
+    await jobRun('pipeline', 'succeeded', '2026-10-24T06:10:00.000Z')
+    await jobRun('pipeline', 'failed', '2026-10-24T08:10:00.000Z')
+    await jobRun('pipeline', 'partial', '2026-10-24T09:10:00.000Z')
+    // A step's own row is not the pipeline's.
+    await jobRun('fetch-declarations', 'succeeded', '2026-10-24T10:12:00.000Z')
 
     expect((await loadWatchAreaDashboard(payload, anna, NOW)).dataUpdatedAt).toBe(
       '2026-10-24T06:10:00.000Z',

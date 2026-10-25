@@ -3,12 +3,13 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import { AppShell } from '@/components/app-shell/app-shell'
-import { countUnreadAlerts } from '@/lib/alerts/unread'
+import { cachedUnreadAlertCount } from '@/lib/alerts/badge'
 import { getSessionUser } from '@/lib/auth/guards'
 
 /**
  * `(app)` layout (E04 MV-050): sidebar on desktop, bottom tabs on mobile, account menu and the
- * unread-alert badge (`AppShell`).
+ * unread-alert badge (`AppShell`). The badge's count is cached per account under
+ * `alerts:<userId>` (`lib/alerts/badge.ts`, MV-083); what changes it invalidates the tag.
  *
  * No session check here: a layout does not re-render on client-side navigation, so every
  * `(app)` page starts with `requireUser({ next })` (`lib/auth/guards.ts`), which also sends an
@@ -18,7 +19,7 @@ import { getSessionUser } from '@/lib/auth/guards'
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await getSessionUser()
-  const unreadCount = user ? await countUnreadAlerts(await getPayload({ config }), user) : 0
+  const unreadCount = user ? await cachedUnreadAlertCount(await getPayload({ config }), user) : 0
 
   return (
     <AppShell unreadCount={unreadCount} user={user}>

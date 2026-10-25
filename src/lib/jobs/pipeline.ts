@@ -1,5 +1,6 @@
 import { JobCancelledError } from 'payload'
 
+import { revalidateAlertBadges } from '@/lib/alerts/badge'
 import type { JobContext } from '@/lib/jobs/context'
 import {
   type FetchDeclarationsResult,
@@ -53,11 +54,14 @@ type Attempt<T> = { ok: true; output: T } | { ok: false; error: unknown }
  * One `sync-declarations` run (`01 §4`, MV-075): fetch → match → notify in order, under the
  * workflow's `runId`, with a `pipeline` row in `job_runs` summarising the steps. A failed
  * fetch does not stop the run (the cache from earlier runs is still matched and pending
- * alerts still go out); a failed match skips notify. When any step failed, its error is
- * rethrown after the summary is written, so Payload marks the job failed.
+ * alerts still go out); a failed match skips notify. Afterwards the nav badge of every
+ * account that got an alert is revalidated (`alerts:<userId>`, MV-083). When any step failed,
+ * its error is rethrown after the summary is written, so Payload marks the job failed.
  */
 export async function runPipeline(ctx: JobContext, steps: PipelineSteps): Promise<PipelineSummary> {
   const errors: unknown[] = []
+  // Payload stamps `createdAt` with this process's clock; not `ctx.now()`, which tests may fix.
+  const startedAt = new Date()
   async function attempt<T>(step: string, fn: () => Promise<T>): Promise<Attempt<T>> {
     try {
       return { ok: true, output: await fn() }
@@ -96,6 +100,7 @@ export async function runPipeline(ctx: JobContext, steps: PipelineSteps): Promis
     },
     pipelineStatus,
   )
+  await revalidateAlertBadges(ctx.payload, startedAt, ctx.logger)
   if (errors.length > 0) throw errors[0]
   return summary
 }

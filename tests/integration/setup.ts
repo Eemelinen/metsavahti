@@ -1,4 +1,4 @@
-import { inject } from 'vitest'
+import { inject, vi } from 'vitest'
 
 import { assertTestDatabaseUrl } from '../helpers/db-guard'
 
@@ -9,3 +9,6 @@ process.env.SMTP_HOST = 'localhost'
 process.env.SMTP_PORT = String(inject('smtpPort'))
 process.env.MAILPIT_API_URL = inject('mailpitApiUrl')
 process.env.WFS_BASE_URL = 'http://wfs.test/rajapinnat/v1/ows/'
+
+// Every file gets the same `next/cache` mocks (see the helper for why).
+vi.mock('next/cache', () => import('../helpers/next-cache-mock'))
