@@ -85,9 +85,15 @@
       },
       { "match": "src/payload/migrations/index.ts", "decision": "skip" },
       {
+        "match": "src/payload/migrations/*.json",
+        "decision": "ask",
+        "reason": "migration snapshots come from pnpm db:migrate:create and are never hand-edited (docs/DECISIONS.md D-003)"
+      },
+      {
         "match": "src/payload/migrations/*",
         "decision": "ask",
-        "reason": "migrations come from pnpm db:migrate:create; hand edits only for PostGIS SQL (docs/DECISIONS.md D-003)"
+        "reason": "migrations come from pnpm db:migrate:create; hand edits only for PostGIS SQL and the down order of a migration this branch generated (docs/DECISIONS.md D-003, D-021)",
+        "exceptNewOnBranch": true
       },
       {
         "match": "AGENTS.md",

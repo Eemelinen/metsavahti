@@ -46,7 +46,7 @@ Each rule carries a `why:` so it can be revisited when the reason disappears.
 
 - MUST use `pnpm` (never npm/yarn/npx installs). why: lockfile + `packageManager` pin. source: package.json.
 - MUST NOT hand-edit generated files: `src/payload-types.ts`, `src/app/(payload)/admin/importMap.js`, `src/app/(payload)/admin/[[...segments]]/**`, `src/app/(payload)/api/**`. Regenerate with `pnpm generate:types` / `pnpm generate:importmap`. why: overwritten on next generate. source: src/ARCHITECTURE.md.
-- MUST create migrations with `pnpm db:migrate:create <name>`; hand edits only for PostGIS statements. `push: false` stays. why: schema history is the only source of schema. source: docs/DECISIONS.md D-003, D-004.
+- MUST create migrations with `pnpm db:migrate:create <name>`; hand edits only for PostGIS statements and for the `down` order of a migration the branch generated (D-021: Payload's generated `down` drops the table before its `payload_locked_documents_rels` constraint). Never hand-edit the `.json` snapshots. `push: false` stays. why: schema history is the only source of schema. source: docs/DECISIONS.md D-003, D-004.
 - MUST run tests only through `pnpm test:*` (they wrap `dotenv -e .env.test`). MUST NOT run bare `vitest`/`playwright`, point tests at port 5432, or set `ALLOW_TESTS_ON_PORT_5432`. why: protects the dev database. source: tests/helpers/db-guard.ts, docs/DECISIONS.md D-005.
 - MUST read configuration via `env` from `@/lib/env`, never `process.env` in `src/`. why: validated once, fails fast. source: src/lib/env.ts.
 - MUST keep all PostGIS SQL in `src/lib/geo/spatial-queries.ts`. why: Payload does not model geometry; one audited module. source: src/ARCHITECTURE.md.

@@ -42,7 +42,8 @@ repository, never here.
   - In loop sessions, `db:up/down` and `docker compose` are blocked.
   - Edits to `src/payload-types.ts`, the import map and `.env*` are denied.
   - The guard asks before edits to generated Payload routes, migrations and the Next.js marker
-    block in AGENTS.md.
+    block in AGENTS.md. A migration the branch generated itself is exempt (`exceptNewOnBranch`,
+    harness v0.3.7+), so a loop session can fix its `down` order; its `.json` snapshot is not.
 - **Clean-state checks beyond the core.**
   - no `.only`/`.skip` added under `tests/`
   - no coverage threshold removed from `vitest.config.ts`
